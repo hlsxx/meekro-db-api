@@ -17,7 +17,7 @@ DB::$encoding = 'utf8mb4_general_ci';
 switch ($_GET["page"]) {
   case "skladky-vsetky":
     if (isset($_GET["pagination"])) {
-      echo getPaginationData();
+      echo Helper::getPaginationData();
     } else {
       echo json_encode(DB::query("SELECT * FROM ucm_skladky"));
     }

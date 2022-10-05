@@ -1,21 +1,25 @@
 <?php
 
-define("ITEMS_PER_PAGE", 6);
+class Helper {
 
-function getOffset() {
-  return ($_GET["pagination"] - 1) * ITEMS_PER_PAGE;
-}
+  static private int $itemsPerPage = 6;
 
-function getPaginationData() {
-  echo json_encode(
-    DB::query("
-      SELECT 
-        * 
-      FROM ucm_skladky
-      LIMIT %d, %d
-    ", 
-      getOffset(),
-      ITEMS_PER_PAGE
-    )
-  );
+  private static function getOffset() {
+    return ($_GET["pagination"] - 1) * self::$itemsPerPage;
+  }
+
+  public static function getPaginationData() {
+    echo json_encode(
+      DB::query("
+        SELECT 
+          * 
+        FROM ucm_skladky
+        LIMIT %d, %d
+      ", 
+        self::getOffset(),
+        self::$itemsPerPage
+      )
+    );
+  }
+
 }
