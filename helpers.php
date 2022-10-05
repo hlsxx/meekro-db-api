@@ -4,12 +4,18 @@ class Helper {
 
   static private int $itemsPerPage = 6;
 
-  private static function getOffset() {
+  /**
+   * @return INT pagination offset
+   */
+  private static function getOffset() : int {
     return ($_GET["pagination"] - 1) * self::$itemsPerPage;
   }
 
-  public static function getPaginationData() {
-    echo json_encode(
+  /**
+   * @return JSON data from ucm_skladky
+   */
+  public static function getPaginationData() : string {
+    return json_encode(
       DB::query("
         SELECT 
           * 
