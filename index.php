@@ -11,7 +11,7 @@ DB::$encoding = 'utf8mb4_general_ci';
 
 switch ($_GET["page"]) {
   case "skladky-vsetky":
-    echo json_encode(DB::query("SELECT * FROM skladky"));
+    echo json_encode(DB::query("SELECT * FROM ucm_skladky"));
   break;
 }
 
