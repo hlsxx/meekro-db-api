@@ -27,6 +27,8 @@ try {
     case "skladka":
       // Check parameter id
       if (!isset($_GET["id"])) throw new Exception("Unknown ID for skladka");
+      // Check if is number
+      if (!is_numeric($_GET["id"])) throw new Exception("ID for skladka must be type of INT");
 
       echo json_encode(DB::query("SELECT * FROM ucm_skladky WHERE id = %d", $_GET["id"]));
     break;
