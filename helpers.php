@@ -28,4 +28,8 @@ class Helper {
     );
   }
 
+  public static function getCoordinates() {
+    //var_dump(file_get_contents("http://maps.google.com/maps/api/geocode/json?address=svrbice"));
+  }
+
 }
