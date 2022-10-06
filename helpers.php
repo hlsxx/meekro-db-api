@@ -29,7 +29,7 @@ class Helper {
   }
 
   public static function getCoordinates() {
-    //var_dump(file_get_contents("http://maps.google.com/maps/api/geocode/json?address=svrbice"));
+    var_dump(file_get_contents("https://maps.google.com/maps/api/geocode/json?address=svrbice&key=" + API_KEY));
   }
 
 }

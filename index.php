@@ -6,6 +6,7 @@ header('Access-Control-Allow-Headers: Origin, Content-Type, X-Auth-Token');
 
 require_once("vendor/autoload.php");
 require_once("helpers.php");
+require_once("config.php");
 
 DB::$user = 'root';
 DB::$password = '';
