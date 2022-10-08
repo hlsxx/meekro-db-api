@@ -8,6 +8,8 @@ require_once("vendor/autoload.php");
 require_once("helpers.php");
 require_once("config.php");
 
+require_once("lib/SkladkaModel.php");
+
 DB::$user = 'root';
 DB::$password = '';
 DB::$dbName = 'dialite';
@@ -26,15 +28,26 @@ try {
       }
     break;
     case "skladka":
+      // /var_dump(class_exists("SkladkaModel")); exit()
+      //$skladkaModel = new SkladkaModel();
+      //var_dump(1); exit();
       // Check parameter id
       if (!isset($_GET["id"])) throw new Exception("Unknown ID for skladka");
       // Check if is number
       if (!is_numeric($_GET["id"])) throw new Exception("ID for skladka must be type of INT");
 
-      echo json_encode(DB::query("SELECT * FROM ucm_skladky WHERE id = %d", $_GET["id"]));
+      echo json_encode(
+        $skladkaModel->getById($_GET["id"])
+      );
     break;
     case "nahlasit":
       $postData = Helper::getPostData();
+
+      try {
+        $skladkaModel = new SkladkaModel();
+      } catch(Exception $e) {
+
+      }
     break;
   }
 } catch(\Exception $e) {
