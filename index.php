@@ -33,6 +33,9 @@ try {
 
       echo json_encode(DB::query("SELECT * FROM ucm_skladky WHERE id = %d", $_GET["id"]));
     break;
+    case "nahlasit":
+      $postData = Helper::getPostData();
+    break;
   }
 } catch(\Exception $e) {
   echo json_encode([

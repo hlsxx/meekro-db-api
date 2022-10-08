@@ -28,8 +28,11 @@ class Helper {
     );
   }
 
-  public static function getCoordinates() {
-    var_dump(file_get_contents("https://maps.google.com/maps/api/geocode/json?address=svrbice&key=" + API_KEY));
+  /**
+   * @return ARRAY post data
+   */
+  public static function getPostData() {
+    return isset($_POST) ? $_POST : file_get_contents("php://input");
   }
 
 }
