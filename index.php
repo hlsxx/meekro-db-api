@@ -11,6 +11,7 @@ header('Access-Control-Allow-Headers: Origin, Content-Type, X-Auth-Token');
 require_once("vendor/autoload.php");
 require_once("helpers.php");
 require_once("response.php");
+require_once("request.php");
 require_once("config.php");
 
 require_once("lib/Model.php");
@@ -23,27 +24,31 @@ DB::$encoding = 'utf8mb4_general_ci';
 
 try {
   // Check parameter PAGE
-  if (!isset($_GET["page"])) Response::throwException("Unknown page to load");
+  if (!Request::getParam("page")) {
+    Response::throwException("Unknown page to load");
+  }
 
-  switch ($_GET["page"]) {
+  switch (Request::getParam("page")) {
     case "skladky-vsetky":
       $skladkaModel = new SkladkaModel();
 
-      if (isset($_GET["pagination"])) {
-        echo Helper::getPaginationData();
-      } else {
-        echo Response::getJson(
-          $skladkaModel->getAll()
-        );
-      }
+      echo Request::getParam("pagination") 
+        ? Helper::getPaginationData() 
+        : Response::getJson($skladkaModel->getAll())
+      ;
     break;
     case "skladka":
       $skladkaModel = new SkladkaModel();
 
       // Check parameter id
-      if (!isset($_GET["id"])) Response::throwException("Unknown ID for skladka");
+      if (!Request::getParam("id")) {
+        Response::throwException("Unknown ID for skladka");
+      }
+
       // Check if is number
-      if (!is_numeric($_GET["id"])) Response::throwException("ID for skladka must be type of INT");
+      if (!is_numeric(Request::getParam("id"))) {
+        Response::throwException("ID for skladka must be type of INT");
+      }
 
       echo Response::getJson(
         $skladkaModel->getById($_GET["id"])
