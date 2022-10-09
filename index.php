@@ -51,7 +51,7 @@ try {
       }
 
       echo Response::getJson(
-        $skladkaModel->getById(Request::getParam("id"))
+        $skladkaModel->getById((int)Request::getParam("id"))
       );
     break;
     case "nahlasit":
@@ -59,10 +59,12 @@ try {
 
       try {
         $skladkaModel = new SkladkaModel();
-      } catch(Exception $e) {
-        $skladkaModel->insert([
+
+        echo $skladkaModel->insert([
           "nazov" => "xxx"
         ]);
+      } catch(Exception $e) {
+        var_dump($e);
       }
     break;
     default:
