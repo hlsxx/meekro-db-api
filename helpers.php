@@ -20,6 +20,7 @@ class Helper {
         SELECT 
           * 
         FROM ucm_skladky
+        ORDER BY id DESC
         LIMIT %d, %d
       ", 
         self::getOffset(),
