@@ -28,11 +28,4 @@ class Helper {
     );
   }
 
-  /**
-   * @return ARRAY post data
-   */
-  public static function getPostData() {
-    return isset($_POST) ? $_POST : file_get_contents("php://input");
-  }
-
 }

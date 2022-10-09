@@ -23,7 +23,6 @@ DB::$dbName = 'dialite';
 DB::$encoding = 'utf8mb4_general_ci'; 
 
 try {
-  // Check parameter PAGE
   if (!Request::getParam("page")) {
     Response::throwException("Unknown page to load");
   }
@@ -40,12 +39,10 @@ try {
     case "skladka":
       $skladkaModel = new SkladkaModel();
 
-      // Check parameter id
       if (!Request::getParam("id")) {
         Response::throwException("Unknown ID for skladka");
       }
 
-      // Check if is number
       if (!is_numeric(Request::getParam("id"))) {
         Response::throwException("ID for skladka must be type of INT");
       }
@@ -55,16 +52,24 @@ try {
       );
     break;
     case "nahlasit":
-      $postData = Helper::getPostData();
+      $postData = Request::getPostData();
 
       try {
         $skladkaModel = new SkladkaModel();
 
-        var_dump($skladkaModel->insert([
-          "nazov" => "xxx"
-        ]));
+        echo $skladkaModel->insert([
+          "nazov" => "xxx",
+          "okres" => "xxx",
+          "obec" => "xx",
+          "prevadzkovatel" => "Illegal",
+          "sidlo" => "xxx",
+          "rok_zacatia" => Date("Y-m-d"),
+          "typ" => 2,
+          "lat" => $postData["lat"],
+          "lng" => $postData["lng"]
+        ]);
       } catch(Exception $e) {
-        var_dump($e);
+        echo Response::getErrorJson($e);
       }
     break;
     default:

@@ -24,7 +24,9 @@ abstract class Model {
    * @return int created record id
    */
   public function insert(array $dataToInsert) {
-    return DB::insertId($dataToInsert, $this->tableName);
+    DB::insert($this->tableName, $dataToInsert);
+
+    return DB::insertId();
   }
 
 }
