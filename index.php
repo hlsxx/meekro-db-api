@@ -1,5 +1,9 @@
 <?php
 
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
 header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: GET, POST, PATCH, PUT, DELETE, OPTIONS');
 header('Access-Control-Allow-Headers: Origin, Content-Type, X-Auth-Token');
@@ -8,6 +12,7 @@ require_once("vendor/autoload.php");
 require_once("helpers.php");
 require_once("config.php");
 
+require_once("lib/Model.php");
 require_once("lib/SkladkaModel.php");
 
 DB::$user = 'root';
@@ -21,16 +26,19 @@ try {
 
   switch ($_GET["page"]) {
     case "skladky-vsetky":
+      $skladkaModel = new SkladkaModel();
+
       if (isset($_GET["pagination"])) {
         echo Helper::getPaginationData();
       } else {
-        echo json_encode(DB::query("SELECT * FROM ucm_skladky"));
+        echo json_encode(
+          $skladkaModel->getAll()
+        );
       }
     break;
     case "skladka":
-      // /var_dump(class_exists("SkladkaModel")); exit()
-      //$skladkaModel = new SkladkaModel();
-      //var_dump(1); exit();
+      $skladkaModel = new SkladkaModel();
+
       // Check parameter id
       if (!isset($_GET["id"])) throw new Exception("Unknown ID for skladka");
       // Check if is number
@@ -49,6 +57,8 @@ try {
 
       }
     break;
+    default:
+      throw new Exception("Page doesnt exists");
   }
 } catch(\Exception $e) {
   echo json_encode([
