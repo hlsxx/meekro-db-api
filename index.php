@@ -60,9 +60,9 @@ try {
       try {
         $skladkaModel = new SkladkaModel();
 
-        echo $skladkaModel->insert([
+        var_dump($skladkaModel->insert([
           "nazov" => "xxx"
-        ]);
+        ]));
       } catch(Exception $e) {
         var_dump($e);
       }

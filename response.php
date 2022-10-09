@@ -10,7 +10,7 @@ class Response {
     return json_encode($dataToReturn);
   }
 
-   /**
+  /**
    * @param exception $e
    * @return json error 
    */
