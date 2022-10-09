@@ -57,17 +57,18 @@ try {
       try {
         $skladkaModel = new SkladkaModel();
 
-        echo $skladkaModel->insert([
-          "nazov" => "xxx",
-          "okres" => "xxx",
-          "obec" => "xx",
-          "prevadzkovatel" => "Illegal",
-          "sidlo" => "xxx",
-          "rok_zacatia" => Date("Y-m-d"),
-          "typ" => 2,
-          "lat" => $postData["lat"],
-          "lng" => $postData["lng"]
-        ]);
+        echo Response::getJson([
+          "status" => "success",
+          "insertedId" => $skladkaModel->insert([
+            "nazov" => "xxx",
+            "okres" => "xxx",
+            "obec" => "xx",
+            "rok_zacatia" => Date("Y-m-d"),
+            "typ" => 2,
+            "lat" => $postData["lat"],
+            "lng" => $postData["lng"]
+          ])
+        ]);          
       } catch(Exception $e) {
         echo Response::getErrorJson($e);
       }

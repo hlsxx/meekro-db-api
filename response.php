@@ -16,7 +16,7 @@ class Response {
    */
   public static function getErrorJson(Exception $e) {
     return json_encode([
-      "error" => "Error",
+      "status" => "error",
       "message" => $e->getMessage()
     ]);
   } 
