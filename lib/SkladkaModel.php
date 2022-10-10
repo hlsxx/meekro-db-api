@@ -3,11 +3,16 @@
 class SkladkaModel extends Model {
 
   public string $tableName = "ucm_skladky";
+
+  private int $currentLoopSkladkaId;
+  private array $mixedDataImproved;
   
   public function getAll() : array {
     $skladkaTypyCrossModel = new SkladkaTypCrossModel();
     $skladkaTypModel = new SkladkaTypModel();
 
+    $vsetkySkladky = parent::getAll();
+    
     return $this->getSkladkyData(
       DB::query("
         SELECT 
@@ -20,7 +25,8 @@ class SkladkaModel extends Model {
         LEFT JOIN {$skladkaTypModel->tableName} as skladky_typy
           ON skladky_typy.id = skladky_typy_cross.id_skladka_typ
         ORDER BY id DESC"
-      )
+      ),
+      $vsetkySkladky
     );
   }
 
@@ -39,7 +45,6 @@ class SkladkaModel extends Model {
     }
 
     return $this->getSkladkyData(
-      $vsetkySkladky,
       DB::query("
         SELECT 
           skladky.*,
@@ -52,7 +57,8 @@ class SkladkaModel extends Model {
           ON skladky_typy.id = skladky_typy_cross.id_skladka_typ
         WHERE skladky.id IN (".implode(",", $skladkyIds).") 
         ORDER BY id DESC
-      ")
+      "),
+      $vsetkySkladky
     );
   }
 
@@ -60,46 +66,47 @@ class SkladkaModel extends Model {
    * @param array $mixedData
    * @return array skladky data
    */
-  public function getSkladkyData(array $vsetkySkladky, array $mixedData) : array {
+  public function getSkladkyData(array $mixedData, array $vsetkySkladky) : array {
     $skladky = [];
 
     $mixedDataIds = [];
-    $mixedDataImproved = [];
     foreach ($mixedData as $mixedItem) {
       $mixedDataIds[] = $mixedItem["id"];
-      $mixedDataImproved[$mixedItem["id"]] = $mixedItem;
+      $this->mixedDataImproved[$mixedItem["id"]] = $mixedItem;
     }
 
     foreach ($vsetkySkladky as $skladka) {
-      if (in_array($skladka["id"], $mixedDataIds)) {
-        if (!isset($skladky[$skladka["id"]])) {
-          $skladky[$skladka["id"]] = array_merge(
+      $this->currentLoopSkladkaId = $skladka["id"];
+
+      if (in_array($this->currentLoopSkladkaId, $mixedDataIds)) {
+        if (!isset($skladky[$this->currentLoopSkladkaId])) {
+          $skladky[$this->currentLoopSkladkaId] = array_merge(
             [
-              "id" => $this->getMixedDataValue($mixedDataImproved, "id", $skladka["id"]),
-              "okres" => $this->getMixedDataValue($mixedDataImproved, "okres", $skladka["id"]),
-              "nazov" => $this->getMixedDataValue($mixedDataImproved, "nazov", $skladka["id"]),
-              "obec" => $this->getMixedDataValue($mixedDataImproved, "obec", $skladka["id"]),
-              "trieda" => $this->getMixedDataValue($mixedDataImproved, "trieda", $skladka["id"]),
-              "prevadzkovatel" => $this->getMixedDataValue($mixedDataImproved, "prevadzkovatel", $skladka["id"]),
-              "sidlo" => $this->getMixedDataValue($mixedDataImproved, "sidlo", $skladka["id"]),
-              "rok_zacatia" => $this->getMixedDataValue($mixedDataImproved, "rok_zacatia", $skladka["id"]),
-              "typ" => $this->getMixedDataValue($mixedDataImproved, "typ", $skladka["id"]),
-              "pocet_nahlaseni" => $this->getMixedDataValue($mixedDataImproved, "pocet_nahlaseni", $skladka["id"]),
-              "existujuca" => $this->getMixedDataValue($mixedDataImproved, "existujuca", $skladka["id"]),
-              "lat" => $this->getMixedDataValue($mixedDataImproved, "lat", $skladka["id"]),
-              "lng" => $this->getMixedDataValue($mixedDataImproved, "lng", $skladka["id"]),
+              "id" => $this->getMixedDataValue("id"),
+              "okres" => $this->getMixedDataValue("okres"),
+              "nazov" => $this->getMixedDataValue("nazov"),
+              "obec" => $this->getMixedDataValue("obec"),
+              "trieda" => $this->getMixedDataValue("trieda"),
+              "prevadzkovatel" => $this->getMixedDataValue("prevadzkovatel"),
+              "sidlo" => $this->getMixedDataValue("sidlo"),
+              "rok_zacatia" => $this->getMixedDataValue("rok_zacatia"),
+              "typ" => $this->getMixedDataValue("typ"),
+              "pocet_nahlaseni" => $this->getMixedDataValue("pocet_nahlaseni"),
+              "existujuca" => $this->getMixedDataValue("existujuca"),
+              "lat" => $this->getMixedDataValue("lat"),
+              "lng" => $this->getMixedDataValue("lng"),
             ], 
             Helper::getSkladkaTyp(
-              $this->getMixedDataValue($mixedDataImproved, "typ_skladky", $skladka["id"]),
-              $this->getMixedDataValue($mixedDataImproved, "pocet_potvrdeni", $skladka["id"])
+              $this->getMixedDataValue("typ_skladky"),
+              $this->getMixedDataValue("pocet_potvrdeni")
             )
           );
         } else {
           $skladky[$skladka["id"]] = array_merge(
             $skladky[$skladka["id"]],
             Helper::getSkladkaTyp(
-              $this->getMixedDataValue($mixedDataImproved, "typ_skladky", $skladka["id"]),
-              $this->getMixedDataValue($mixedDataImproved, "pocet_potvrdeni", $skladka["id"])
+              $this->getMixedDataValue("typ_skladky"),
+              $this->getMixedDataValue("pocet_potvrdeni")
             )
           );
         }
@@ -111,7 +118,11 @@ class SkladkaModel extends Model {
     return array_values($skladky);
   }
 
-  public function getMixedDataValue(array $mixedDataImproved, string $itemColumn, int $skladkaId) {
-    return $mixedDataImproved[$skladkaId][$itemColumn];
+  /**
+   * @param string $itemColumn
+   * @return string|int|double 
+   */
+  public function getMixedDataValue(string $itemColumn) {
+    return $this->mixedDataImproved[$this->currentLoopSkladkaId][$itemColumn];
   }
 }
