@@ -11,7 +11,8 @@ class SkladkaModel extends Model {
     $mixedData = DB::query("
       SELECT 
         skladky.*,
-        skladky_typy.id as typ_skladky
+        skladky_typy.id as typ_skladky,
+        skladky_typy_cross.pocet_potvrdeni
       FROM {$skladkaTypyCrossModel->tableName} as skladky_typy_cross
       LEFT JOIN {$this->tableName} as skladky
         ON skladky.id = skladky_typy_cross.id_skladka
@@ -23,7 +24,7 @@ class SkladkaModel extends Model {
     $skladky = [];
     foreach ($mixedData as $item) {
       if (!isset($skladky[$item["id"]])) {
-        $skladky[$item["id"]] = [
+        $skladky[$item["id"]] = array_merge([
           "okres" => $item["okres"],
           "nazov" => $item["nazov"],
           "obec" => $item["obec"],
@@ -35,18 +36,13 @@ class SkladkaModel extends Model {
           "pocet_nahlaseni" => $item["pocet_nahlaseni"],
           "existujuca" => $item["existujuca"],
           "lat" => $item["lat"],
-          "lng" => $item["lng"],
-          "bio" => Helper::getSkladkaTyp($item["typ_skladky"], "bio"),
-          "papier" => "",
-          "plast" => "",
-          "olej" => "",
-          "sklo" => "",
-          "elektro" =>"",
-          "zmiesane" => "",
-          "vlastne" => ""
-        ];
+          "lng" => $item["lng"]
+        ], Helper::getSkladkaTyp($item["typ_skladky"], $item["pocet_potvrdeni"]));
       } else {
-        //$skladky[$item["id"]]["typ_skladky"][] = $item["typ_skladky"];
+        $skladky[$item["id"]] = array_merge(
+          $skladky[$item["id"]],
+          Helper::getSkladkaTyp($item["typ_skladky"], $item["pocet_potvrdeni"])
+        );
       }
     }
 

@@ -29,25 +29,38 @@ class Helper {
     );
   }
 
-  public static function getSkladkaTyp(int $typSkladkyCislo, string $typSkladky) {
+  public static function getSkladkaTyp(int $typSkladkyCislo, int $pocetPotvrdeni) {
+    $typ = "";
+
     switch ($typSkladkyCislo) {
       case 1:
-        
+        $typ = "papier";
       break;
       case 2:
+        $typ = "plast";
       break;
       case 3:
+        $typ = "olej";
       break;
       case 4:
+        $typ = "sklo";
       break;
       case 5:
+        $typ = "elektro";
       break;
       case 6:
+        $typ = "zmiesane";
       break;
       case 7:
+        $typ = "vlastne";
       break;
       default:
+        $typ = "zmiesane";
       break;
     }
+
+    return [
+      $typ => $pocetPotvrdeni
+    ];
   }
 }
