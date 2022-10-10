@@ -14,8 +14,11 @@ require_once("response.php");
 require_once("request.php");
 require_once("config.php");
 
+// Models
 require_once("lib/Model.php");
 require_once("lib/SkladkaModel.php");
+require_once("lib/SkladkaTypModel.php");
+require_once("lib/SkladkaTypCrossModel.php");
 
 DB::$user = DB_USER;
 DB::$password = DB_PASSWORD;
