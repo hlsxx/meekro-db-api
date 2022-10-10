@@ -25,6 +25,7 @@ class SkladkaModel extends Model {
     foreach ($mixedData as $item) {
       if (!isset($skladky[$item["id"]])) {
         $skladky[$item["id"]] = array_merge([
+          "id" => $item["id"],
           "okres" => $item["okres"],
           "nazov" => $item["nazov"],
           "obec" => $item["obec"],
