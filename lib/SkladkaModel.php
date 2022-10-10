@@ -46,6 +46,6 @@ class SkladkaModel extends Model {
       }
     }
 
-    return $skladky;
+    return array_values($skladky);
   }
 }
