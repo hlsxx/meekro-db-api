@@ -54,24 +54,22 @@ try {
     case "nahlasit":
       $postData = Request::getPostData();
 
-      try {
-        $skladkaModel = new SkladkaModel();
+      if (empty($postData)) Response::throwException("Data are empty");
 
-        echo Response::getJson([
-          "status" => "success",
-          "insertedId" => $skladkaModel->insert([
-            "nazov" => "xxx",
-            "okres" => "xxx",
-            "obec" => "xx",
-            "rok_zacatia" => Date("Y-m-d"),
-            "typ" => 2,
-            "lat" => $postData["lat"],
-            "lng" => $postData["lng"]
-          ])
-        ]);          
-      } catch(Exception $e) {
-        echo Response::getErrorJson($e);
-      }
+      $skladkaModel = new SkladkaModel();
+
+      echo Response::getJson([
+        "status" => "success",
+        "insertedId" => $skladkaModel->insert([
+          "nazov" => "xxx",
+          "okres" => "xxx",
+          "obec" => "xx",
+          "rok_zacatia" => Date("Y-m-d"),
+          "typ" => 2,
+          "lat" => $postData["lat"],
+          "lng" => $postData["lng"]
+        ])
+      ]);          
     break;
     default:
       Response::throwException("Page doesnt exists");
