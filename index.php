@@ -35,7 +35,7 @@ try {
       $skladkaModel = new SkladkaModel();
 
       echo Request::getParam("pagination") 
-        ? Helper::getPaginationData() 
+        ? Response::getJson($skladkaModel->getPaginationData()) 
         : Response::getJson($skladkaModel->getAll())
       ;
     break;

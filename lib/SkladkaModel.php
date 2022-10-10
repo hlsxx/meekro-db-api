@@ -4,23 +4,54 @@ class SkladkaModel extends Model {
 
   public string $tableName = "ucm_skladky";
   
-  public function getAll() {
+  public function getAll() : array {
     $skladkaTypyCrossModel = new SkladkaTypCrossModel();
     $skladkaTypModel = new SkladkaTypModel();
 
-    $mixedData = DB::query("
-      SELECT 
-        skladky.*,
-        skladky_typy.id as typ_skladky,
-        skladky_typy_cross.pocet_potvrdeni
-      FROM {$skladkaTypyCrossModel->tableName} as skladky_typy_cross
-      LEFT JOIN {$this->tableName} as skladky
-        ON skladky.id = skladky_typy_cross.id_skladka
-      LEFT JOIN {$skladkaTypModel->tableName} as skladky_typy
-        ON skladky_typy.id = skladky_typy_cross.id_skladka_typ
-      ORDER BY id DESC"
+    return $this->getSkladkyData(
+      DB::query("
+        SELECT 
+          skladky.*,
+          skladky_typy.id as typ_skladky,
+          skladky_typy_cross.pocet_potvrdeni
+        FROM {$skladkaTypyCrossModel->tableName} as skladky_typy_cross
+        LEFT JOIN {$this->tableName} as skladky
+          ON skladky.id = skladky_typy_cross.id_skladka
+        LEFT JOIN {$skladkaTypModel->tableName} as skladky_typy
+          ON skladky_typy.id = skladky_typy_cross.id_skladka_typ
+        ORDER BY id DESC"
+      )
     );
+  }
 
+  /**
+   * @return array data from ucm_skladky
+   */
+  public function getPaginationData() : array {
+    $skladkaTypyCrossModel = new SkladkaTypCrossModel();
+    $skladkaTypModel = new SkladkaTypModel();
+
+    return $this->getSkladkyData(
+      DB::query("
+        SELECT 
+          skladky.*,
+          skladky_typy.id as typ_skladky,
+          skladky_typy_cross.pocet_potvrdeni
+        FROM {$skladkaTypyCrossModel->tableName} as skladky_typy_cross
+        LEFT JOIN {$this->tableName} as skladky
+          ON skladky.id = skladky_typy_cross.id_skladka
+        LEFT JOIN {$skladkaTypModel->tableName} as skladky_typy
+          ON skladky_typy.id = skladky_typy_cross.id_skladka_typ
+        ORDER BY id DESC
+        LIMIT %d, %d
+      ", 
+        Helper::getOffset(),
+        Helper::$itemsPerPage
+      )
+    );
+  }
+
+  public function getSkladkyData(array $mixedData) : array {
     $skladky = [];
     foreach ($mixedData as $item) {
       if (!isset($skladky[$item["id"]])) {
