@@ -17,9 +17,9 @@ require_once("config.php");
 require_once("lib/Model.php");
 require_once("lib/SkladkaModel.php");
 
-DB::$user = 'root';
-DB::$password = '';
-DB::$dbName = 'dialite';
+DB::$user = DB_USER;
+DB::$password = DB_PASSWORD;
+DB::$dbName = DB_NAME;
 DB::$encoding = 'utf8mb4_general_ci'; 
 
 try {
