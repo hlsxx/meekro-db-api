@@ -31,6 +31,13 @@ class SkladkaModel extends Model {
     $skladkaTypyCrossModel = new SkladkaTypCrossModel();
     $skladkaTypModel = new SkladkaTypModel();
 
+    $vsetkySkladky = parent::getPaginationData();
+
+    $skladkyIds = [];
+    foreach ($vsetkySkladky as $skladka) {
+      $skladkyIds[] = $skladka["id"];
+    }
+
     return $this->getSkladkyData(
       DB::query("
         SELECT 
@@ -42,12 +49,9 @@ class SkladkaModel extends Model {
           ON skladky.id = skladky_typy_cross.id_skladka
         LEFT JOIN {$skladkaTypModel->tableName} as skladky_typy
           ON skladky_typy.id = skladky_typy_cross.id_skladka_typ
+        WHERE skladky.id IN (".implode(",", $skladkyIds).") 
         ORDER BY id DESC
-        LIMIT %d, %d
-      ", 
-        Helper::getOffset(),
-        Helper::$itemsPerPage
-      )
+      ")
     );
   }
 

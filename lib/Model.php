@@ -12,6 +12,22 @@ abstract class Model {
   }
 
   /**
+   * @return array data
+   */
+  public function getPaginationData() {
+    return  DB::query("
+      SELECT 
+        *
+      FROM {$this->tableName}
+      ORDER BY id DESC
+      LIMIT %d, %d
+    ", 
+      Helper::getOffset(),
+      Helper::$itemsPerPage
+    );
+  }
+
+  /**
    * @param int $id
    * @return array data
    */
