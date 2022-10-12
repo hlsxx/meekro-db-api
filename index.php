@@ -71,9 +71,9 @@ try {
       echo Response::getJson([
         "status" => "success",
         "insertedId" => $skladkaModel->insert([
-          "nazov" => "xxx",
-          "okres" => "xxx",
-          "obec" => "xx",
+          "nazov" => uniqid(),
+          "okres" => "TODO",
+          "obec" => "TODO",
           "rok_zacatia" => Date("Y-m-d"),
           "typ" => 2,
           "lat" => $postData["lat"],
