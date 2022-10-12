@@ -39,6 +39,11 @@ try {
         : Response::getJson($skladkaModel->getAll())
       ;
     break;
+    case "skladky-typy":
+      $skladkaTypModel = new SkladkaTypModel();
+
+      echo Response::getJson($skladkaTypModel->getAll());
+    break;
     case "skladka":
       $skladkaModel = new SkladkaModel();
 
