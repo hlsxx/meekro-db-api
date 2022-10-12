@@ -8,17 +8,17 @@ header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: GET, POST, PATCH, PUT, DELETE, OPTIONS');
 header('Access-Control-Allow-Headers: Origin, Content-Type, X-Auth-Token');
 
-require_once("vendor/autoload.php");
-require_once("helpers.php");
-require_once("response.php");
-require_once("request.php");
-require_once("config.php");
+require_once(__DIR__ . "/vendor/autoload.php");
+require_once(__DIR__ . "/helpers.php");
+require_once(__DIR__ . "/response.php");
+require_once(__DIR__ . "/request.php");
+require_once(__DIR__ . "/config.php");
 
 // Models
-require_once("lib/Model.php");
-require_once("lib/SkladkaModel.php");
-require_once("lib/SkladkaTypModel.php");
-require_once("lib/SkladkaTypCrossModel.php");
+require_once(__DIR__ . "/lib/Model.php");
+require_once(__DIR__ . "/lib/SkladkaModel.php");
+require_once(__DIR__ . "/lib/SkladkaTypModel.php");
+require_once(__DIR__ . "/lib/SkladkaTypCrossModel.php");
 
 DB::$user = DB_USER;
 DB::$password = DB_PASSWORD;
