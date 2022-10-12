@@ -42,7 +42,9 @@ try {
     case "skladky-typy":
       $skladkaTypModel = new SkladkaTypModel();
 
-      echo Response::getJson($skladkaTypModel->getAll());
+      echo Response::getJson(
+        $skladkaTypModel->getAllOrderBy("id", "ASC")
+      );
     break;
     case "skladka":
       $skladkaModel = new SkladkaModel();
