@@ -80,21 +80,34 @@ try {
       $postData = Request::getPostData();
 
       if (empty($postData)) Response::throwException("Data are empty");
+      if ($postData["choosenTypes"] == "") Response::throwException("Type not selected");
 
       $skladkaModel = new SkladkaModel();
 
+      $insertedIdSkladka = $skladkaModel->insert([
+        "nazov" => uniqid(),
+        "okres" => "TODO",
+        "obec" => "TODO",
+        "rok_zacatia" => Date("Y-m-d"),
+        "typ" => 2,
+        "lat" => $postData["lat"],
+        "lng" => $postData["lng"]
+      ]); 
+      
+      $skladkaTypyCrossModel = new SkladkaTypCrossModel();
+
+      $usedTypes = explode(",", $postData["choosenTypes"]);
+      foreach ($usedTypes as $usedType) {
+        $skladkaTypyCrossModel->insert([
+          "id_skladka" => $insertedIdSkladka,
+          "id_skladka_typ" => $usedType
+        ]);
+      }
+
       echo Response::getJson([
         "status" => "success",
-        "insertedId" => $skladkaModel->insert([
-          "nazov" => uniqid(),
-          "okres" => "TODO",
-          "obec" => "TODO",
-          "rok_zacatia" => Date("Y-m-d"),
-          "typ" => 2,
-          "lat" => $postData["lat"],
-          "lng" => $postData["lng"]
-        ])
-      ]);          
+        "insertedId" => $insertedIdSkladka
+      ]);  
     break;
     default:
       Response::throwException("Page doesnt exists");
