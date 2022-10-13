@@ -133,22 +133,26 @@ class SkladkaModel extends Model {
    * @param int $id
    * @return array data
    */
-  public function getByIdComplex(int $id): array {
+  public function getByIdComplex(int $id, int $type = NULL): array {
     $skladkaTypyCrossModel = new SkladkaTypCrossModel();
     $skladkaTypModel = new SkladkaTypModel();
 
-    return DB::query("
-      SELECT 
-        skladky.*,
-        skladky_typy_cross.pocet_potvrdeni,
-        skladky_typy_cross.popis,
-        skladky_typy.nazov as skladka_typ_nazov
-      FROM {$skladkaTypyCrossModel->tableName} as skladky_typy_cross
-      LEFT JOIN {$this->tableName} as skladky
-      ON skladky.id = skladky_typy_cross.id_skladka
-      LEFT JOIN {$skladkaTypModel->tableName} as skladky_typy
-      ON skladky_typy.id = skladky_typy_cross.id_skladka_typ
-      WHERE skladky_typy_cross.id_skladka = %d
-    ", $id);
+    if ($type === 2) {
+      return DB::query("
+        SELECT 
+          skladky.*,
+          skladky_typy_cross.pocet_potvrdeni,
+          skladky_typy_cross.popis,
+          skladky_typy.nazov as skladka_typ_nazov
+        FROM {$skladkaTypyCrossModel->tableName} as skladky_typy_cross
+        LEFT JOIN {$this->tableName} as skladky
+        ON skladky.id = skladky_typy_cross.id_skladka
+        LEFT JOIN {$skladkaTypModel->tableName} as skladky_typy
+        ON skladky_typy.id = skladky_typy_cross.id_skladka_typ
+        WHERE skladky_typy_cross.id_skladka = %d
+      ", $id);
+    } else if ($type === 1) {
+      return parent::getById($id);
+    }
   }
 }

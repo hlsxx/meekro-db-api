@@ -61,12 +61,19 @@ try {
         Response::throwException("Unknown ID for skladka");
       }
 
+      if (!Request::getParam("type")) {
+        Response::throwException("Unknown type for skladka");
+      }
+
       if (!is_numeric(Request::getParam("id"))) {
         Response::throwException("ID for skladka must be type of INT");
       }
 
       echo Response::getJson(
-        $skladkaModel->getByIdComplex((int)Request::getParam("id"))
+        $skladkaModel->getByIdComplex(
+          (int)Request::getParam("id"),
+          (int)Request::getParam("type")
+        )
       );
     break;
     case "nahlasit":
