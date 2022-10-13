@@ -7,6 +7,9 @@ class SkladkaModel extends Model {
   private int $currentLoopSkladkaId;
   private array $mixedDataImproved;
   
+  /**
+   * @return array data from ucm_skladky
+   */
   public function getAllComplex() : array {
     $skladkaTypyCrossModel = new SkladkaTypCrossModel();
     $skladkaTypModel = new SkladkaTypModel();
@@ -31,7 +34,7 @@ class SkladkaModel extends Model {
   }
 
   /**
-   * @return array data from ucm_skladky
+   * @return array data pagination data from ucm_skladky
    */
   public function getPaginationDataComplex() : array {
     $skladkaTypyCrossModel = new SkladkaTypCrossModel();
@@ -124,5 +127,28 @@ class SkladkaModel extends Model {
    */
   public function getMixedDataValue(string $itemColumn) {
     return $this->mixedDataImproved[$this->currentLoopSkladkaId][$itemColumn];
+  }
+
+  /**
+   * @param int $id
+   * @return array data
+   */
+  public function getByIdComplex(int $id): array {
+    $skladkaTypyCrossModel = new SkladkaTypCrossModel();
+    $skladkaTypModel = new SkladkaTypModel();
+
+    return DB::query("
+      SELECT 
+        skladky.*,
+        skladky_typy_cross.pocet_potvrdeni,
+        skladky_typy_cross.popis,
+        skladky_typy.nazov as skladka_typ_nazov
+      FROM {$skladkaTypyCrossModel->tableName} as skladky_typy_cross
+      LEFT JOIN {$this->tableName} as skladky
+      ON skladky.id = skladky_typy_cross.id_skladka
+      LEFT JOIN {$skladkaTypModel->tableName} as skladky_typy
+      ON skladky_typy.id = skladky_typy_cross.id_skladka_typ
+      WHERE skladky_typy_cross.id_skladka = %d
+    ", $id);
   }
 }

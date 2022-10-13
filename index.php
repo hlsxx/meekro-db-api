@@ -66,7 +66,7 @@ try {
       }
 
       echo Response::getJson(
-        $skladkaModel->getById((int)Request::getParam("id"))
+        $skladkaModel->getByIdComplex((int)Request::getParam("id"))
       );
     break;
     case "nahlasit":
