@@ -7,7 +7,7 @@ class SkladkaModel extends Model {
   private int $currentLoopSkladkaId;
   private array $mixedDataImproved;
   
-  public function getAll() : array {
+  public function getAllComplex() : array {
     $skladkaTypyCrossModel = new SkladkaTypCrossModel();
     $skladkaTypModel = new SkladkaTypModel();
 
@@ -33,7 +33,7 @@ class SkladkaModel extends Model {
   /**
    * @return array data from ucm_skladky
    */
-  public function getPaginationData() : array {
+  public function getPaginationDataComplex() : array {
     $skladkaTypyCrossModel = new SkladkaTypCrossModel();
     $skladkaTypModel = new SkladkaTypModel();
 

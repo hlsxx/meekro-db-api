@@ -35,6 +35,14 @@ try {
       $skladkaModel = new SkladkaModel();
 
       echo Request::getParam("pagination") 
+        ? Response::getJson($skladkaModel->getPaginationDataComplex()) 
+        : Response::getJson($skladkaModel->getAllComplex())
+      ;
+    break;
+    case "skladky-vsetky-simple":
+      $skladkaModel = new SkladkaModel();
+
+      echo Request::getParam("pagination") 
         ? Response::getJson($skladkaModel->getPaginationData()) 
         : Response::getJson($skladkaModel->getAll())
       ;
