@@ -89,9 +89,9 @@ try {
         "okres" => "TODO",
         "obec" => "TODO",
         "rok_zacatia" => Date("Y-m-d"),
-        "typ" => 2,
-        "lat" => $postData["lat"],
-        "lng" => $postData["lng"]
+        "typ" => SkladkaTypModel::$types["nelegalna"],
+        "lat" => (int)$postData["lat"],
+        "lng" => (int)$postData["lng"]
       ]); 
       
       $skladkaTypyCrossModel = new SkladkaTypCrossModel();
