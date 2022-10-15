@@ -42,10 +42,24 @@ try {
     case "skladky-vsetky-simple":
       $skladkaModel = new SkladkaModel();
 
-      echo Request::getParam("pagination") 
-        ? Response::getJson($skladkaModel->getPaginationData()) 
-        : Response::getJson($skladkaModel->getAll())
-      ;
+      // POST data for FILTERING
+      $postData = Request::getPostData();
+
+      if (isset($postData["filter"])) {
+        echo Request::getParam("pagination") 
+          ? Response::getJson($skladkaModel->getPaginationDataFiltered(
+              json_decode($postData["filter"], TRUE)
+            )) 
+          : Response::getJson($skladkaModel->getAllFiltered(
+              json_decode($postData["filter"], TRUE)
+            ))
+        ;
+      } else {
+        echo Request::getParam("pagination") 
+          ? Response::getJson($skladkaModel->getPaginationData()) 
+          : Response::getJson($skladkaModel->getAll())
+        ;
+      }
     break;
     case "skladky-typy":
       $skladkaTypModel = new SkladkaTypModel();

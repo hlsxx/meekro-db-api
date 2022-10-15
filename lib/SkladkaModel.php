@@ -66,6 +66,33 @@ class SkladkaModel extends Model {
   }
 
   /**
+   * @param array $filterData FILTER data
+   * @return array data pagination data from ucm_skladky FILTERED
+   */
+  public function getPaginationDataFiltered(array $filterData): array {
+    $skladkaTypyCrossModel = new SkladkaTypCrossModel();
+    $skladkaTypModel = new SkladkaTypModel();
+
+    return DB::query(
+      "SELECT 
+        skladky.*,
+        skladky_typy.id as typ_skladky,
+        skladky_typy_cross.pocet_potvrdeni
+      FROM {$skladkaTypyCrossModel->tableName} as skladky_typy_cross
+      LEFT JOIN {$this->tableName} as skladky
+        ON skladky.id = skladky_typy_cross.id_skladka
+      LEFT JOIN {$skladkaTypModel->tableName} as skladky_typy
+        ON skladky_typy.id = skladky_typy_cross.id_skladka_typ
+      WHERE skladky.typ = %d
+      ORDER BY id DESC
+      LIMIT %d, %d",
+      (int)$filterData["type"],
+      Helper::getOffset(),
+      Helper::$itemsPerPage
+    );
+  }
+
+  /**
    * @param array $mixedData
    * @return array skladky data
    */
@@ -100,16 +127,16 @@ class SkladkaModel extends Model {
               "lng" => $this->getMixedDataValue("lng"),
             ], 
             Helper::getSkladkaTyp(
-              $this->getMixedDataValue("typ_skladky"),
-              $this->getMixedDataValue("pocet_potvrdeni")
+              (int)$this->getMixedDataValue("typ_skladky"),
+              (int)$this->getMixedDataValue("pocet_potvrdeni")
             )
           );
         } else {
           $skladky[$skladka["id"]] = array_merge(
             $skladky[$skladka["id"]],
             Helper::getSkladkaTyp(
-              $this->getMixedDataValue("typ_skladky"),
-              $this->getMixedDataValue("pocet_potvrdeni")
+              (int)$this->getMixedDataValue("typ_skladky"),
+              (int)$this->getMixedDataValue("pocet_potvrdeni")
             )
           );
         }
