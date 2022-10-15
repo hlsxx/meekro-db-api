@@ -70,7 +70,8 @@ class SkladkaModel extends Model {
    * @return array data pagination data from ucm_skladky FILTERED
    */
   public function getPaginationDataFiltered(array $filterData): array {
-    return DB::query(
+
+    $data = DB::query(
       "SELECT 
         *
       FROM {$this->tableName}
@@ -82,6 +83,25 @@ class SkladkaModel extends Model {
       Helper::getOffset(),
       Helper::$itemsPerPage
     );
+
+    $filterDataByDistance = [];
+    if ($filterData["gpsEnabled"] === true && (int)$filterData["filterBy"] == 2 && (int)$filterData["distance"] > 0) {
+      foreach ($data as $skladka) {
+        $distance = Helper::getDistanceFromLatLonInKm(
+          (int)$filterData["lat"],
+          (int)$filterData["lng"],
+          (int)$skladka["lat"], 
+          (int)$skladka["lng"]
+        );
+
+        // Check distance from FILTERED value
+        if ($distance <= (int)$filterData["distance"]) {
+          $filterDataByDistance[] = $skladka;
+        }
+      }
+    }
+
+    return empty($filterDataByDistance) ? $data : $filterDataByDistance;
   }
 
   /**
