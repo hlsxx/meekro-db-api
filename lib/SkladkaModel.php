@@ -70,23 +70,15 @@ class SkladkaModel extends Model {
    * @return array data pagination data from ucm_skladky FILTERED
    */
   public function getPaginationDataFiltered(array $filterData): array {
-    $skladkaTypyCrossModel = new SkladkaTypCrossModel();
-    $skladkaTypModel = new SkladkaTypModel();
-
     return DB::query(
       "SELECT 
-        skladky.*,
-        skladky_typy.id as typ_skladky,
-        skladky_typy_cross.pocet_potvrdeni
-      FROM {$skladkaTypyCrossModel->tableName} as skladky_typy_cross
-      LEFT JOIN {$this->tableName} as skladky
-        ON skladky.id = skladky_typy_cross.id_skladka
-      LEFT JOIN {$skladkaTypModel->tableName} as skladky_typy
-        ON skladky_typy.id = skladky_typy_cross.id_skladka_typ
-      WHERE skladky.typ = %d
+        *
+      FROM {$this->tableName}
+      WHERE {$this->tableName}.typ IN (%d, %d)
       ORDER BY id DESC
       LIMIT %d, %d",
-      (int)$filterData["type"],
+      !in_array((int)$filterData["type"], [1, 2]) ? 1 : (int)$filterData["type"],
+      !in_array((int)$filterData["type"], [1, 2]) ? 2 : (int)$filterData["type"],
       Helper::getOffset(),
       Helper::$itemsPerPage
     );
@@ -146,6 +138,22 @@ class SkladkaModel extends Model {
     }
 
     return array_values($skladky);
+  }
+
+  /**
+   * @param array $filterData FILTER data
+   * @return array all data from ucm_skladky FILTERED
+   */
+  public function getAllFiltered(array $filterData): array {
+    return DB::query(
+      "SELECT 
+        *
+      FROM {$this->tableName}
+      WHERE {$this->tableName}.typ IN (%d, %d)
+      ORDER BY id DESC",
+      !in_array((int)$filterData["type"], [1, 2]) ? 1 : (int)$filterData["type"],
+      !in_array((int)$filterData["type"], [1, 2]) ? 2 : (int)$filterData["type"]
+    );
   }
 
   /**
