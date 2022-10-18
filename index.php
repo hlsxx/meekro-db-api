@@ -45,8 +45,9 @@ try {
       // POST data for FILTERING
       $postData = Request::getPostData();
 
+      $data = [];
       if (isset($postData["filter"])) {
-        echo Request::getParam("pagination") 
+        $data = Request::getParam("pagination") 
           ? Response::getJson($skladkaModel->getPaginationDataFiltered(
               json_decode($postData["filter"], TRUE)
             )) 
@@ -55,11 +56,16 @@ try {
             ))
         ;
       } else {
-        echo Request::getParam("pagination") 
+        $data = Request::getParam("pagination") 
           ? Response::getJson($skladkaModel->getPaginationData()) 
           : Response::getJson($skladkaModel->getAll())
         ;
       }
+
+      echo Response::getJson([
+        "status" => "success",
+        "data" => $data
+      ]); 
     break;
     case "skladky-typy":
       $skladkaTypModel = new SkladkaTypModel();
