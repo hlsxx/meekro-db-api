@@ -26,14 +26,20 @@ DB::$password = DB_PASSWORD;
 DB::$dbName = DB_NAME;
 DB::$encoding = 'utf8mb4_general_ci'; 
 
-try {
-  $log = new Monolog\Logger('MeekroAPI-Log-System');
-  $log->pushHandler(
-    new Monolog\Handler\StreamHandler(__DIR__ . '/logs/info.log', 200)
-  );
+// Logs
+$logInfo = new Monolog\Logger('MeekroAPI-Log-System');
+$logInfo->pushHandler(
+  new Monolog\Handler\StreamHandler(__DIR__ . '/logs/info.log', Monolog\Logger::INFO)
+);
 
-  $log->warning('Foo');
-  $log->error('Bar');
+$logError = new Monolog\Logger('MeekroAPI-Log-System');
+$logError->pushHandler(
+  new Monolog\Handler\StreamHandler(__DIR__ . '/logs/error.log', Monolog\Logger::ERROR)
+);
+
+try {
+
+  $logInfo->info("REQUEST from {$_SERVER['REMOTE_ADDR']}");
 
   if (!Request::getParam("page")) {
     Response::throwException("Unknown page to load");
@@ -146,6 +152,7 @@ try {
     break;
   }
 } catch(\Exception $e) {
+  $logError->error($e->getMessage());
   echo Response::getErrorJson($e);
 }
 

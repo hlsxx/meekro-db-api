@@ -11,6 +11,14 @@ class Response {
   }
 
   /**
+   * @param array $dataToReturn
+   * @return json data
+   */
+  public static function get(array $dataToReturn) {
+    return json_encode($dataToReturn);
+  }
+
+  /**
    * @param exception $e
    * @return json error 
    */
