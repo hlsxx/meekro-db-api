@@ -94,7 +94,10 @@ try {
       $postData = Request::getPostData();
 
       if (empty($postData)) Response::throwException("Data are empty");
-      if ($postData["choosenTypes"] == "") Response::throwException("Type not selected");
+      if (!isset($postData["choosenTypes"])) Response::throwException("Choosen types do not exits");
+      if ($postData["choosenTypes"] == "") Response::throwException("Choosen Types are empty");
+      if (!isset($postData["lat"])) Response::throwException("Lat not set");
+      if (!isset($postData["lng"])) Response::throwException("Lng not set");
 
       $skladkaModel = new SkladkaModel();
 
@@ -103,9 +106,9 @@ try {
         "okres" => "TODO",
         "obec" => "TODO",
         "rok_zacatia" => Date("Y-m-d"),
-        "typ" => SkladkaTypModel::$types["nelegalna"],
-        "lat" => (int)$postData["lat"],
-        "lng" => (int)$postData["lng"]
+        "typ" => 2,
+        "lat" => (float)$postData["lat"],
+        "lng" => (float)$postData["lng"]
       ]); 
       
       $skladkaTypyCrossModel = new SkladkaTypCrossModel();

@@ -14,7 +14,11 @@ class Request {
    * @return array post data
    */
   public static function getPostData() {
-    return isset($_POST) && !empty($_POST) ? $_POST : file_get_contents("php://input");
+    return 
+      isset($_POST) && !empty($_POST) 
+      ? $_POST 
+      : json_decode(file_get_contents("php://input"), TRUE)
+    ;
   }
 
 }
