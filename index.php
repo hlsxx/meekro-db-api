@@ -48,17 +48,17 @@ try {
       $data = [];
       if (isset($postData["filter"])) {
         $data = Request::getParam("pagination") 
-          ? Response::getJson($skladkaModel->getPaginationDataFiltered(
+          ? $skladkaModel->getPaginationDataFiltered(
               json_decode($postData["filter"], TRUE)
-            )) 
-          : Response::getJson($skladkaModel->getAllFiltered(
+            )
+          : $skladkaModel->getAllFiltered(
               json_decode($postData["filter"], TRUE)
-            ))
+            )
         ;
       } else {
         $data = Request::getParam("pagination") 
-          ? Response::getJson($skladkaModel->getPaginationData()) 
-          : Response::getJson($skladkaModel->getAll())
+          ? $skladkaModel->getPaginationData()
+          : $skladkaModel->getAll()
         ;
       }
 
