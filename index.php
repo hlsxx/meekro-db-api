@@ -8,6 +8,7 @@ header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: GET, POST, PATCH, PUT, DELETE, OPTIONS');
 header('Access-Control-Allow-Headers: Origin, Content-Type, X-Auth-Token');
 
+// Common
 require_once(__DIR__ . "/vendor/autoload.php");
 require_once(__DIR__ . "/helpers.php");
 require_once(__DIR__ . "/response.php");
@@ -26,6 +27,14 @@ DB::$dbName = DB_NAME;
 DB::$encoding = 'utf8mb4_general_ci'; 
 
 try {
+  $log = new Monolog\Logger('MeekroAPI-Log-System');
+  $log->pushHandler(
+    new Monolog\Handler\StreamHandler(__DIR__ . '/logs/info.log', 200)
+  );
+
+  $log->warning('Foo');
+  $log->error('Bar');
+
   if (!Request::getParam("page")) {
     Response::throwException("Unknown page to load");
   }

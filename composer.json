@@ -1,5 +1,6 @@
 {
     "require": {
-        "sergeytsalkov/meekrodb": "^2.4"
+        "sergeytsalkov/meekrodb": "^2.4",
+        "monolog/monolog": "^2.8"
     }
 }
