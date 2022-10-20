@@ -217,7 +217,7 @@ class SkladkaModel extends Model {
    * @return array data
    */
   public function getByCoors(float $lat, float $lng): array {
-    return DB::query("SELECT * FROM {$this->tableName} WHERE lat = %d AND lng = %d", $lat, $lng);
+    return DB::queryFirstRow("SELECT * FROM {$this->tableName} WHERE lat = %d AND lng = %d", $lat, $lng);
   }
 
   /**
