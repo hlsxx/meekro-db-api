@@ -210,4 +210,25 @@ class SkladkaModel extends Model {
       return parent::getById($id);
     }
   }
+
+  /**
+   * @param float $lat
+   * @param float $lng
+   * @return array data
+   */
+  public function getByCoors(float $lat, float $lng): array {
+    return DB::query("SELECT * FROM {$this->tableName} WHERE lat = %d AND lng = %d", $lat, $lng);
+  }
+
+  /**
+   * @param float $lat
+   * @param float $lng
+   * @return array data
+   */
+  public function getByCoorsComplex(float $lat, float $lng): array {
+    $skladkaTypyCrossModel = new SkladkaTypCrossModel();
+    $skladkaTypModel = new SkladkaTypModel();
+
+    return $this->getByCoors($lat, $lng);
+  }
 }

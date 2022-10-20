@@ -111,6 +111,27 @@ try {
         )
       );
     break;
+    case "skladka-by-coors":
+      $skladkaModel = new SkladkaModel();
+
+      $postData = Request::getPostData();
+
+      if (!isset($postData["lat"]) || empty($postData["lat"])) {
+        Response::throwException("Param: lat does not exists or is empty");
+      }
+
+      if (!isset($postData["lng"]) || empty($postData["lng"])) {
+        Response::throwException("Param: lng does not exists or is empty");
+      }
+
+      echo Response::getJson([
+        "status" => "success",
+        "data" => $skladkaModel->getByCoorsComplex(
+          (float)$postData["lat"],
+          (float)$postData["lng"]
+        )
+      ]);
+    break;
     case "nahlasit":
       $postData = Request::getPostData();
 
