@@ -39,7 +39,7 @@ abstract class Model {
    * @return array data
    */
   public function getById(int $id) : array {
-    return DB::query("SELECT * FROM {$this->tableName} WHERE id = %d", $id);
+    return DB::queryFirstRow("SELECT * FROM {$this->tableName} WHERE id = %d", $id);
   }
 
   /**

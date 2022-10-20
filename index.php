@@ -104,12 +104,13 @@ try {
         Response::throwException("ID for skladka must be type of INT");
       }
 
-      echo Response::getJson(
-        $skladkaModel->getByIdComplex(
+      echo Response::getJson([
+        "status" => "success",
+        "data" => $skladkaModel->getByIdComplex(
           (int)Request::getParam("id"),
           (int)Request::getParam("type")
         )
-      );
+      ]);
     break;
     case "skladka-by-coors":
       $skladkaModel = new SkladkaModel();
@@ -136,8 +137,8 @@ try {
       $postData = Request::getPostData();
 
       if (empty($postData)) Response::throwException("Data are empty");
-      if (!isset($postData["choosenTypes"])) Response::throwException("Choosen types do not exits");
-      if ($postData["choosenTypes"] == "") Response::throwException("Choosen Types are empty");
+      if (!isset($postData["choosenTypes"])) Response::throwException("Error: Parameter choosenTypes je prazdny");
+      if ($postData["choosenTypes"] == "") Response::throwException("Vyberte typ");
       if (!isset($postData["lat"])) Response::throwException("Lat not set");
       if (!isset($postData["lng"])) Response::throwException("Lng not set");
 

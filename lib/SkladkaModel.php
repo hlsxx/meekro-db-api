@@ -193,7 +193,7 @@ class SkladkaModel extends Model {
     $skladkaTypModel = new SkladkaTypModel();
 
     if ($type === 2) {
-      return DB::query("
+      return DB::queryFirstRow("
         SELECT 
           skladky.*,
           skladky_typy_cross.pocet_potvrdeni,
