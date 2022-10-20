@@ -11,6 +11,18 @@ class Response {
   }
 
   /**
+   * @param array|string $dataToReturn
+   * @return array data
+   */
+  public static function getArray($dataToReturn) {
+    return 
+      is_string($dataToReturn)
+      ? json_decode($dataToReturn, TRUE)
+      : (array)$dataToReturn
+    ;
+  }
+
+  /**
    * @param array $dataToReturn
    * @return json data
    */

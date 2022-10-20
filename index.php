@@ -64,10 +64,10 @@ try {
       if (isset($postData["filter"])) {
         $data = Request::getParam("pagination") 
           ? $skladkaModel->getPaginationDataFiltered(
-              json_decode($postData["filter"], TRUE)
+              Response::getArray($postData["filter"])
             )
           : $skladkaModel->getAllFiltered(
-              json_decode($postData["filter"], TRUE)
+              Response::getArray($postData["filter"])
             )
         ;
       } else {
