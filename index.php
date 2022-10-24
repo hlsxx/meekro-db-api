@@ -20,6 +20,7 @@ require_once(__DIR__ . "/lib/Model.php");
 require_once(__DIR__ . "/lib/SkladkaModel.php");
 require_once(__DIR__ . "/lib/SkladkaTypModel.php");
 require_once(__DIR__ . "/lib/SkladkaTypCrossModel.php");
+require_once(__DIR__ . "/lib/UnknownUserModel.php");
 
 DB::$user = DB_USER;
 DB::$password = DB_PASSWORD;
@@ -187,9 +188,24 @@ try {
         "status" => "success"
       ]);  
     break;
+    case "vygeneruj-uid":
+      $unknownUserModel = new UnknownUser();
+
+      $insertedUnknownUserId = $unknownUserModel->insert([
+        "uid" => uniqid()
+      ]);
+
+      $unknownUser = $unknownUserModel->getById($insertedUnknownUserId);
+
+      echo Response::getJson([
+        "status" => "success",
+        "unknownUserUID" => $unknownUser["uid"]
+      ]); 
+    break;
     default:
       Response::throwException("Page doesnt exists");
     break;
+
   }
 } catch(\Exception $e) {
   $logError->error($e->getMessage());
