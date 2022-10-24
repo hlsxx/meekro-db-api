@@ -145,10 +145,12 @@ try {
 
       $skladkaModel = new SkladkaModel();
 
+      $uniqueId = uniqid();
+
       $insertedIdSkladka = $skladkaModel->insert([
-        "nazov" => uniqid(),
-        "okres" => "TODO",
-        "obec" => "TODO",
+        "nazov" => "{$uniqueId}_nazov",
+        "okres" => "{$uniqueId}_okres",
+        "obec" => "{$uniqueId}_obec",
         "rok_zacatia" => Date("Y-m-d"),
         "typ" => 2,
         "lat" => (float)$postData["lat"],
@@ -181,12 +183,31 @@ try {
       $currentSkladka = $skladkaModel->getById($idSkladka);
       
       $skladkaModel->update([
-        "pocet_nahlaseni" => $currentSkladka["pocet_nahlaseni"] + 1
+        "pocet_nahlaseni" => (int)$currentSkladka["pocet_nahlaseni"] + 1
       ], $idSkladka);
 
       echo Response::getJson([
         "status" => "success"
       ]);  
+    break;
+    case "potvrdit-skladku-typy":
+      $postData = Request::getPostData();
+
+      $skladkyTypCrossModel = new SkladkaTypCrossModel();
+
+      $idSkladka = (int)$postData["idSkladka"];
+      $choosenTypes = $postData["choosenTypes"];
+
+      $usedTypes = explode(",", $choosenTypes);
+      foreach ($usedTypes as $usedType) {
+        $skladkaTypCross = $skladkyTypCrossModel->getById($usedType["id"]);
+
+        $skladkaTypyCrossModel->update([
+          "id_skladka" => $idSkladka,
+          "id_skladka_typ" => $usedType,
+          "pocet_potvrdeni" => (int)$skladkaTypCross["pocet_potvrdeni"] + 1
+        ]);
+      }
     break;
     case "vygeneruj-uid":
       $unknownUserModel = new UnknownUser();
