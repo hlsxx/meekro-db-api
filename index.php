@@ -169,6 +169,24 @@ try {
         "insertedId" => $insertedIdSkladka
       ]);  
     break;
+    case "potvrdit":
+      $postData = Request::getPostData();
+
+      //$deviceUID = $postData["uid"];
+      $idSkladka = (int)$postData["idSkladka"];
+
+      $skladkaModel = new SkladkaModel(); 
+
+      $currentSkladka = $skladkaModel->getById($idSkladka);
+      
+      $skladkaModel->update([
+        "pocet_nahlaseni" => $currentSkladka["pocet_nahlaseni"] + 1
+      ], $idSkladka);
+
+      echo Response::getJson([
+        "status" => "success"
+      ]);  
+    break;
     default:
       Response::throwException("Page doesnt exists");
     break;

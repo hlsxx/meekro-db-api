@@ -52,4 +52,17 @@ abstract class Model {
     return DB::insertId();
   }
 
+  /**
+   * @param array $data
+   * @param int $id
+   */
+  public function update(array $data, int $id) {
+    return DB::update(
+      $this->tableName, 
+      $data, 
+      "id = %i",
+      $id
+    );
+  }
+
 }
