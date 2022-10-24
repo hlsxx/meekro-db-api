@@ -163,7 +163,8 @@ try {
       foreach ($usedTypes as $usedType) {
         $skladkaTypyCrossModel->insert([
           "id_skladka" => $insertedIdSkladka,
-          "id_skladka_typ" => $usedType
+          "id_skladka_typ" => $usedType,
+          "pocet_potvrdeni" => 1
         ]);
       }
 
@@ -193,21 +194,42 @@ try {
     case "potvrdit-skladku-typy":
       $postData = Request::getPostData();
 
-      $skladkyTypCrossModel = new SkladkaTypCrossModel();
+      $skladkaTypCrossModel = new SkladkaTypCrossModel();
 
-      $idSkladka = (int)$postData["idSkladka"];
+      $idSkladka = $postData["idSkladka"];
       $choosenTypes = $postData["choosenTypes"];
 
       $usedTypes = explode(",", $choosenTypes);
-      foreach ($usedTypes as $usedType) {
-        $skladkaTypCross = $skladkyTypCrossModel->getById($usedType["id"]);
 
-        $skladkaTypyCrossModel->update([
-          "id_skladka" => $idSkladka,
-          "id_skladka_typ" => $usedType,
-          "pocet_potvrdeni" => (int)$skladkaTypCross["pocet_potvrdeni"] + 1
-        ]);
+      $newTypesAdded = [];
+      foreach ($usedTypes as $usedType) {
+        $skladkaTypCrossData = DB::queryFirstRow("
+          SELECT 
+            * 
+          FROM {$skladkaTypCrossModel->tableName} 
+          WHERE id_skladka = %i AND id_skladka_typ = %i
+        ", (int)$idSkladka, (int)$usedType);
+
+        // If type doesnt exists just add him, else update pocet_potvrdeni
+        if ($skladkaTypCrossData === NULL) {
+          $insertedType = $skladkaTypCrossModel->insert([
+            "id_skladka" => (int)$idSkladka,
+            "id_skladka_typ" => (int)$usedType,
+            "pocet_potvrdeni" => 1
+          ]);
+
+          $newTypesAdded[] = (int)$usedType;
+        } else {
+          $skladkaTypCrossModel->update([
+            "pocet_potvrdeni" => (int)$skladkaTypCrossData["pocet_potvrdeni"] + 1
+          ], (int)$skladkaTypCrossData["id"]);
+        }
       }
+
+      echo Response::getJson([
+        "status" => "success",
+        "new_types" => Response::getJson($newTypesAdded)
+      ]); 
     break;
     case "vygeneruj-uid":
       $unknownUserModel = new UnknownUser();
