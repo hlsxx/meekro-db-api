@@ -21,6 +21,7 @@ require_once(__DIR__ . "/lib/SkladkaModel.php");
 require_once(__DIR__ . "/lib/SkladkaTypModel.php");
 require_once(__DIR__ . "/lib/SkladkaTypCrossModel.php");
 require_once(__DIR__ . "/lib/UnknownUserModel.php");
+require_once(__DIR__ . "/lib/SkladkaPotvrdenieModel.php");
 
 DB::$user = DB_USER;
 DB::$password = DB_PASSWORD;
@@ -180,6 +181,7 @@ try {
       $idSkladka = (int)$postData["idSkladka"];
 
       $skladkaModel = new SkladkaModel(); 
+      $skladkaPotvrdenieModel = new SkladkaPotvrdenieModel();
 
       $currentSkladka = $skladkaModel->getById($idSkladka);
       
@@ -187,9 +189,34 @@ try {
         "pocet_nahlaseni" => (int)$currentSkladka["pocet_nahlaseni"] + 1
       ], $idSkladka);
 
+      $skladkaPotvrdenieModel->insert([
+        "id_skladka" => $idSkladka,
+        "unknown_user_uid" => $postData["uid"]
+      ]);
+
       echo Response::getJson([
         "status" => "success"
       ]);  
+    break;
+    case "potvrdil-som":
+      $postData = Request::getPostData();
+
+      $idSkladka = $postData["idSkladka"];
+      $uid = $postData["uid"];
+
+      $skladkaPotvrdenieModel = new SkladkaPotvrdenieModel();
+
+      $data = DB::queryFirstRow("
+        SELECT
+          *
+        FROM {$skladkaPotvrdenieModel->tableName}
+        WHERE id_skladka = %i AND unknown_user_uid = %s
+      ", (int)$idSkladka, (string)$uid);
+
+      echo Response::getJson([
+        "status" => "success",
+        "accept-button" => !empty($data) ? true : false
+      ]);
     break;
     case "potvrdit-skladku-typy":
       $postData = Request::getPostData();
