@@ -215,7 +215,7 @@ try {
 
       echo Response::getJson([
         "status" => "success",
-        "accept-button" => !empty($data) ? true : false
+        "confirmed" => !empty($data) ? true : false
       ]);
     break;
     case "potvrdit-skladku-typy":
