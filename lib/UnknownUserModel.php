@@ -1,6 +1,6 @@
 <?php
 
-class UnknownUser extends Model {
+class UnknownUserModel extends Model {
 
   public string $tableName = "ucm_unknown_users";
 

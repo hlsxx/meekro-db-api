@@ -22,6 +22,7 @@ require_once(__DIR__ . "/lib/SkladkaTypModel.php");
 require_once(__DIR__ . "/lib/SkladkaTypCrossModel.php");
 require_once(__DIR__ . "/lib/UnknownUserModel.php");
 require_once(__DIR__ . "/lib/SkladkaPotvrdenieModel.php");
+require_once(__DIR__ . "/lib/SkladkaUnknownUserModel.php");
 
 DB::$user = DB_USER;
 DB::$password = DB_PASSWORD;
@@ -259,10 +260,11 @@ try {
       ]); 
     break;
     case "vygeneruj-uid":
-      $unknownUserModel = new UnknownUser();
+      $unknownUserModel = new UnknownUserModel();
 
       $insertedUnknownUserId = $unknownUserModel->insert([
-        "uid" => uniqid()
+        "uid" => uniqid(),
+        "created_at" => date("Y-m-d H:i:s", time())
       ]);
 
       $unknownUser = $unknownUserModel->getById($insertedUnknownUserId);
@@ -271,6 +273,22 @@ try {
         "status" => "success",
         "unknownUserUID" => $unknownUser["uid"]
       ]); 
+    break;
+    case "zaznamenat-aktivitu":
+      $postData = Request::getPostData();
+
+      $uid = $postData["uid"];
+
+      $unknownUserModel = new UnknownUserModel();
+
+      DB::update(
+        $unknownUserModel->tableName, 
+        [
+          "last_login" => date("Y-m-d H:i:s", time())
+        ], 
+        "uid = %s",
+        $uid
+      );
     break;
     default:
       Response::throwException("Page doesnt exists");
