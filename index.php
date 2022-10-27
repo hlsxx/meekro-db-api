@@ -209,12 +209,12 @@ try {
 
       $skladkaPotvrdenieModel = new SkladkaPotvrdenieModel();
 
-      $data = DB::queryFirstRow('
+      $data = DB::queryFirstRow("
         SELECT
           *
         FROM {$skladkaPotvrdenieModel->tableName}
         WHERE id_skladka = %i AND unknown_user_uid = %s
-      ', (int)$idSkladka, (string)$uid);
+      ", (int)$postData['idSkladka'], $postData['uid']);
 
       echo Response::getJson([
         'status' => 'success',
@@ -233,12 +233,12 @@ try {
 
       $newTypesAdded = [];
       foreach ($usedTypes as $usedType) {
-        $skladkaTypCrossData = DB::queryFirstRow('
+        $skladkaTypCrossData = DB::queryFirstRow("
           SELECT 
             * 
           FROM {$skladkaTypCrossModel->tableName} 
           WHERE id_skladka = %i AND id_skladka_typ = %i
-        ', (int)$idSkladka, (int)$usedType);
+        ", (int)$idSkladka, (int)$usedType);
 
         // If type doesnt exists just add him, else update pocet_potvrdeni
         if ($skladkaTypCrossData === NULL) {

@@ -227,9 +227,16 @@ class SkladkaModel extends Model {
    * @return array data
    */
   public function getByCoorsComplex(float $lat, float $lng): array {
-    $skladkaTypyCrossModel = new SkladkaTypCrossModel();
-    $skladkaTypModel = new SkladkaTypModel();
+    $skladkaUnknownUserModel = new SkladkaUnknownUserModel();
 
-    return $this->getByCoors($lat, $lng);
+    return DB::queryFirstRow("
+      SELECT 
+        s.*,
+        sus.unknown_user_uid as uid 
+      FROM {$this->tableName} s
+      LEFT JOIN {$skladkaUnknownUserModel->tableName} sus
+      ON sus.id_skladka = s.id
+      WHERE lat = %d AND lng = %d
+    ", $lat, $lng);
   }
 }
