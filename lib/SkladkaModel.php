@@ -86,12 +86,13 @@ class SkladkaModel extends Model {
 
     $filterDataByDistance = [];
     if ($filterData["gpsEnabled"] === true && (int)$filterData["filterBy"] == 2 && (int)$filterData["distance"] > 0) {
+
       foreach ($data as $skladka) {
         $distance = Helper::getDistanceFromLatLonInKm(
-          (int)$filterData["lat"],
-          (int)$filterData["lng"],
-          (int)$skladka["lat"], 
-          (int)$skladka["lng"]
+          (float)$filterData["lat"],
+          (float)$filterData["lng"],
+          (float)$skladka["lat"], 
+          (float)$skladka["lng"]
         );
 
         // Check distance from FILTERED value
