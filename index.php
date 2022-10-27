@@ -145,6 +145,8 @@ try {
       if (!isset($postData["lat"])) Response::throwException("Lat not set");
       if (!isset($postData["lng"])) Response::throwException("Lng not set");
 
+      if (!isset($postData["uid"])) Response::throwException("Device UID empty");
+
       $skladkaModel = new SkladkaModel();
 
       $uniqueId = uniqid();
@@ -158,6 +160,13 @@ try {
         "lat" => (float)$postData["lat"],
         "lng" => (float)$postData["lng"]
       ]); 
+
+      $skladkaUnknownUserModel = new SkladkaUnknownUserModel();
+
+      $skladkaUnknownUserModel->insert([
+        "id_skladka" => $insertedIdSkladka,
+        "unknown_user_uid" => $postData["uid"]
+      ]);
       
       $skladkaTypyCrossModel = new SkladkaTypCrossModel();
 
@@ -178,8 +187,10 @@ try {
     case "potvrdit":
       $postData = Request::getPostData();
 
-      //$deviceUID = $postData["uid"];
       $idSkladka = (int)$postData["idSkladka"];
+
+      if (!isset($postData["uid"])) Response::throwException("Device UID empty");
+      if ($idSkladka == 0) Response::throwException("Unknown idSkladka");
 
       $skladkaModel = new SkladkaModel(); 
       $skladkaPotvrdenieModel = new SkladkaPotvrdenieModel();
