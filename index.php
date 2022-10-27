@@ -40,6 +40,9 @@ $logError->pushHandler(
   new Monolog\Handler\StreamHandler(__DIR__ . '/logs/error.log', Monolog\Logger::ERROR)
 );
 
+// Test file
+require_once(__DIR__ . '/test.php');
+
 try {
 
   $logInfo->info("REQUEST from {$_SERVER['REMOTE_ADDR']}");
