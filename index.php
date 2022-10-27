@@ -58,12 +58,14 @@ try {
       ;
     break;
     case 'skladky-vsetky-simple': // GET | POST for filter
-      $postData = Request::getPostData();
-
       $skladkaModel = new SkladkaModel();
 
       $data = [];
-      if (isset($postData['filter'])) {
+      if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+        $postData = Request::getPostData();
+
+        Request::validatePostParam('filter');
+
         $data = Request::getParam('pagination') 
           ? $skladkaModel->getPaginationDataFiltered(
               Response::getArray($postData['filter'])
@@ -92,8 +94,8 @@ try {
       );
     break;
     case 'skladka': // GET
-      Request::validatePostParam('id');
-      Request::validatePostParam('type');
+      Request::validateGetParam('id');
+      Request::validateGetParam('type');
 
       $skladkaModel = new SkladkaModel();
 
@@ -136,9 +138,9 @@ try {
       $uniqueId = uniqid();
 
       $insertedIdSkladka = $skladkaModel->insert([
-        'nazov' => '{$uniqueId}_nazov',
-        'okres' => '{$uniqueId}_okres',
-        'obec' => '{$uniqueId}_obec',
+        'nazov' => "{$uniqueId}_nazov",
+        'okres' => "{$uniqueId}_okres",
+        'obec' => "{$uniqueId}_obec",
         'rok_zacatia' => Date('Y-m-d'),
         'typ' => 2,
         'lat' => (float)$postData['lat'],
