@@ -45,11 +45,11 @@ try {
   $logInfo->info("REQUEST from {$_SERVER['REMOTE_ADDR']}");
 
   if (!Request::getParam('page')) {
-    Response::throwException('Unknown page to load');
+    Response::throwException('GET param: {page} not set');
   }
 
   switch (Request::getParam('page')) {
-    case 'skladky-vsetky':
+    case 'skladky-vsetky': // GET
       $skladkaModel = new SkladkaModel();
 
       echo Request::getParam('pagination') 
@@ -57,11 +57,10 @@ try {
         : Response::getJson($skladkaModel->getAllComplex())
       ;
     break;
-    case 'skladky-vsetky-simple':
-      $skladkaModel = new SkladkaModel();
-
-      // POST data for FILTERING
+    case 'skladky-vsetky-simple': // GET | POST for filter
       $postData = Request::getPostData();
+
+      $skladkaModel = new SkladkaModel();
 
       $data = [];
       if (isset($postData['filter'])) {
@@ -85,27 +84,18 @@ try {
         'data' => $data
       ]); 
     break;
-    case 'skladky-typy':
+    case 'skladky-typy': // GET
       $skladkaTypModel = new SkladkaTypModel();
 
       echo Response::getJson(
         $skladkaTypModel->getAllOrderBy('id', 'ASC')
       );
     break;
-    case 'skladka':
+    case 'skladka': // GET
+      Request::validatePostParam('id');
+      Request::validatePostParam('type');
+
       $skladkaModel = new SkladkaModel();
-
-      if (!Request::getParam('id')) {
-        Response::throwException('Unknown ID for skladka');
-      }
-
-      if (!Request::getParam('type')) {
-        Response::throwException('Unknown type for skladka');
-      }
-
-      if (!is_numeric(Request::getParam('id'))) {
-        Response::throwException('ID for skladka must be type of INT');
-      }
 
       echo Response::getJson([
         'status' => 'success',
@@ -115,18 +105,13 @@ try {
         )
       ]);
     break;
-    case 'skladka-by-coors':
-      $skladkaModel = new SkladkaModel();
-
+    case 'skladka-by-coors': // POST
       $postData = Request::getPostData();
 
-      if (!isset($postData['lat']) || empty($postData['lat'])) {
-        Response::throwException('Param: lat does not exists or is empty');
-      }
+      Request::validatePostParam('lat');
+      Request::validatePostParam('lng');
 
-      if (!isset($postData['lng']) || empty($postData['lng'])) {
-        Response::throwException('Param: lng does not exists or is empty');
-      }
+      $skladkaModel = new SkladkaModel();
 
       echo Response::getJson([
         'status' => 'success',
@@ -136,16 +121,15 @@ try {
         )
       ]);
     break;
-    case 'nahlasit':
+    case 'nahlasit': // POST
       $postData = Request::getPostData();
 
-      if (empty($postData)) Response::throwException('Data are empty');
-      if (!isset($postData['choosenTypes'])) Response::throwException('Error: Parameter choosenTypes je prazdny');
-      if ($postData['choosenTypes'] == '') Response::throwException('Vyberte typ');
-      if (!isset($postData['lat'])) Response::throwException('Lat not set');
-      if (!isset($postData['lng'])) Response::throwException('Lng not set');
+      Request::validatePostParam('choosenTypes');
+      Request::validatePostParam('lat');
+      Request::validatePostParam('lng');
+      Request::validatePostParam('uid');
 
-      if (!isset($postData['uid'])) Response::throwException('Device UID empty');
+      if ($postData['choosenTypes'] == '') Response::throwException('Vyberte typ');
 
       $skladkaModel = new SkladkaModel();
 
@@ -184,22 +168,23 @@ try {
         'insertedId' => $insertedIdSkladka
       ]);  
     break;
-    case 'potvrdit':
+    case 'potvrdit': // POST
       $postData = Request::getPostData();
+
+      Request::validatePostParam('idSkladka');
+      Request::validatePostParam('uid');
 
       $idSkladka = (int)$postData['idSkladka'];
 
-      if (!isset($postData['uid'])) Response::throwException('Device UID empty');
-      if ($idSkladka == 0) Response::throwException('Unknown idSkladka');
-
       $skladkaModel = new SkladkaModel(); 
-      $skladkaPotvrdenieModel = new SkladkaPotvrdenieModel();
 
       $currentSkladka = $skladkaModel->getById($idSkladka);
       
       $skladkaModel->update([
         'pocet_nahlaseni' => (int)$currentSkladka['pocet_nahlaseni'] + 1
       ], $idSkladka);
+
+      $skladkaPotvrdenieModel = new SkladkaPotvrdenieModel();
 
       $skladkaPotvrdenieModel->insert([
         'id_skladka' => $idSkladka,
@@ -210,11 +195,11 @@ try {
         'status' => 'success'
       ]);  
     break;
-    case 'potvrdil-som':
+    case 'potvrdil-som': // POST
       $postData = Request::getPostData();
 
-      $idSkladka = $postData['idSkladka'];
-      $uid = $postData['uid'];
+      Request::validatePostParam('idSkladka');
+      Request::validatePostParam('uid');
 
       $skladkaPotvrdenieModel = new SkladkaPotvrdenieModel();
 
@@ -230,13 +215,13 @@ try {
         'confirmed' => !empty($data) ? true : false
       ]);
     break;
-    case 'potvrdit-skladku-typy':
+    case 'potvrdit-skladku-typy': // POST
       $postData = Request::getPostData();
 
-      $skladkaTypCrossModel = new SkladkaTypCrossModel();
+      Request::validatePostParam('idSkladka');
+      Request::validatePostParam('choosenTypes');
 
-      $idSkladka = $postData['idSkladka'];
-      $choosenTypes = $postData['choosenTypes'];
+      $skladkaTypCrossModel = new SkladkaTypCrossModel();
 
       $usedTypes = explode(',', $choosenTypes);
 
@@ -270,7 +255,7 @@ try {
         'new_types' => Response::getJson($newTypesAdded)
       ]); 
     break;
-    case 'vygeneruj-uid':
+    case 'vygeneruj-uid': // GET
       $unknownUserModel = new UnknownUserModel();
 
       $insertedUnknownUserId = $unknownUserModel->insert([
@@ -285,10 +270,10 @@ try {
         'unknownUserUID' => $unknownUser['uid']
       ]); 
     break;
-    case 'zaznamenat-aktivitu':
+    case 'zaznamenat-aktivitu': // POST
       $postData = Request::getPostData();
 
-      $uid = $postData['uid'];
+      Request::validatePostParam('uid');
 
       $unknownUserModel = new UnknownUserModel();
 
@@ -298,11 +283,11 @@ try {
           'last_login' => date('Y-m-d H:i:s', time())
         ], 
         'uid = %s',
-        $uid
+        $postData['uid']
       );
     break;
     default:
-      Response::throwException('Page doesnt exists');
+      Response::throwException('PAGE: {' . Request::getParam('page') . '} doesnt exists');
     break;
 
   }
