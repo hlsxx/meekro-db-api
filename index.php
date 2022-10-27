@@ -9,20 +9,20 @@ header('Access-Control-Allow-Methods: GET, POST, PATCH, PUT, DELETE, OPTIONS');
 header('Access-Control-Allow-Headers: Origin, Content-Type, X-Auth-Token');
 
 // Common
-require_once(__DIR__ . "/vendor/autoload.php");
-require_once(__DIR__ . "/helpers.php");
-require_once(__DIR__ . "/response.php");
-require_once(__DIR__ . "/request.php");
-require_once(__DIR__ . "/config.php");
+require_once(__DIR__ . '/vendor/autoload.php');
+require_once(__DIR__ . '/helpers.php');
+require_once(__DIR__ . '/response.php');
+require_once(__DIR__ . '/request.php');
+require_once(__DIR__ . '/config.php');
 
 // Models
-require_once(__DIR__ . "/lib/Model.php");
-require_once(__DIR__ . "/lib/SkladkaModel.php");
-require_once(__DIR__ . "/lib/SkladkaTypModel.php");
-require_once(__DIR__ . "/lib/SkladkaTypCrossModel.php");
-require_once(__DIR__ . "/lib/UnknownUserModel.php");
-require_once(__DIR__ . "/lib/SkladkaPotvrdenieModel.php");
-require_once(__DIR__ . "/lib/SkladkaUnknownUserModel.php");
+require_once(__DIR__ . '/lib/Model.php');
+require_once(__DIR__ . '/lib/SkladkaModel.php');
+require_once(__DIR__ . '/lib/SkladkaTypModel.php');
+require_once(__DIR__ . '/lib/SkladkaTypCrossModel.php');
+require_once(__DIR__ . '/lib/UnknownUserModel.php');
+require_once(__DIR__ . '/lib/SkladkaPotvrdenieModel.php');
+require_once(__DIR__ . '/lib/SkladkaUnknownUserModel.php');
 
 DB::$user = DB_USER;
 DB::$password = DB_PASSWORD;
@@ -44,153 +44,153 @@ try {
 
   $logInfo->info("REQUEST from {$_SERVER['REMOTE_ADDR']}");
 
-  if (!Request::getParam("page")) {
-    Response::throwException("Unknown page to load");
+  if (!Request::getParam('page')) {
+    Response::throwException('Unknown page to load');
   }
 
-  switch (Request::getParam("page")) {
-    case "skladky-vsetky":
+  switch (Request::getParam('page')) {
+    case 'skladky-vsetky':
       $skladkaModel = new SkladkaModel();
 
-      echo Request::getParam("pagination") 
+      echo Request::getParam('pagination') 
         ? Response::getJson($skladkaModel->getPaginationDataComplex()) 
         : Response::getJson($skladkaModel->getAllComplex())
       ;
     break;
-    case "skladky-vsetky-simple":
+    case 'skladky-vsetky-simple':
       $skladkaModel = new SkladkaModel();
 
       // POST data for FILTERING
       $postData = Request::getPostData();
 
       $data = [];
-      if (isset($postData["filter"])) {
-        $data = Request::getParam("pagination") 
+      if (isset($postData['filter'])) {
+        $data = Request::getParam('pagination') 
           ? $skladkaModel->getPaginationDataFiltered(
-              Response::getArray($postData["filter"])
+              Response::getArray($postData['filter'])
             )
           : $skladkaModel->getAllFiltered(
-              Response::getArray($postData["filter"])
+              Response::getArray($postData['filter'])
             )
         ;
       } else {
-        $data = Request::getParam("pagination") 
+        $data = Request::getParam('pagination') 
           ? $skladkaModel->getPaginationData()
           : $skladkaModel->getAll()
         ;
       }
 
       echo Response::getJson([
-        "status" => "success",
-        "data" => $data
+        'status' => 'success',
+        'data' => $data
       ]); 
     break;
-    case "skladky-typy":
+    case 'skladky-typy':
       $skladkaTypModel = new SkladkaTypModel();
 
       echo Response::getJson(
-        $skladkaTypModel->getAllOrderBy("id", "ASC")
+        $skladkaTypModel->getAllOrderBy('id', 'ASC')
       );
     break;
-    case "skladka":
+    case 'skladka':
       $skladkaModel = new SkladkaModel();
 
-      if (!Request::getParam("id")) {
-        Response::throwException("Unknown ID for skladka");
+      if (!Request::getParam('id')) {
+        Response::throwException('Unknown ID for skladka');
       }
 
-      if (!Request::getParam("type")) {
-        Response::throwException("Unknown type for skladka");
+      if (!Request::getParam('type')) {
+        Response::throwException('Unknown type for skladka');
       }
 
-      if (!is_numeric(Request::getParam("id"))) {
-        Response::throwException("ID for skladka must be type of INT");
+      if (!is_numeric(Request::getParam('id'))) {
+        Response::throwException('ID for skladka must be type of INT');
       }
 
       echo Response::getJson([
-        "status" => "success",
-        "data" => $skladkaModel->getByIdComplex(
-          (int)Request::getParam("id"),
-          (int)Request::getParam("type")
+        'status' => 'success',
+        'data' => $skladkaModel->getByIdComplex(
+          (int)Request::getParam('id'),
+          (int)Request::getParam('type')
         )
       ]);
     break;
-    case "skladka-by-coors":
+    case 'skladka-by-coors':
       $skladkaModel = new SkladkaModel();
 
       $postData = Request::getPostData();
 
-      if (!isset($postData["lat"]) || empty($postData["lat"])) {
-        Response::throwException("Param: lat does not exists or is empty");
+      if (!isset($postData['lat']) || empty($postData['lat'])) {
+        Response::throwException('Param: lat does not exists or is empty');
       }
 
-      if (!isset($postData["lng"]) || empty($postData["lng"])) {
-        Response::throwException("Param: lng does not exists or is empty");
+      if (!isset($postData['lng']) || empty($postData['lng'])) {
+        Response::throwException('Param: lng does not exists or is empty');
       }
 
       echo Response::getJson([
-        "status" => "success",
-        "data" => $skladkaModel->getByCoorsComplex(
-          (float)$postData["lat"],
-          (float)$postData["lng"]
+        'status' => 'success',
+        'data' => $skladkaModel->getByCoorsComplex(
+          (float)$postData['lat'],
+          (float)$postData['lng']
         )
       ]);
     break;
-    case "nahlasit":
+    case 'nahlasit':
       $postData = Request::getPostData();
 
-      if (empty($postData)) Response::throwException("Data are empty");
-      if (!isset($postData["choosenTypes"])) Response::throwException("Error: Parameter choosenTypes je prazdny");
-      if ($postData["choosenTypes"] == "") Response::throwException("Vyberte typ");
-      if (!isset($postData["lat"])) Response::throwException("Lat not set");
-      if (!isset($postData["lng"])) Response::throwException("Lng not set");
+      if (empty($postData)) Response::throwException('Data are empty');
+      if (!isset($postData['choosenTypes'])) Response::throwException('Error: Parameter choosenTypes je prazdny');
+      if ($postData['choosenTypes'] == '') Response::throwException('Vyberte typ');
+      if (!isset($postData['lat'])) Response::throwException('Lat not set');
+      if (!isset($postData['lng'])) Response::throwException('Lng not set');
 
-      if (!isset($postData["uid"])) Response::throwException("Device UID empty");
+      if (!isset($postData['uid'])) Response::throwException('Device UID empty');
 
       $skladkaModel = new SkladkaModel();
 
       $uniqueId = uniqid();
 
       $insertedIdSkladka = $skladkaModel->insert([
-        "nazov" => "{$uniqueId}_nazov",
-        "okres" => "{$uniqueId}_okres",
-        "obec" => "{$uniqueId}_obec",
-        "rok_zacatia" => Date("Y-m-d"),
-        "typ" => 2,
-        "lat" => (float)$postData["lat"],
-        "lng" => (float)$postData["lng"]
+        'nazov' => '{$uniqueId}_nazov',
+        'okres' => '{$uniqueId}_okres',
+        'obec' => '{$uniqueId}_obec',
+        'rok_zacatia' => Date('Y-m-d'),
+        'typ' => 2,
+        'lat' => (float)$postData['lat'],
+        'lng' => (float)$postData['lng']
       ]); 
 
       $skladkaUnknownUserModel = new SkladkaUnknownUserModel();
 
       $skladkaUnknownUserModel->insert([
-        "id_skladka" => $insertedIdSkladka,
-        "unknown_user_uid" => $postData["uid"]
+        'id_skladka' => $insertedIdSkladka,
+        'unknown_user_uid' => $postData['uid']
       ]);
       
       $skladkaTypyCrossModel = new SkladkaTypCrossModel();
 
-      $usedTypes = explode(",", $postData["choosenTypes"]);
+      $usedTypes = explode(',', $postData['choosenTypes']);
       foreach ($usedTypes as $usedType) {
         $skladkaTypyCrossModel->insert([
-          "id_skladka" => $insertedIdSkladka,
-          "id_skladka_typ" => $usedType,
-          "pocet_potvrdeni" => 1
+          'id_skladka' => $insertedIdSkladka,
+          'id_skladka_typ' => $usedType,
+          'pocet_potvrdeni' => 1
         ]);
       }
 
       echo Response::getJson([
-        "status" => "success",
-        "insertedId" => $insertedIdSkladka
+        'status' => 'success',
+        'insertedId' => $insertedIdSkladka
       ]);  
     break;
-    case "potvrdit":
+    case 'potvrdit':
       $postData = Request::getPostData();
 
-      $idSkladka = (int)$postData["idSkladka"];
+      $idSkladka = (int)$postData['idSkladka'];
 
-      if (!isset($postData["uid"])) Response::throwException("Device UID empty");
-      if ($idSkladka == 0) Response::throwException("Unknown idSkladka");
+      if (!isset($postData['uid'])) Response::throwException('Device UID empty');
+      if ($idSkladka == 0) Response::throwException('Unknown idSkladka');
 
       $skladkaModel = new SkladkaModel(); 
       $skladkaPotvrdenieModel = new SkladkaPotvrdenieModel();
@@ -198,111 +198,111 @@ try {
       $currentSkladka = $skladkaModel->getById($idSkladka);
       
       $skladkaModel->update([
-        "pocet_nahlaseni" => (int)$currentSkladka["pocet_nahlaseni"] + 1
+        'pocet_nahlaseni' => (int)$currentSkladka['pocet_nahlaseni'] + 1
       ], $idSkladka);
 
       $skladkaPotvrdenieModel->insert([
-        "id_skladka" => $idSkladka,
-        "unknown_user_uid" => $postData["uid"]
+        'id_skladka' => $idSkladka,
+        'unknown_user_uid' => $postData['uid']
       ]);
 
       echo Response::getJson([
-        "status" => "success"
+        'status' => 'success'
       ]);  
     break;
-    case "potvrdil-som":
+    case 'potvrdil-som':
       $postData = Request::getPostData();
 
-      $idSkladka = $postData["idSkladka"];
-      $uid = $postData["uid"];
+      $idSkladka = $postData['idSkladka'];
+      $uid = $postData['uid'];
 
       $skladkaPotvrdenieModel = new SkladkaPotvrdenieModel();
 
-      $data = DB::queryFirstRow("
+      $data = DB::queryFirstRow('
         SELECT
           *
         FROM {$skladkaPotvrdenieModel->tableName}
         WHERE id_skladka = %i AND unknown_user_uid = %s
-      ", (int)$idSkladka, (string)$uid);
+      ', (int)$idSkladka, (string)$uid);
 
       echo Response::getJson([
-        "status" => "success",
-        "confirmed" => !empty($data) ? true : false
+        'status' => 'success',
+        'confirmed' => !empty($data) ? true : false
       ]);
     break;
-    case "potvrdit-skladku-typy":
+    case 'potvrdit-skladku-typy':
       $postData = Request::getPostData();
 
       $skladkaTypCrossModel = new SkladkaTypCrossModel();
 
-      $idSkladka = $postData["idSkladka"];
-      $choosenTypes = $postData["choosenTypes"];
+      $idSkladka = $postData['idSkladka'];
+      $choosenTypes = $postData['choosenTypes'];
 
-      $usedTypes = explode(",", $choosenTypes);
+      $usedTypes = explode(',', $choosenTypes);
 
       $newTypesAdded = [];
       foreach ($usedTypes as $usedType) {
-        $skladkaTypCrossData = DB::queryFirstRow("
+        $skladkaTypCrossData = DB::queryFirstRow('
           SELECT 
             * 
           FROM {$skladkaTypCrossModel->tableName} 
           WHERE id_skladka = %i AND id_skladka_typ = %i
-        ", (int)$idSkladka, (int)$usedType);
+        ', (int)$idSkladka, (int)$usedType);
 
         // If type doesnt exists just add him, else update pocet_potvrdeni
         if ($skladkaTypCrossData === NULL) {
           $insertedType = $skladkaTypCrossModel->insert([
-            "id_skladka" => (int)$idSkladka,
-            "id_skladka_typ" => (int)$usedType,
-            "pocet_potvrdeni" => 1
+            'id_skladka' => (int)$idSkladka,
+            'id_skladka_typ' => (int)$usedType,
+            'pocet_potvrdeni' => 1
           ]);
 
           $newTypesAdded[] = (int)$usedType;
         } else {
           $skladkaTypCrossModel->update([
-            "pocet_potvrdeni" => (int)$skladkaTypCrossData["pocet_potvrdeni"] + 1
-          ], (int)$skladkaTypCrossData["id"]);
+            'pocet_potvrdeni' => (int)$skladkaTypCrossData['pocet_potvrdeni'] + 1
+          ], (int)$skladkaTypCrossData['id']);
         }
       }
 
       echo Response::getJson([
-        "status" => "success",
-        "new_types" => Response::getJson($newTypesAdded)
+        'status' => 'success',
+        'new_types' => Response::getJson($newTypesAdded)
       ]); 
     break;
-    case "vygeneruj-uid":
+    case 'vygeneruj-uid':
       $unknownUserModel = new UnknownUserModel();
 
       $insertedUnknownUserId = $unknownUserModel->insert([
-        "uid" => uniqid(),
-        "created_at" => date("Y-m-d H:i:s", time())
+        'uid' => uniqid(),
+        'created_at' => date('Y-m-d H:i:s', time())
       ]);
 
       $unknownUser = $unknownUserModel->getById($insertedUnknownUserId);
 
       echo Response::getJson([
-        "status" => "success",
-        "unknownUserUID" => $unknownUser["uid"]
+        'status' => 'success',
+        'unknownUserUID' => $unknownUser['uid']
       ]); 
     break;
-    case "zaznamenat-aktivitu":
+    case 'zaznamenat-aktivitu':
       $postData = Request::getPostData();
 
-      $uid = $postData["uid"];
+      $uid = $postData['uid'];
 
       $unknownUserModel = new UnknownUserModel();
 
       DB::update(
         $unknownUserModel->tableName, 
         [
-          "last_login" => date("Y-m-d H:i:s", time())
+          'last_login' => date('Y-m-d H:i:s', time())
         ], 
-        "uid = %s",
+        'uid = %s',
         $uid
       );
     break;
     default:
-      Response::throwException("Page doesnt exists");
+      Response::throwException('Page doesnt exists');
     break;
 
   }
