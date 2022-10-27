@@ -89,9 +89,10 @@ try {
     case 'skladky-typy': // GET
       $skladkaTypModel = new SkladkaTypModel();
 
-      echo Response::getJson(
-        $skladkaTypModel->getAllOrderBy('id', 'ASC')
-      );
+      echo Response::getJson([
+        'status' => 'success',
+        'data' => $skladkaTypModel->getAllOrderBy('id', 'ASC')
+      ]);
     break;
     case 'skladka': // GET
       Request::validateGetParam('id');
@@ -287,6 +288,10 @@ try {
         'uid = %s',
         $postData['uid']
       );
+
+      echo Response::getJson([
+        'status' => 'success'
+      ]); 
     break;
     default:
       Response::throwException('PAGE: {' . Request::getParam('page') . '} doesnt exists');
