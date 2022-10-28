@@ -28,7 +28,12 @@ class Request {
    * @return bool exists or no
    */
   public static function postParamIsset(string $paramName): bool {
-    return isset($_POST[$paramName]);
+    $phpInput = json_decode(file_get_contents("php://input"), TRUE);
+
+    return 
+      isset($_POST[$paramName])
+      ?: isset($phpInput[$paramName])
+    ;
   }
 
   /**
