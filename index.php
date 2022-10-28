@@ -105,9 +105,8 @@ try {
 
       echo Response::getJson([
         'status' => 'success',
-        'data' => $skladkaModel->getByIdComplex(
-          (int)Request::getParam('id'),
-          (int)Request::getParam('type')
+        'data' => $skladkaModel->getById(
+          (int)Request::getParam('id')
         )
       ]);
     break;
@@ -229,7 +228,7 @@ try {
 
       $skladkaTypCrossModel = new SkladkaTypCrossModel();
 
-      $usedTypes = explode(',', $choosenTypes);
+      $usedTypes = explode(',', $postData['choosenTypes']);
 
       $newTypesAdded = [];
       foreach ($usedTypes as $usedType) {
@@ -238,12 +237,12 @@ try {
             * 
           FROM {$skladkaTypCrossModel->tableName} 
           WHERE id_skladka = %i AND id_skladka_typ = %i
-        ", (int)$idSkladka, (int)$usedType);
+        ", (int)$postData['idSkladka'], (int)$usedType);
 
         // If type doesnt exists just add him, else update pocet_potvrdeni
         if ($skladkaTypCrossData === NULL) {
           $insertedType = $skladkaTypCrossModel->insert([
-            'id_skladka' => (int)$idSkladka,
+            'id_skladka' => (int)$postData['idSkladka'],
             'id_skladka_typ' => (int)$usedType,
             'pocet_potvrdeni' => 1
           ]);
