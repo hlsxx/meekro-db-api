@@ -281,7 +281,8 @@ class SkladkaModel extends Model {
 
     $data = DB::query(
       "SELECT 
-        *
+        s.*,
+        sus.unknown_user_uid as uid 
       FROM {$this->tableName}
       LEFT JOIN {$skladkaUnknownUserModel->tableName} sus
       ON sus.id_skladka = s.id
@@ -324,7 +325,8 @@ class SkladkaModel extends Model {
 
     return DB::query(
       "SELECT 
-        *
+        s.*,
+        sus.unknown_user_uid as uid 
       FROM {$this->tableName}
       LEFT JOIN {$skladkaUnknownUserModel->tableName} sus
       ON sus.id_skladka = s.id
@@ -343,7 +345,8 @@ class SkladkaModel extends Model {
     
     return  DB::query("
       SELECT 
-        *
+        s.*,
+        sus.unknown_user_uid as uid 
       FROM {$this->tableName} s
       LEFT JOIN {$skladkaUnknownUserModel->tableName} sus
       ON sus.id_skladka = s.id
