@@ -10,7 +10,7 @@ class SkladkaModel extends Model {
   /**
    * @return array data from ucm_skladky
    */
-  /*public function getAllComplex() : array {
+  public function ___getAllComplex() : array {
     $skladkaTypyCrossModel = new SkladkaTypCrossModel();
     $skladkaTypModel = new SkladkaTypModel();
 
@@ -31,12 +31,12 @@ class SkladkaModel extends Model {
       ),
       $vsetkySkladky
     );
-  }*/
+  }
 
   /**
    * @return array data pagination data from ucm_skladky
    */
-  public function getPaginationDataComplex() : array {
+  public function ___getPaginationDataComplex() : array {
     $skladkaTypyCrossModel = new SkladkaTypCrossModel();
     $skladkaTypModel = new SkladkaTypModel();
 
@@ -320,6 +320,8 @@ class SkladkaModel extends Model {
    * @return array all data from ucm_skladky FILTERED
    */
   public function getAllFilteredComplex(array $filterData): array {
+    $skladkaUnknownUserModel = new SkladkaUnknownUserModel();
+
     return DB::query(
       "SELECT 
         *
@@ -330,6 +332,26 @@ class SkladkaModel extends Model {
       ORDER BY id DESC",
       !in_array((int)$filterData["type"], [1, 2]) ? 1 : (int)$filterData["type"],
       !in_array((int)$filterData["type"], [1, 2]) ? 2 : (int)$filterData["type"]
+    );
+  }
+
+   /**
+   * @return array data
+   */
+  public function getPaginationDataComplex() : array {
+    $skladkaUnknownUserModel = new SkladkaUnknownUserModel();
+    
+    return  DB::query("
+      SELECT 
+        *
+      FROM {$this->tableName} s
+      LEFT JOIN {$skladkaUnknownUserModel->tableName} sus
+      ON sus.id_skladka = s.id
+      ORDER BY id DESC
+      LIMIT %d, %d
+    ", 
+      Helper::getOffset(),
+      Helper::$itemsPerPage
     );
   }
 
