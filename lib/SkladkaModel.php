@@ -10,7 +10,7 @@ class SkladkaModel extends Model {
   /**
    * @return array data from ucm_skladky
    */
-  public function getAllComplex() : array {
+  /*public function getAllComplex() : array {
     $skladkaTypyCrossModel = new SkladkaTypCrossModel();
     $skladkaTypModel = new SkladkaTypModel();
 
@@ -31,7 +31,7 @@ class SkladkaModel extends Model {
       ),
       $vsetkySkladky
     );
-  }
+  }*/
 
   /**
    * @return array data pagination data from ucm_skladky
@@ -239,4 +239,98 @@ class SkladkaModel extends Model {
       WHERE lat = %d AND lng = %d
     ", $lat, $lng);
   }
+
+  /**
+   * @return array data
+   */
+  public function getByPaginationDataComplex(): array {
+    $skladkaUnknownUserModel = new SkladkaUnknownUserModel();
+
+    return DB::query("
+      SELECT 
+        s.*,
+        sus.unknown_user_uid as uid 
+      FROM {$this->tableName} s
+      LEFT JOIN {$skladkaUnknownUserModel->tableName} sus
+      ON sus.id_skladka = s.id
+    ");
+  }
+
+  /**
+   * @return array data
+   */
+  public function getAllComplex(): array { 
+    $skladkaUnknownUserModel = new SkladkaUnknownUserModel();
+
+    return DB::query("
+      SELECT 
+        s.*,
+        sus.unknown_user_uid as uid 
+      FROM {$this->tableName} s
+      LEFT JOIN {$skladkaUnknownUserModel->tableName} sus
+      ON sus.id_skladka = s.id
+    ");
+  }
+
+  /**
+   * @param array $filterData FILTER data
+   * @return array data pagination data from ucm_skladky FILTERED
+   */
+  public function getPaginationDataFilteredComplex(array $filterData): array {
+    $skladkaUnknownUserModel = new SkladkaUnknownUserModel();
+
+    $data = DB::query(
+      "SELECT 
+        *
+      FROM {$this->tableName}
+      LEFT JOIN {$skladkaUnknownUserModel->tableName} sus
+      ON sus.id_skladka = s.id
+      WHERE {$this->tableName}.typ IN (%d, %d)
+      ORDER BY id DESC
+      LIMIT %d, %d",
+      !in_array((int)$filterData["type"], [1, 2]) ? 1 : (int)$filterData["type"],
+      !in_array((int)$filterData["type"], [1, 2]) ? 2 : (int)$filterData["type"],
+      Helper::getOffset(),
+      Helper::$itemsPerPage
+    );
+
+    $filterDataByDistance = [];
+    if ($filterData["gpsEnabled"] === true && (int)$filterData["filterBy"] == 2 && (int)$filterData["distance"] > 0) {
+
+      foreach ($data as $skladka) {
+        $distance = Helper::getDistanceFromLatLonInKm(
+          (float)$filterData["lat"],
+          (float)$filterData["lng"],
+          (float)$skladka["lat"], 
+          (float)$skladka["lng"]
+        );
+
+        // Check distance from FILTERED value
+        if ($distance <= (int)$filterData["distance"]) {
+          $filterDataByDistance[] = $skladka;
+        }
+      }
+    }
+
+    return empty($filterDataByDistance) ? $data : $filterDataByDistance;
+  }
+
+   /**
+   * @param array $filterData FILTER data
+   * @return array all data from ucm_skladky FILTERED
+   */
+  public function getAllFilteredComplex(array $filterData): array {
+    return DB::query(
+      "SELECT 
+        *
+      FROM {$this->tableName}
+      LEFT JOIN {$skladkaUnknownUserModel->tableName} sus
+      ON sus.id_skladka = s.id
+      WHERE {$this->tableName}.typ IN (%d, %d)
+      ORDER BY id DESC",
+      !in_array((int)$filterData["type"], [1, 2]) ? 1 : (int)$filterData["type"],
+      !in_array((int)$filterData["type"], [1, 2]) ? 2 : (int)$filterData["type"]
+    );
+  }
+
 }

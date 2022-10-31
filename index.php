@@ -89,6 +89,35 @@ try {
         'data' => $data
       ]); 
     break;
+    case 'skladky-vsetky-complex': // GET | POST for filter
+      $skladkaModel = new SkladkaModel();
+
+      $data = [];
+      if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+        $postData = Request::getPostData();
+
+        Request::validatePostParam('filter');
+
+        $data = Request::getParam('pagination') 
+          ? $skladkaModel->getPaginationDataFilteredComplex(
+              Response::getArray($postData['filter'])
+            )
+          : $skladkaModel->getAllFilteredComplex(
+              Response::getArray($postData['filter'])
+            )
+        ;
+      } else {
+        $data = Request::getParam('pagination') 
+          ? $skladkaModel->getPaginationDataComplex()
+          : $skladkaModel->getAllComplex()
+        ;
+      }
+
+      echo Response::getJson([
+        'status' => 'success',
+        'data' => $data
+      ]); 
+    break;
     case 'skladky-typy': // GET
       $skladkaTypModel = new SkladkaTypModel();
 
