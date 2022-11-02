@@ -1,6 +1,7 @@
 {
     "require": {
         "sergeytsalkov/meekrodb": "^2.4",
-        "monolog/monolog": "2.5"
+        "monolog/monolog": "2.5",
+        "gabordemooij/redbean": "dev-master"
     }
 }
