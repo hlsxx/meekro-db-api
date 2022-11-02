@@ -5,13 +5,23 @@ require_once(__DIR__ . '/config.php');
 
 use \RedBeanPHP\R as R;
 
+class Model_ucm_skladky extends \RedBeanPHP\SimpleModel {
+  public function dispense() {
+    $this->bean->typ = 2;
+    $this->bean->pocet_nahlaseni = 0;
+    $this->bean->existujuca = 1;
+    $this->bean->lat = 0;
+    $this->bean->lng = 1;
+  }
+}
+
 R::setup(
   "mysql:host=localhost;dbname=" . DB_NAME,
   DB_USER, DB_PASSWORD
 );
 
-R::ext('ucmdispense', function( $type ){ 
-  return R::getRedBean()->dispense( $type ); 
+R::ext('ucmdispense', function($type){ 
+  return R::getRedBean()->dispense($type); 
 });
 
 /** UCM_NOTIFICATIONS */
