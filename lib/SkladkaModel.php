@@ -358,4 +358,19 @@ class SkladkaModel extends Model {
     );
   }
 
+  public function getByZoomLevel(int $zoomLevel) {
+    $skladkaUnknownUserModel = new SkladkaUnknownUserModel();
+
+    return DB::query("
+      SELECT 
+        s.*,
+        sus.unknown_user_uid as uid 
+      FROM {$this->tableName} s
+      LEFT JOIN {$skladkaUnknownUserModel->tableName} sus
+      ON sus.id_skladka = s.id
+      LIMIT {$zoomLevel}
+    ");
+
+  }
+
 }

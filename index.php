@@ -89,6 +89,20 @@ try {
         'data' => $data
       ]); 
     break;
+    case 'skladky-vsetky-simple-mapa': // GET
+      $skladkaModel = new SkladkaModel();
+
+      Request::validateGetParam('zoom-level');
+
+      $zoomLevel = Request::getParam('zoom-level');
+      
+      $data = $skladkaModel->getByZoomLevel((int)$zoomLevel);
+
+      echo Response::getJson([
+        'status' => 'success',
+        'data' => $data
+      ]); 
+    break;
     case 'skladky-vsetky-complex': // GET | POST for filter
       $skladkaModel = new SkladkaModel();
 
