@@ -324,6 +324,8 @@ try {
         'status' => 'success'
       ]); 
     break;
+    case 'notifikacie':
+    break;
     default:
       Response::throwException('PAGE: {' . Request::getParam('page') . '} doesnt exists');
     break;
