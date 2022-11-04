@@ -65,6 +65,7 @@ $skladkaPotvrdenieModel->initTable();
 /** UCM_USERS */
 $userModel = $bride->initModel('users');
 
+//$userModel->defineColumn('unknown_user_id')->type('int')->size(11)->null(false);
 $userModel->defineColumn('email')->type('varchar')->size(100)->null(false);
 $userModel->defineColumn('name')->type('varchar')->size(50)->null(true);
 $userModel->defineColumn('password')->type('varchar')->size(255)->null(false);

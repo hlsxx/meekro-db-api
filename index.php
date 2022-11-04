@@ -348,6 +348,7 @@ try {
 
       Request::validatePostParam('email');
       Request::validatePostParam('password');
+      Request::validatePostParam('uid');
 
       if (!filter_var($postData['email'], FILTER_VALIDATE_EMAIL)) {
         Response::throwException('Incorrect email format');
@@ -362,7 +363,13 @@ try {
 
       if (!empty($userAlreadyExists)) Response::throwException('User email already exists');
 
+      //$unknownUserModel = $bride->initModel('unknown_users');
+      //$unknownUserData = $unknownUserModel->getByCustom('uid', $postData['uid']);
+
+      //if (!empty($unknownUserData)) Response::throwException('UID doesnt valide');
+
       $idUser = $userModel->insert([
+        //'unknown_user_id' => $unknownUserData['id'],
         'email' => $postData['email'],
         'password' => password_hash($postData['password'], PASSWORD_BCRYPT)
       ]);
