@@ -1,130 +1,91 @@
 <?php
 
-require_once(__DIR__ . '/vendor/autoload.php');
-require_once(__DIR__ . '/config.php');
+require_once('./config.php');
 
-use \RedBeanPHP\R as R;
+$bride = new \Test\BridePHP(DB_NAME, DB_USER, DB_PASSWORD);
 
-class Model_ucm_skladky extends \RedBeanPHP\SimpleModel {
-  public function dispense() {
-    $this->bean->typ = 2;
-    $this->bean->pocet_nahlaseni = 0;
-    $this->bean->existujuca = 1;
-    $this->bean->lat = 0;
-    $this->bean->lng = 1;
-  }
-}
+$bride->tablePrefix('ucm');
 
-R::setup(
-  "mysql:host=localhost;dbname=" . DB_NAME,
-  DB_USER, DB_PASSWORD
-);
-
-R::ext('ucmdispense', function($type){ 
-  return R::getRedBean()->dispense($type); 
-});
-
-/** UCM_NOTIFICATIONS */
-$notifications = R::ucmdispense('ucm_notifications');
-
-$notifications->title = 'Testovacia notifikacia #1';
-$notifications->description = 'Testovacia notifikacia popis #1';
-$notifications->type = 1;
-$notifications->created_at = date('Y-m-d H:i:s', time());
-
-R::store($notifications);
-
+exit();
 /** UCM_SKLADKY */
-$skladka1 = R::ucmdispense('ucm_skladky');
+$skladkyModel = $bride->initModel('skladky');
 
-$skladka1->okres = 'Legalna skladka #1';
-$skladka1->nazov = 'Testovacia notifikacia popis #1';
-$skladka1->obec = 'Trnava';
-$skladka1->trieda = 'XXXX';
-$skladka1->prevadzkovatel = 'Legalna skladka prevadzkovatel #1';
-$skladka1->sidlo = 'Legalna skladka sidlo #1';
-$skladka1->rok_zacatia = date('Y-m-d H:i:s', time());
-$skladka1->typ = 1;
-$skladka1->pocet_nahlaseni = 0;
-$skladka1->existujuca = 1;
-$skladka1->lat = 48.1833;
-$skladka1->lng = 17.0379;
-
-R::store($skladka1);
-
-$skladka2 = R::ucmdispense('ucm_skladky');
-
-$skladka2->okres = 'Nelegalna skladka #1';
-$skladka2->nazov = 'Testovacia notifikacia popis #1';
-$skladka2->obec = 'Trnava';
-$skladka2->rok_zacatia = date('Y-m-d H:i:s', time());
-$skladka2->typ = 2;
-$skladka2->existujuca = 1;
-$skladka2->lat = 48.384046250301;
-$skladka2->lng = 17.587909698486;
-
-R::store($skladka2);
+$skladkyModel->defineColumn('okres')->type('varchar')->size(60)->null(false);
+$skladkyModel->defineColumn('nazov')->type('varchar')->size(60)->null(false);
+$skladkyModel->defineColumn('obec')->type('varchar')->size(60)->null(false);
+$skladkyModel->defineColumn('trieda')->type('varchar')->size(15)->null(true);
+$skladkyModel->defineColumn('prevadzkovatel')->type('varchar')->size(60)->null(true);
+$skladkyModel->defineColumn('sidlo')->type('varchar')->size(60)->null(true);
+$skladkyModel->defineColumn('rok_zacatia')->type('datetime')->null(false);
+$skladkyModel->defineColumn('typ')->type('tinyint')->size(1)->default(2)->null(false);
+$skladkyModel->defineColumn('pocet_nahlaseni')->type('int')->size(4)->default(0)->null(false);
+$skladkyModel->defineColumn('existujuca')->type('tinyint')->size(1)->default(1)->null(false);
+$skladkyModel->defineColumn('lat')->type('double')->default(0)->null(false);
+$skladkyModel->defineColumn('lng')->type('double')->default(0)->null(false);
+$skladkyModel->initTable();
 
 /** UCM_SKLADKY_TYPY */
-$skladkaTypyArray = [
-  'Bio odpad',
-  'Papier',
-  'Plast',
-  'Olej',
-  'Sklo',
-  'Elektro',
-  'Zmiesany',
-  'Iny'
-];
+$skladkaTypModel = $bride->initModel('skladky_typy');
 
-foreach ($skladkaTypyArray as $skladkaTyp) {
-  $skladkyTypy = R::ucmdispense('ucm_skladky_typy');
-  $skladkyTypy->nazov = $skladkaTyp;
-  R::store($skladkyTypy);
-}
-
-/** UCM_SKLADKY_TYPY_CROSS */
-$skladkaTypCross = R::ucmdispense('ucm_skladky_cross');
-
-$skladkaTypCross->id_skladka = 2;
-$skladkaTypCross->id_skladka_typ = 1;
-$skladkaTypCross->pocet_potvrdeni = 10;
-
-R::store($skladkaTypCross);
+$skladkaTypModel->defineColumn('nazov')->type('varchar')->size(25)->null(false);
+$skladkaTypModel->initTable();
 
 /** UCM_UNKNOWN_USERS */
-$ucmUnknownUsers1 = R::ucmdispense('ucm_unknown_users');
+$unknownUserModel = $bride->initModel('unknown_users');
 
-$reportUserUid = uniqid();
-$ucmUnknownUsers1->uid = $reportUserUid;
-$ucmUnknownUsers1->created_at = date('Y-m-d H:i:s', time());
-$ucmUnknownUsers1->last_login = date('Y-m-d H:i:s', time());
-
-R::store($ucmUnknownUsers1);
-
-$ucmUnknownUsers2 = R::ucmdispense('ucm_unknown_users');
-
-$acceptUserUid = uniqid();
-$ucmUnknownUsers2->uid = $acceptUserUid;
-$ucmUnknownUsers2->created_at = date('Y-m-d H:i:s', time());
-$ucmUnknownUsers2->last_login = date('Y-m-d H:i:s', time());
-
-R::store($ucmUnknownUsers2);
+$unknownUserModel->defineColumn('uid')->type('varchar')->size(30)->null(false);
+$unknownUserModel->defineColumn('id_user')->type('int')->size(11)->null(false);
+$unknownUserModel->defineColumn('created_at')->type('datetime')->null(false);
+$unknownUserModel->defineColumn('last_login')->type('datetime')->null(true);
+$unknownUserModel->initTable();
 
 /** UCM_SKLADKY_UNKNOWN_USERS */
-$ucmSkladkyUnknownUsers = R::ucmdispense('ucm_skladky_unknown_users');
+$skladkaUnknownUserModel = $bride->initModel('skladky_unknown_users');
 
-$ucmSkladkyUnknownUsers->id_skladka = 2;
-$ucmSkladkyUnknownUsers->unknown_user_uid = $reportUserUid;
+$skladkaUnknownUserModel->defineColumn('id_skladka')->type('int')->size(11)->null(false);
+$skladkaUnknownUserModel->defineColumn('unknown_user_uid')->type('varchar')->size(30)->null(false);
+$skladkaUnknownUserModel->initTable();
 
-R::store($ucmSkladkyUnknownUsers);
+/** UCM_SKLADKY_TYPY_CROSS */
+$skladkaTypCrossModel = $bride->initModel('ucm_skladky_typy_cross');
+
+$skladkaTypCrossModel->defineColumn('id_skladka')->type('int')->size(11)->null(false);
+$skladkaTypCrossModel->defineColumn('id_skladka_typ')->type('int')->size(11)->null(false);
+$skladkaTypCrossModel->defineColumn('pocet_potvrdeni')->type('int')->size(4)->default(0)->null(false);
+$skladkaTypCrossModel->defineColumn('unknown_user_uid')->type('varchar')->size(30)->null(false);
+$skladkaTypCrossModel->initTable();
 
 /** UCM_SKLADKY_POTVRDENIA */
-$ucmSkladkyPotvrdenia = R::ucmdispense('ucm_skladky_potvrdenia');
+$skladkaPotvrdenieModel = $bride->initModel('skladky_potvrdenia');
 
-$ucmSkladkyPotvrdenia->id_skladka = 2;
-$ucmSkladkyPotvrdenia->unknown_user_uid = $acceptUserUid;
+$skladkaPotvrdenieModel->defineColumn('id_skladka')->type('int')->size(11)->null(false);
+$skladkaPotvrdenieModel->defineColumn('unknown_user_uid')->type('varchar')->size(30)->null(false);
+$skladkaPotvrdenieModel->initTable();
 
-R::store($ucmSkladkyPotvrdenia);
+/** UCM_USERS */
+$userModel = $bride->initModel('users');
+
+$userModel->defineColumn('email')->type('varchar')->size(100)->null(false);
+$userModel->defineColumn('name')->type('varchar')->size(50)->null(true);
+$userModel->defineColumn('password')->type('varchar')->size(255)->null(false);
+$userModel->defineColumn('type')->type('tinyint')->size(1)->default(1)->null(false);
+$userModel->defineColumn('verified')->type('tinyint')->size(1)->default(0)->null(false);
+$userModel->initTable();
+
+/** UCM_TOKENS */
+$tokenModel = $bride->initModel('tokens');
+
+$tokenModel->defineColumn('type')->type('tinyint')->size(1)->null(false);
+$tokenModel->defineColumn('token_number')->type('int')->size(4)->null(true);
+$tokenModel->defineColumn('token_string')->type('varchar')->size(20)->null(true);
+$tokenModel->defineColumn('id_user')->type('int')->size(11)->null(false);
+$tokenModel->defineColumn('attempt')->type('tinyint')->size(1)->null(false);
+$tokenModel->initTable();
 
 
+/** UCM_NOTIFICATIONS */
+/*$skladkaPotvrdenieModel = $bride->initModel('notifications');
+
+$skladkaPotvrdenieModel->defineColumn('id_skladka')->type('int')->size(11)->null(false);
+$skladkaPotvrdenieModel->defineColumn('unknown_user_uid')->type('varchar')->size(30)->null(false);
+$skladkaPotvrdenieModel->initTable();*/

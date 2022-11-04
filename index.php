@@ -29,6 +29,9 @@ DB::$password = DB_PASSWORD;
 DB::$dbName = DB_NAME;
 DB::$encoding = 'utf8mb4_general_ci'; 
 
+$bride = new \Test\BridePhp(DB_NAME, DB_USER, DB_PASSWORD);
+$bride->tablePrefix('ucm');
+
 // Logs
 $logInfo = new Monolog\Logger('MeekroAPI-Log-System');
 $logInfo->pushHandler(
@@ -337,6 +340,26 @@ try {
       echo Response::getJson([
         'status' => 'success'
       ]); 
+    break;
+    case 'registracia': // POST
+      $postData = Request::getPostData();
+
+      Request::validatePostParam('email');
+      Request::validatePostParam('password');
+
+      $userModel = $bride->initModel('users');
+      $idUser = $userModel->insert([
+        'email' => $postData['email'],
+        'password' => password_hash($postData['password'], PASSWORD_BCRYPT)
+      ]);
+
+      $tokenModel = $bride->initModel('tokens');
+      $tokenModel->insert([
+        'id_user' => $idUser,
+        'attempt' => 3,
+        'type' => 1,
+        'token_number' => rand(1000, 9999)
+      ]);
     break;
     case 'notifikacie':
     break;
