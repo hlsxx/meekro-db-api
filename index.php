@@ -15,6 +15,14 @@ require_once(__DIR__ . '/response.php');
 require_once(__DIR__ . '/request.php');
 require_once(__DIR__ . '/config.php');
 
+DB::$user = DB_USER;
+DB::$password = DB_PASSWORD;
+DB::$dbName = DB_NAME;
+DB::$encoding = 'utf8mb4_general_ci'; 
+
+$bride = new \Bride\Bride(DB_NAME, DB_USER, DB_PASSWORD);
+$bride->tablePrefix('ucm');
+
 // Models
 require_once(__DIR__ . '/lib/Model.php');
 require_once(__DIR__ . '/lib/SkladkaModel.php');
@@ -23,14 +31,8 @@ require_once(__DIR__ . '/lib/SkladkaTypCrossModel.php');
 require_once(__DIR__ . '/lib/UnknownUserModel.php');
 require_once(__DIR__ . '/lib/SkladkaPotvrdenieModel.php');
 require_once(__DIR__ . '/lib/SkladkaUnknownUserModel.php');
+require_once(__DIR__ . '/lib/TokenModel.php');
 
-DB::$user = DB_USER;
-DB::$password = DB_PASSWORD;
-DB::$dbName = DB_NAME;
-DB::$encoding = 'utf8mb4_general_ci'; 
-
-$bride = new \Test\BridePhp(DB_NAME, DB_USER, DB_PASSWORD);
-$bride->tablePrefix('ucm');
 
 // Logs
 $logInfo = new Monolog\Logger('MeekroAPI-Log-System');
@@ -347,18 +349,36 @@ try {
       Request::validatePostParam('email');
       Request::validatePostParam('password');
 
+      if (!filter_var($postData['email'], FILTER_VALIDATE_EMAIL)) {
+        Response::throwException('Incorrect email format');
+      }
+
+      if (strlen($postData['password']) < 8) {
+        Response::throwException('Password musst have at least 8 symbols');
+      }
+
       $userModel = $bride->initModel('users');
+      $userAlreadyExists = $userModel->getByCustom('email', $postData['email']);
+
+      if (!empty($userAlreadyExists)) Response::throwException('User email already exists');
+
       $idUser = $userModel->insert([
         'email' => $postData['email'],
         'password' => password_hash($postData['password'], PASSWORD_BCRYPT)
       ]);
+
+      $tokenNumber = (new TokenModel())->getTokenNumber();
 
       $tokenModel = $bride->initModel('tokens');
       $tokenModel->insert([
         'id_user' => $idUser,
         'attempt' => 3,
         'type' => 1,
-        'token_number' => rand(1000, 9999)
+        'token_number' => $tokenNumber
+      ]);
+
+      echo Response::getJson([
+        'status' => 'success'
       ]);
     break;
     case 'notifikacie':
