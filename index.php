@@ -385,6 +385,74 @@ try {
       ]);
 
       echo Response::getJson([
+        'status' => 'success',
+        'data' => [
+          'email' => $postData['email']
+        ]
+      ]);
+    break;
+    case 'prihlasenie': // POST
+      $postData = Request::getPostData();
+
+      Request::validatePostParam('email');
+      Request::validatePostParam('password');
+      Request::validatePostParam('uid');
+
+      if (!filter_var($postData['email'], FILTER_VALIDATE_EMAIL)) {
+        Response::throwException('Incorrect email format');
+      }
+
+      $userModel = $bride->initModel('users');
+      $userData = $userModel->getByCustom('email', $postData['email']);
+
+      if (empty($userData)) Response::throwException('Email doesnt exists');
+
+      if (!password_verify($postData['password'], $userData['password'])) {
+        Response::throwException('Password is incorrect');
+      }
+
+      if ((bool)$userData['verified'] == false) Response::throwException('Account is not verifiend');
+
+      echo Response::getJson([
+        'status' => 'success',
+        'data' => [
+          'email' => $userData['email']
+        ]
+      ]);
+    break;
+    case 'registracia-validacia': // POST
+      $postData = Request::getPostData();
+
+      Request::validatePostParam('token_number');
+      Request::validatePostParam('uid');
+
+      $userModel = $bride->initModel('users');
+      $userAlreadyExists = $userModel->getByCustom('email', $postData['email']);
+
+      if (!empty($userAlreadyExists)) Response::throwException('User email already exists');
+
+      //$unknownUserModel = $bride->initModel('unknown_users');
+      //$unknownUserData = $unknownUserModel->getByCustom('uid', $postData['uid']);
+
+      //if (!empty($unknownUserData)) Response::throwException('UID doesnt valide');
+
+      $idUser = $userModel->insert([
+        //'unknown_user_id' => $unknownUserData['id'],
+        'email' => $postData['email'],
+        'password' => password_hash($postData['password'], PASSWORD_BCRYPT)
+      ]);
+
+      $tokenNumber = (new TokenModel())->getTokenNumber();
+
+      $tokenModel = $bride->initModel('tokens');
+      $tokenModel->insert([
+        'id_user' => $idUser,
+        'attempt' => 3,
+        'type' => 1,
+        'token_number' => $tokenNumber
+      ]);
+
+      echo Response::getJson([
         'status' => 'success'
       ]);
     break;
