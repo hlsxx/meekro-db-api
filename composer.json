@@ -8,6 +8,7 @@
     "require": {
         "sergeytsalkov/meekrodb": "^2.4",
         "monolog/monolog": "2.5",
-        "bride-php/bride-php": "@dev"
+        "bride-php/bride-php": "@dev",
+        "phpmailer/phpmailer": "^6.6"
     }
 }

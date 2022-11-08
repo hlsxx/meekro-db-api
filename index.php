@@ -33,6 +33,9 @@ require_once(__DIR__ . '/lib/SkladkaPotvrdenieModel.php');
 require_once(__DIR__ . '/lib/SkladkaUnknownUserModel.php');
 require_once(__DIR__ . '/lib/TokenModel.php');
 
+// Mailer
+require_once(__DIR__ . '/lib/Mailer.php');
+
 
 // Logs
 $logInfo = new Monolog\Logger('MeekroAPI-Log-System');
@@ -55,7 +58,7 @@ try {
   if (!Request::getParam('page')) {
     Response::throwException('GET param: {page} not set');
   }
-
+  
   switch (Request::getParam('page')) {
     case 'skladky-vsetky': // GET
       $skladkaModel = new SkladkaModel();
@@ -457,6 +460,10 @@ try {
       ]);
     break;
     case 'notifikacie':
+    break;
+    case 'test-mail':
+      $mailer = new Mailer();
+      var_dump($mailer->sendRegistrationCode("test@xxxx.com", rand(1000, 9999)));
     break;
     default:
       Response::throwException('PAGE: {' . Request::getParam('page') . '} doesnt exists');
