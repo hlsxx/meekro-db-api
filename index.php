@@ -361,18 +361,17 @@ try {
         Response::throwException('Password musst have at least 8 symbols');
       }
 
+      $unknownUserModel = $bride->initModel('unknown_users');
+      $unknownUserData = $unknownUserModel->getByCustom('uid', $postData['uid']);
+
+      if (empty($unknownUserData)) Response::throwException('UID does not correct');
+
       $userModel = $bride->initModel('users');
       $userAlreadyExists = $userModel->getByCustom('email', $postData['email']);
 
       if (!empty($userAlreadyExists)) Response::throwException('User email already exists');
 
-      //$unknownUserModel = $bride->initModel('unknown_users');
-      //$unknownUserData = $unknownUserModel->getByCustom('uid', $postData['uid']);
-
-      //if (!empty($unknownUserData)) Response::throwException('UID doesnt valide');
-
       $idUser = $userModel->insert([
-        //'unknown_user_id' => $unknownUserData['id'],
         'email' => $postData['email'],
         'password' => password_hash($postData['password'], PASSWORD_BCRYPT)
       ]);
@@ -382,6 +381,7 @@ try {
       $tokenModel = $bride->initModel('tokens');
       $tokenModel->insert([
         'id_user' => $idUser,
+        'id_unknown_user' => $unknownUserData['id'],
         'attempt' => 3,
         'type' => 1,
         'token_number' => $tokenNumber
@@ -414,7 +414,7 @@ try {
         Response::throwException('Password is incorrect');
       }
 
-      if ((bool)$userData['verified'] == false) Response::throwException('Account is not verifiend');
+      if ((bool)$userData['verified'] == false) Response::throwException('Account is not verified');
 
       echo Response::getJson([
         'status' => 'success',
@@ -429,35 +429,43 @@ try {
       Request::validatePostParam('token_number');
       Request::validatePostParam('uid');
 
-      $userModel = $bride->initModel('users');
-      $userAlreadyExists = $userModel->getByCustom('email', $postData['email']);
+      $unknownUserModel = $bride->initModel('unknown_users');
+      $unknownUserData = $unknownUserModel->getByCustom('uid', $postData['uid']);
 
-      if (!empty($userAlreadyExists)) Response::throwException('User email already exists');
-
-      //$unknownUserModel = $bride->initModel('unknown_users');
-      //$unknownUserData = $unknownUserModel->getByCustom('uid', $postData['uid']);
-
-      //if (!empty($unknownUserData)) Response::throwException('UID doesnt valide');
-
-      $idUser = $userModel->insert([
-        //'unknown_user_id' => $unknownUserData['id'],
-        'email' => $postData['email'],
-        'password' => password_hash($postData['password'], PASSWORD_BCRYPT)
-      ]);
-
-      $tokenNumber = (new TokenModel())->getTokenNumber();
+      if (empty($unknownUserData)) Response::throwException('UID does not correct');
 
       $tokenModel = $bride->initModel('tokens');
-      $tokenModel->insert([
-        'id_user' => $idUser,
-        'attempt' => 3,
-        'type' => 1,
-        'token_number' => $tokenNumber
-      ]);
+      //$token->getByCustom('uid', $postData['uid'])
 
-      echo Response::getJson([
-        'status' => 'success'
-      ]);
+      $tokenData = DB::queryFirstRow("
+        SELECT 
+          *
+        FROM {$tokenModel->tableName} 
+        WHERE id_unknown_user = %d 
+        AND type = 1
+      ", $unknownUserData['id']);
+
+      if (empty($tokenData)) Response::throwException('Token not exists for UID: ' . $postData['uid']);
+
+      if ((int)$tokenData['token_number'] == (int)$postData['token_number']) {
+        $tokenModel->delete($tokenData['id']);
+
+        $userModel = $bride->initModel('users');
+        $userModel->update([
+          'verified' => 1
+        ], $tokenData['id_user']);
+
+        echo Response::getJson([
+          'status' => 'success',
+          'message' => 'Successful verified'
+        ]);
+      } else {
+        $tokenModel->update([
+          'attempt' => (int)$tokenData['attempt'] - 1
+        ], $tokenData['id']);
+
+        Response::throwException('Code is invalid, try again');
+      }
     break;
     case 'notifikacie':
     break;
