@@ -1,11 +1,25 @@
 <?php
 
-require_once('./config.php');
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
 
-$bride = new \Test\BridePHP(DB_NAME, DB_USER, DB_PASSWORD);
+require_once('./config.php');
+require_once(__DIR__ . '/vendor/autoload.php');
+
+$bride = new \Bride\Bride(DB_NAME, DB_USER, DB_PASSWORD);
 
 $bride->tablePrefix('ucm');
 
+$tokenModel = $bride->initModel('tokens');
+
+$tokenModel->defineColumn('type')->type('tinyint')->size(1)->null(false);
+$tokenModel->defineColumn('token_number')->type('int')->size(4)->null(true);
+$tokenModel->defineColumn('token_string')->type('varchar')->size(20)->null(true);
+$tokenModel->defineColumn('id_user')->type('int')->size(11)->null(false);
+$tokenModel->defineColumn('id_unknown_user')->type('int')->size(11)->null(false);
+$tokenModel->defineColumn('attempt')->type('tinyint')->size(1)->null(false);
+$tokenModel->initTable();
 exit();
 /** UCM_SKLADKY */
 $skladkyModel = $bride->initModel('skladky');
@@ -44,6 +58,7 @@ $skladkaUnknownUserModel = $bride->initModel('skladky_unknown_users');
 
 $skladkaUnknownUserModel->defineColumn('id_skladka')->type('int')->size(11)->null(false);
 $skladkaUnknownUserModel->defineColumn('unknown_user_uid')->type('varchar')->size(30)->null(false);
+$skladkaUnknownUserModel->defineColumn('id_user')->type('int')->size(11)->null(true);
 $skladkaUnknownUserModel->initTable();
 
 /** UCM_SKLADKY_TYPY_CROSS */
@@ -80,6 +95,7 @@ $tokenModel->defineColumn('type')->type('tinyint')->size(1)->null(false);
 $tokenModel->defineColumn('token_number')->type('int')->size(4)->null(true);
 $tokenModel->defineColumn('token_string')->type('varchar')->size(20)->null(true);
 $tokenModel->defineColumn('id_user')->type('int')->size(11)->null(false);
+$tokenModel->defineColumn('id_unknown_user')->type('int')->size(11)->null(false);
 $tokenModel->defineColumn('attempt')->type('tinyint')->size(1)->null(false);
 $tokenModel->initTable();
 
