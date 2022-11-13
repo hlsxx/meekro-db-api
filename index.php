@@ -371,9 +371,11 @@ try {
 
       if (!empty($userAlreadyExists)) Response::throwException('User email already exists');
 
+      $createdAt = date('Y-m-d H:i:s');
       $idUser = $userModel->insert([
         'email' => $postData['email'],
-        'password' => password_hash($postData['password'], PASSWORD_BCRYPT)
+        'password' => password_hash($postData['password'], PASSWORD_BCRYPT),
+        'created_at' => $createdAt
       ]);
 
       $tokenNumber = (new TokenModel())->getTokenNumber();
@@ -384,7 +386,8 @@ try {
         'id_unknown_user' => $unknownUserData['id'],
         'attempt' => 3,
         'type' => 1,
-        'token_number' => $tokenNumber
+        'token_number' => $tokenNumber,
+        'created_at' => $createdAt
       ]);
 
       echo Response::getJson([
@@ -446,6 +449,27 @@ try {
       ", $unknownUserData['id']);
 
       if (empty($tokenData)) Response::throwException('Token not exists for UID: ' . $postData['uid']);
+      
+      $timeToTokenValid = strtotime($tokenData['created_at'] . ' + 10 minute');
+
+      if (date('Y-m-d H:i:s', $timeToTokenValid) < date('Y-m-d H:i:s')) {
+        $tokenModel->delete($tokenData['id']);
+
+        // TODO: SEND MAIL WITH NEW TOKEN
+        $tokenNumber = (new TokenModel())->getTokenNumber();
+
+        $tokenModel = $bride->initModel('tokens');
+        $tokenModel->insert([
+          'id_user' => $tokenData['id_user'],
+          'id_unknown_user' => $unknownUserData['id'],
+          'attempt' => 3,
+          'type' => 1,
+          'token_number' => $tokenNumber,
+          'created_at' => date('Y-m-d H:i:s')
+        ]);
+
+        Response::throwException('The token has been expired. We sent you another one.');
+      }
 
       if ((int)$tokenData['token_number'] == (int)$postData['token_number']) {
         $tokenModel->delete($tokenData['id']);
