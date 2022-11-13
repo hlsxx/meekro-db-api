@@ -11,6 +11,7 @@ $bride = new \Bride\Bride(DB_NAME, DB_USER, DB_PASSWORD);
 
 $bride->tablePrefix('ucm');
 
+/** UCM_USERS */
 $tokenModel = $bride->initModel('tokens');
 
 $tokenModel->defineColumn('type')->type('tinyint')->size(1)->null(false);
@@ -19,6 +20,7 @@ $tokenModel->defineColumn('token_string')->type('varchar')->size(20)->null(true)
 $tokenModel->defineColumn('id_user')->type('int')->size(11)->null(false);
 $tokenModel->defineColumn('id_unknown_user')->type('int')->size(11)->null(false);
 $tokenModel->defineColumn('attempt')->type('tinyint')->size(1)->null(false);
+$tokenModel->defineColumn('created_at')->type('datetime')->null(false);
 $tokenModel->initTable();
 exit();
 /** UCM_SKLADKY */
@@ -80,12 +82,13 @@ $skladkaPotvrdenieModel->initTable();
 /** UCM_USERS */
 $userModel = $bride->initModel('users');
 
-//$userModel->defineColumn('unknown_user_id')->type('int')->size(11)->null(false);
 $userModel->defineColumn('email')->type('varchar')->size(100)->null(false);
 $userModel->defineColumn('name')->type('varchar')->size(50)->null(true);
 $userModel->defineColumn('password')->type('varchar')->size(255)->null(false);
 $userModel->defineColumn('type')->type('tinyint')->size(1)->default(1)->null(false);
 $userModel->defineColumn('verified')->type('tinyint')->size(1)->default(0)->null(false);
+$userModel->defineColumn('created_at')->type('datetime')->null(false);
+$userModel->defineColumn('last_login')->type('datetime')->null(true);
 $userModel->initTable();
 
 /** UCM_TOKENS */
@@ -97,6 +100,7 @@ $tokenModel->defineColumn('token_string')->type('varchar')->size(20)->null(true)
 $tokenModel->defineColumn('id_user')->type('int')->size(11)->null(false);
 $tokenModel->defineColumn('id_unknown_user')->type('int')->size(11)->null(false);
 $tokenModel->defineColumn('attempt')->type('tinyint')->size(1)->null(false);
+$tokenModel->defineColumn('created_at')->type('datetime')->null(false);
 $tokenModel->initTable();
 
 
