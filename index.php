@@ -15,6 +15,9 @@ require_once(__DIR__ . '/response.php');
 require_once(__DIR__ . '/request.php');
 require_once(__DIR__ . '/config.php');
 
+// Debug
+require_once(__DIR__ . '/debug.php');
+
 DB::$user = DB_USER;
 DB::$password = DB_PASSWORD;
 DB::$dbName = DB_NAME;
@@ -85,6 +88,7 @@ try {
               Response::getArray($postData['filter'])
             )
         ;
+
       } else {
         $data = Request::getParam('pagination') 
           ? $skladkaModel->getPaginationData()
