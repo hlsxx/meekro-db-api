@@ -497,6 +497,14 @@ try {
     break;
     case 'notifikacie':
     break;
+    case 'nahrat-obrazok':
+      if (empty($_FILES)) Response::throwException('$_FILES empty');
+
+      Request::validateFileParam('idSkladka');
+      Request::validateFileParam('uid');
+
+      $filePath = FILES_DIR . '/nelegalne-skladky';
+    break;
     case 'test-mail':
       $mailer = new Mailer();
       var_dump($mailer->sendRegistrationCode("test@xxxx.com", rand(1000, 9999)));

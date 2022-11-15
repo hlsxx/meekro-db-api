@@ -11,6 +11,21 @@ $bride = new \Bride\Bride(DB_NAME, DB_USER, DB_PASSWORD);
 
 $bride->tablePrefix('ucm');
 
+$galleryModel = $bride->initModel('gallery');
+
+$galleryModel->defineColumn('link')->type('varchar')->size(100)->null(true);
+$galleryModel->defineColumn('created_at')->type('datetime')->null(false);
+$galleryModel->initTable();
+
+/** UCM_SKLADKY_GALLERY */
+$skladkyGalleryModel = $bride->initModel('skladky_gallery');
+
+$skladkyGalleryModel->defineColumn('id_skladka')->type('int')->size(11)->null(false);
+$skladkyGalleryModel->defineColumn('id_gallery')->type('int')->size(11)->null(false);
+$skladkyGalleryModel->defineColumn('id_unknown_user')->type('int')->size(11)->null(false);
+$skladkyGalleryModel->initTable();
+exit();
+
 /** UCM_USERS */
 $tokenModel = $bride->initModel('tokens');
 
@@ -102,6 +117,21 @@ $tokenModel->defineColumn('id_unknown_user')->type('int')->size(11)->null(false)
 $tokenModel->defineColumn('attempt')->type('tinyint')->size(1)->null(false);
 $tokenModel->defineColumn('created_at')->type('datetime')->null(false);
 $tokenModel->initTable();
+
+/** UCM_GALLERY */
+$galleryModel = $bride->initModel('gallery');
+
+$galleryModel->defineColumn('link')->type('varchar')->size(100)->null(true);
+$galleryModel->defineColumn('created_at')->type('datetime')->null(false);
+$galleryModel->initTable();
+
+/** UCM_SKLADKY_GALLERY */
+$skladkyGalleryModel = $bride->initModel('skladky_gallery');
+
+$skladkyGalleryModel->defineColumn('id_skladka')->type('int')->size(11)->null(false);
+$skladkyGalleryModel->defineColumn('id_gallery')->type('int')->size(11)->null(false);
+$skladkyGalleryModel->defineColumn('id_unknown_user')->type('int')->size(11)->null(false);
+$skladkyGalleryModel->initTable();
 
 
 /** UCM_NOTIFICATIONS */

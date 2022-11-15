@@ -67,4 +67,15 @@ class Request {
     }
   }
 
+  /**
+   * @param string GET param name
+   * 
+   * @return void
+   */
+  public static function validateFileParam(string $paramName): void {
+    if (isset($_FILES[$paramName]) == false) {
+      throw new Exception('$_FILES' . " param: {{$paramName}} does not exists.");
+    }
+  }
+
 }
