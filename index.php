@@ -1,5 +1,7 @@
 <?php
 
+use LDAP\Result;
+
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
@@ -191,6 +193,11 @@ try {
 
       if ($postData['choosenTypes'] == '') Response::throwException('Vyberte typ');
 
+      $unknownUserModel = $bride->initModel('unknown_users');
+      $unknownUserData = $unknownUserModel->getByCustom('uid', $postData['uid']);
+
+      if (empty($unknownUserData)) Response::throwException('Invalid UID');
+
       $skladkaModel = new SkladkaModel();
 
       $uniqueId = uniqid();
@@ -221,6 +228,50 @@ try {
           'id_skladka_typ' => $usedType,
           'pocet_potvrdeni' => 1
         ]);
+      }
+
+      /** Images upload */
+      if (!empty($_FILES)) {
+        $filePath = FILES_DIR . '/nelegalne-skladky/' . $insertedIdSkladka;
+
+        $galleryModel = $bride->initModel('gallery');
+        $skladkyGalleryModel = $bride->initModel('skladky_gallery');
+
+        foreach ($_FILES as $file) {
+          if ($file['size'] > 0) {
+            if (!file_exists($filePath)) {
+              if (!mkdir($filePath, 0777, true)) {
+                Response::throwException('Error with creating folder');
+              }
+            }
+
+            $fileExtension = explode('.', $file['name']);
+
+            if (!in_array(end($fileExtension), ['jpeg', 'jpg', 'png'])) {
+              Response::throwException('Allowed format of images: jpeg, jpg, png');
+            }
+
+            $countExistingImages = count(scandir($filePath)) - 2;
+            $newName = ($countExistingImages + 1) . '.' . end($fileExtension);
+
+            $imagePath = $filePath . '/' . $newName;
+
+            if (!move_uploaded_file($file['tmp_name'], $imagePath)) {
+              Response::throwException('Error with images uploading');
+            }
+
+            $idGallery = $galleryModel->insert([
+              'link' => $newName,
+              'created_at' => date('Y-m-d H:i:s')
+            ]);
+
+            $skladkyGalleryModel->insert([
+              'id_skladka' => (int)$insertedIdSkladka,
+              'id_gallery' => (int)$idGallery,
+              'id_unknown_user' => (int)$unknownUserData['id']
+            ]);
+          }
+        }
       }
 
       echo Response::getJson([
@@ -497,13 +548,48 @@ try {
     break;
     case 'notifikacie':
     break;
-    case 'nahrat-obrazok':
+    case 'nelegalna-skladka-nahrat-obrazok':
+      $postData = Request::getPostData();
+
+      Request::validatePostParam('idSkladka');
+      Request::validatePostParam('uid');
+
       if (empty($_FILES)) Response::throwException('$_FILES empty');
 
-      Request::validateFileParam('idSkladka');
-      Request::validateFileParam('uid');
+      $skladkaModel = $bride->initModel('skladky');
+      $skladkaData = $skladkaModel->getById($postData['idSkladka']);
 
-      $filePath = FILES_DIR . '/nelegalne-skladky';
+      if (empty($skladkaData)) Response::throwException('Skladka does not exists');
+
+      $filePath = FILES_DIR . '/nelegalne-skladky/' . $skladkaData['id'];
+
+      $uploadSuccess = false;
+      foreach ($_FILES as $file) {
+        if ($file['size'] > 0) {
+          if (!file_exists($filePath)) {
+            mkdir($filePath, 0777, true);
+          }
+
+          $fileExtension = explode('.', $file['name']);
+
+          if (!in_array(end($fileExtension), ['jpeg','jpg','png'])) {
+            Response::throwException('Allowed format of images: jpeg, jpg, png');
+          }
+
+          $imagePath = $filePath . '/' . $file['name'];
+
+          $uploadSuccess = (bool)move_uploaded_file($file['tmp_name'], $imagePath);
+        }
+      }
+
+      if ($uploadSuccess === true) {
+        echo Response::getJson([
+          'status' => 'success',
+          'message' => 'Images uploaded'
+        ]);
+      } else {
+        Response::throwException('Error with images uploading');
+      }
     break;
     case 'test-mail':
       $mailer = new Mailer();
