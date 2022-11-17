@@ -61,7 +61,7 @@ class Request {
    */
   public static function validatePostParam(string $paramName): void {
     if (self::postParamIsset($paramName) == false) {
-      throw new Exception("POST param: {{$paramName}} does not exists.");
+      throw new Exception("POST param: {{$paramName}} does not exists. (MeekroAPI version: " . APP_VERSION);
     }
   }
 
@@ -72,7 +72,7 @@ class Request {
    */
   public static function validateGetParam(string $paramName): void {
     if (self::getParamIsset($paramName) == false) {
-      throw new Exception("GET param: {{$paramName}} does not exists.");
+      throw new Exception("GET param: {{$paramName}} does not exists. (MeekroAPI version: " . APP_VERSION);
     }
   }
 

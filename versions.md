@@ -6,3 +6,5 @@
 - uzivatel-nahlasene-skladky check if user is registered fix
 - registracia-validacia add id_user into unknow_user
 - uzivatel-nahlasene-skladky fix for get skladky
+#VERSION 0.11:
+- Exception message
