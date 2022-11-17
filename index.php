@@ -157,14 +157,20 @@ try {
       $unknownUserData = $unknownUserModel->getByCustom('uid', $getData['uid']);
 
       if (empty($unknownUserData)) Response::throwException('Invalid UID');
-      if ($unknownUserData['id_user']) Response::throwException('You must be registered before');
+      if ($unknownUserData['id_user'] == NULL) Response::throwException('You must be registered before');
 
-      $skladkaModel->query("
+      $skladkyData = $skladkaModel->query("
         SELECT 
           *
-        FROM {$skladkaModel->tableName}
+        FROM {model}
         WHERE id_unknown_user = %i
-      ", (int)$unknownUserData['id_user']);
+      ", (int)$unknownUserData['id']);
+
+      echo Response::getJson([
+        'status' => 'success',
+        'data' => $skladkyData
+      ]);
+    break;
     case 'skladky-typy': // GET
       $skladkaTypModel = new SkladkaTypModel();
 
@@ -564,6 +570,10 @@ try {
 
       if ((int)$tokenData['token_number'] == (int)$postData['token_number']) {
         $tokenModel->delete($tokenData['id']);
+
+        $unknownUserModel->update([
+          'id_user' => (int)$tokenData['id_user']
+        ], (int)$unknownUserData['id']);
 
         $userModel = $bride->initModel('users');
         $userModel->update([

@@ -1,0 +1,8 @@
+#VERSION 0.10 (MAJOR UPDATE):
+- Updated tables
+- Install plugin impr.
+
+#VERSION 0.11:
+- uzivatel-nahlasene-skladky check if user is registered fix
+- registracia-validacia add id_user into unknow_user
+- uzivatel-nahlasene-skladky fix for get skladky

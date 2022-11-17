@@ -30,7 +30,7 @@ $skladkyModel->defineColumn('pocet_nahlaseni')->type('int')->size(4)->default(0)
 $skladkyModel->defineColumn('existujuca')->type('tinyint')->size(1)->default(1)->null(false);
 $skladkyModel->defineColumn('lat')->type('double')->default(0)->null(false);
 $skladkyModel->defineColumn('lng')->type('double')->default(0)->null(false);
-$skladkyModel->defineColumn('unknown_user_id')->type('int')->size(11)->null(false);
+$skladkyModel->defineColumn('id_unknown_user')->type('int')->size(11)->null(false);
 $skladkyModel->initTable();
 
 /** UCM_SKLADKY_TYPY */
@@ -43,7 +43,7 @@ $skladkaTypModel->initTable();
 $unknownUserModel = $bride->initModel('unknown_users');
 
 $unknownUserModel->defineColumn('uid')->type('varchar')->size(30)->null(false);
-$unknownUserModel->defineColumn('id_user')->type('int')->size(11)->null(false);
+$unknownUserModel->defineColumn('id_user')->type('int')->size(11)->null(true);
 $unknownUserModel->defineColumn('created_at')->type('datetime')->null(false);
 $unknownUserModel->defineColumn('last_login')->type('datetime')->null(true);
 $unknownUserModel->initTable();
@@ -69,7 +69,7 @@ $skladkaTypCrossModel->initTable();
 $skladkaPotvrdenieModel = $bride->initModel('skladky_potvrdenia');
 
 $skladkaPotvrdenieModel->defineColumn('id_skladka')->type('int')->size(11)->null(false);
-$skladkaPotvrdenieModel->defineColumn('unknown_user_id')->type('int')->size(11)->null(false);
+$skladkaPotvrdenieModel->defineColumn('id_unknown_user')->type('int')->size(11)->null(false);
 $skladkaPotvrdenieModel->initTable();
 
 /** UCM_USERS */
