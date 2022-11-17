@@ -592,6 +592,45 @@ try {
         Response::throwException('Code is invalid, try again');
       }
     break;
+    case 'ucet-prehlad': // GET
+      Request::getGetData();
+
+      Request::validateGetParam('uid');
+
+      $unknownUserModel = $bride->initModel('unknown_users');
+      $unknownUserData = $unknownUserModel->getByCustom('uid', $postData['uid']);
+
+      if (empty($unknownUserData)) Response::throwException('Invalid UID');
+
+      $skladkaModel = $bride->initModel('skladky');
+
+      $skladkyData = $skladkaModel->query("
+        SELECT 
+          *
+        FROM {model}
+        WHERE id_unknown_user = %i
+      ", (int)$unknownUserData['id']);
+
+      $skladkaPotvrdeniaModel = $bride->initModel('skladky_potvrdenia');
+      $skladkaPotvrdeniaData = $skladkaModel->query("
+        SELECT 
+          *
+        FROM {model}
+        WHERE id_unknown_user = %i
+      ", (int)$unknownUserData['id']);
+
+      $points = (count($skladkyData) * 10) + (count($skladkyData) * 3);
+
+      echo Response::getJson([
+        'status' => 'success',
+        'data' => [
+          'reported' => count($skladkyData),
+          'confirmed' => count($skladkaPotvrdeniaData),
+          'cleared' => 0,
+          'points' => $points
+        ]
+      ]);
+    break;
     case 'notifikacie': //TODO FEATURE GET 
     break;
     case 'nelegalna-skladka-nahrat-obrazok': //TODO FEATURE POST
