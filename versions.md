@@ -6,5 +6,7 @@
 - uzivatel-nahlasene-skladky check if user is registered fix
 - registracia-validacia add id_user into unknow_user
 - uzivatel-nahlasene-skladky fix for get skladky
-#VERSION 0.11:
+#VERSION 0.12:
 - Exception message
+#VERSION 0.13:
+- Install.php insert typy

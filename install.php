@@ -39,6 +39,16 @@ $skladkaTypModel = $bride->initModel('skladky_typy');
 $skladkaTypModel->defineColumn('nazov')->type('varchar')->size(25)->null(false);
 $skladkaTypModel->initTable();
 
+$typy = ['bio', 'papier', 'plat', 'kov', 'sklo', 'elektro', 'zmiesany', 'iny'];
+
+foreach ($typy as $typ) {
+  $skladkaTypModel->insert([
+    'nazov' => $typ
+  ]);
+
+  echo '<small>Inserted record ' . $typ . '</small></br>';
+}
+
 /** UCM_UNKNOWN_USERS */
 $unknownUserModel = $bride->initModel('unknown_users');
 
