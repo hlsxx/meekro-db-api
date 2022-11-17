@@ -67,7 +67,7 @@ $skladkaUnknownUserModel->defineColumn('id_user')->type('int')->size(11)->null(t
 $skladkaUnknownUserModel->initTable();*/
 
 /** UCM_SKLADKY_TYPY_CROSS */
-$skladkaTypCrossModel = $bride->initModel('ucm_skladky_typy_cross');
+$skladkaTypCrossModel = $bride->initModel('skladky_typy_cross');
 
 $skladkaTypCrossModel->defineColumn('id_skladka')->type('int')->size(11)->null(false);
 $skladkaTypCrossModel->defineColumn('id_skladka_typ')->type('int')->size(11)->null(false);
