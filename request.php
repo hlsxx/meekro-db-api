@@ -23,6 +23,15 @@ class Request {
   }
 
   /**
+   * @return array get data
+   */
+  public static function getGetData(): array {
+    return 
+      isset($_GET) && !empty($_GET) ? $_GET : []
+    ;
+  }
+
+  /**
    * @param string POST param name
    * 
    * @return bool exists or no

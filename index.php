@@ -146,6 +146,25 @@ try {
         'data' => $data
       ]); 
     break;
+    case 'uzivatel-nahlasene-skladky': // GET
+      $getData = Request::getGetData();
+
+      Request::validateGetParam('uid');
+
+      $skladkaModel = $bride->initModel('skladky');
+      $unknownUserModel = $bride->initModel('unknown_users');
+
+      $unknownUserData = $unknownUserModel->getByCustom('uid', $getData['uid']);
+
+      if (empty($unknownUserData)) Response::throwException('Invalid UID');
+      if ($unknownUserData['id_user']) Response::throwException('You must be registered before');
+
+      $skladkaModel->query("
+        SELECT 
+          *
+        FROM {$skladkaModel->tableName}
+        WHERE id_unknown_user = %i
+      ", (int)$unknownUserData['id_user']);
     case 'skladky-typy': // GET
       $skladkaTypModel = new SkladkaTypModel();
 
@@ -209,15 +228,16 @@ try {
         'rok_zacatia' => Date('Y-m-d'),
         'typ' => 2,
         'lat' => (float)$postData['lat'],
-        'lng' => (float)$postData['lng']
+        'lng' => (float)$postData['lng'],
+        'id_unknown_user' => (int)$unknownUserData['id']
       ]); 
 
-      $skladkaUnknownUserModel = new SkladkaUnknownUserModel();
+      /* $skladkaUnknownUserModel = new SkladkaUnknownUserModel();
 
       $skladkaUnknownUserModel->insert([
         'id_skladka' => $insertedIdSkladka,
         'unknown_user_uid' => $postData['uid']
-      ]);
+      ]);*/
       
       $skladkaTypyCrossModel = new SkladkaTypCrossModel();
 
@@ -240,7 +260,7 @@ try {
         foreach ($_FILES as $file) {
           if ($file['size'] > 0) {
             if (!file_exists($filePath)) {
-              if (!mkdir($filePath, 0777, true)) {
+              if (!mkdir($filePath, 0755, true)) {
                 Response::throwException('Error with creating folder');
               }
             }
@@ -285,6 +305,11 @@ try {
       Request::validatePostParam('idSkladka');
       Request::validatePostParam('uid');
 
+      $unknownUserModel = $bride->initModel('unknown_users');
+      $unknownUserData = $unknownUserModel->getByCustom('uid', $postData['uid']);
+
+      if (empty($unknownUserData)) Response::throwException('Invalid UID');
+
       $idSkladka = (int)$postData['idSkladka'];
 
       $skladkaModel = new SkladkaModel(); 
@@ -296,10 +321,10 @@ try {
       ], $idSkladka);
 
       $skladkaPotvrdenieModel = new SkladkaPotvrdenieModel();
-
+      
       $skladkaPotvrdenieModel->insert([
         'id_skladka' => $idSkladka,
-        'unknown_user_uid' => $postData['uid']
+        'unknown_user_id' => (int)$unknownUserData['id']
       ]);
 
       echo Response::getJson([
@@ -312,14 +337,19 @@ try {
       Request::validatePostParam('idSkladka');
       Request::validatePostParam('uid');
 
+      $unknownUserModel = $bride->initModel('unknown_users');
+      $unknownUserData = $unknownUserModel->getByCustom('uid', $postData['uid']);
+
+      if (empty($unknownUserData)) Response::throwException('Invalid UID');
+
       $skladkaPotvrdenieModel = new SkladkaPotvrdenieModel();
 
       $data = DB::queryFirstRow("
         SELECT
           *
         FROM {$skladkaPotvrdenieModel->tableName}
-        WHERE id_skladka = %i AND unknown_user_uid = %s
-      ", (int)$postData['idSkladka'], $postData['uid']);
+        WHERE id_skladka = %i AND unknown_user_id = %i
+      ", (int)$postData['idSkladka'], (int)$unknownUserData['id']);
 
       echo Response::getJson([
         'status' => 'success',
@@ -369,16 +399,17 @@ try {
     case 'vygeneruj-uid': // GET
       $unknownUserModel = new UnknownUserModel();
 
+      $uid = uniqid();
       $insertedUnknownUserId = $unknownUserModel->insert([
-        'uid' => uniqid(),
+        'uid' => $uid,
         'created_at' => date('Y-m-d H:i:s', time())
       ]);
 
-      $unknownUser = $unknownUserModel->getById($insertedUnknownUserId);
+      if ($insertedUnknownUserId === false) Response::throwException('Unknown Error creating UID');
 
       echo Response::getJson([
         'status' => 'success',
-        'unknownUserUID' => $unknownUser['uid']
+        'unknownUserUID' => $uid
       ]); 
     break;
     case 'zaznamenat-aktivitu': // POST
@@ -386,15 +417,16 @@ try {
 
       Request::validatePostParam('uid');
 
-      $unknownUserModel = new UnknownUserModel();
+      $unknownUserModel = $bride->initModel('unknown_users');
+      $unknownUserData = $unknownUserModel->getByCustom('uid', $postData['uid']);
 
-      DB::update(
-        $unknownUserModel->tableName, 
+      if (empty($unknownUserData)) Response::throwException('Invalid UID');
+
+      $unknownUserModel->update(
         [
           'last_login' => date('Y-m-d H:i:s', time())
-        ], 
-        'uid = %s',
-        $postData['uid']
+        ],
+        (int)$unknownUserData['id']
       );
 
       echo Response::getJson([
@@ -419,7 +451,7 @@ try {
       $unknownUserModel = $bride->initModel('unknown_users');
       $unknownUserData = $unknownUserModel->getByCustom('uid', $postData['uid']);
 
-      if (empty($unknownUserData)) Response::throwException('UID does not correct');
+      if (empty($unknownUserData)) Response::throwException('Invalid UID');
 
       $userModel = $bride->initModel('users');
       $userAlreadyExists = $userModel->getByCustom('email', $postData['email']);
@@ -437,8 +469,8 @@ try {
 
       $tokenModel = $bride->initModel('tokens');
       $tokenModel->insert([
-        'id_user' => $idUser,
-        'id_unknown_user' => $unknownUserData['id'],
+        'id_user' => (int)$idUser,
+        'id_unknown_user' => (int)$unknownUserData['id'],
         'attempt' => 3,
         'type' => 1,
         'token_number' => $tokenNumber,
@@ -458,6 +490,11 @@ try {
       Request::validatePostParam('email');
       Request::validatePostParam('password');
       Request::validatePostParam('uid');
+
+      $unknownUserModel = $bride->initModel('unknown_users');
+      $unknownUserData = $unknownUserModel->getByCustom('uid', $postData['uid']);
+
+      if (empty($unknownUserData)) Response::throwException('Invalid UID');
 
       if (!filter_var($postData['email'], FILTER_VALIDATE_EMAIL)) {
         Response::throwException('Incorrect email format');
@@ -490,18 +527,17 @@ try {
       $unknownUserModel = $bride->initModel('unknown_users');
       $unknownUserData = $unknownUserModel->getByCustom('uid', $postData['uid']);
 
-      if (empty($unknownUserData)) Response::throwException('UID does not correct');
+      if (empty($unknownUserData)) Response::throwException('Invalid UID');
 
       $tokenModel = $bride->initModel('tokens');
-      //$token->getByCustom('uid', $postData['uid'])
 
       $tokenData = DB::queryFirstRow("
         SELECT 
           *
         FROM {$tokenModel->tableName} 
-        WHERE id_unknown_user = %d 
+        WHERE id_unknown_user = %i
         AND type = 1
-      ", $unknownUserData['id']);
+      ", (int)$unknownUserData['id']);
 
       if (empty($tokenData)) Response::throwException('Token not exists for UID: ' . $postData['uid']);
       
@@ -515,8 +551,8 @@ try {
 
         $tokenModel = $bride->initModel('tokens');
         $tokenModel->insert([
-          'id_user' => $tokenData['id_user'],
-          'id_unknown_user' => $unknownUserData['id'],
+          'id_user' => (int)$tokenData['id_user'],
+          'id_unknown_user' => (int)$unknownUserData['id'],
           'attempt' => 3,
           'type' => 1,
           'token_number' => $tokenNumber,
@@ -546,9 +582,9 @@ try {
         Response::throwException('Code is invalid, try again');
       }
     break;
-    case 'notifikacie':
+    case 'notifikacie': //TODO FEATURE GET 
     break;
-    case 'nelegalna-skladka-nahrat-obrazok':
+    case 'nelegalna-skladka-nahrat-obrazok': //TODO FEATURE POST
       $postData = Request::getPostData();
 
       Request::validatePostParam('idSkladka');
@@ -591,7 +627,7 @@ try {
         Response::throwException('Error with images uploading');
       }
     break;
-    case 'test-mail':
+    case 'test-mail': // TEST PURPOSE
       $mailer = new Mailer();
       var_dump($mailer->sendRegistrationCode("test@xxxx.com", rand(1000, 9999)));
     break;
