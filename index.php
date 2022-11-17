@@ -1,7 +1,5 @@
 <?php
 
-use LDAP\Result;
-
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
@@ -9,6 +7,9 @@ error_reporting(E_ALL);
 header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: GET, POST, PATCH, PUT, DELETE, OPTIONS');
 header('Access-Control-Allow-Headers: Origin, Content-Type, X-Auth-Token');
+
+// App
+require_once(__DIR__ . '/app.php');
 
 // Common
 require_once(__DIR__ . '/vendor/autoload.php');
@@ -40,7 +41,6 @@ require_once(__DIR__ . '/lib/TokenModel.php');
 
 // Mailer
 require_once(__DIR__ . '/lib/Mailer.php');
-
 
 // Logs
 $logInfo = new Monolog\Logger('MeekroAPI-Log-System');
