@@ -15,3 +15,6 @@
 
 #VERSION 0.14:
 - Added ucet-prehlad
+
+#VERSION 0.15:
+- ucet-prehlad fix parametrov

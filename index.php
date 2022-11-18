@@ -593,12 +593,12 @@ try {
       }
     break;
     case 'ucet-prehlad': // GET
-      Request::getGetData();
+      $getData = Request::getGetData();
 
       Request::validateGetParam('uid');
 
       $unknownUserModel = $bride->initModel('unknown_users');
-      $unknownUserData = $unknownUserModel->getByCustom('uid', $postData['uid']);
+      $unknownUserData = $unknownUserModel->getByCustom('uid', $getData['uid']);
 
       if (empty($unknownUserData)) Response::throwException('Invalid UID');
 
