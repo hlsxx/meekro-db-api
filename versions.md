@@ -18,3 +18,7 @@
 
 #VERSION 0.15:
 - ucet-prehlad fix parametrov
+
+#VERSION 0.16:
+- fix pre ucet-prehlad pocitanie
+- pridanie vycistit page

@@ -326,11 +326,44 @@ try {
         'pocet_nahlaseni' => (int)$currentSkladka['pocet_nahlaseni'] + 1
       ], $idSkladka);
 
-      $skladkaPotvrdenieModel = new SkladkaPotvrdenieModel();
+      $skladkaPotvrdenieModel = $bride->initModel('skladky_potvrdenia');
       
       $skladkaPotvrdenieModel->insert([
         'id_skladka' => $idSkladka,
-        'unknown_user_id' => (int)$unknownUserData['id']
+        'id_unknown_user' => (int)$unknownUserData['id']
+      ]);
+
+      echo Response::getJson([
+        'status' => 'success'
+      ]);  
+    break;
+    case 'vycistit': // POST
+      $postData = Request::getPostData();
+
+      Request::validatePostParam('idSkladka');
+      Request::validatePostParam('uid');
+
+      $unknownUserModel = $bride->initModel('unknown_users');
+      $unknownUserData = $unknownUserModel->getByCustom('uid', $postData['uid']);
+
+      if (empty($unknownUserData)) Response::throwException('Invalid UID');
+
+      $idSkladka = (int)$postData['idSkladka'];
+
+      $skladkaModel = $bride->initModel('skladky');
+
+      $currentSkladka = $skladkaModel->getById($idSkladka);
+      
+      $skladkaModel->update([
+        'existujuca' => 0
+      ], $idSkladka);
+
+      $skladkaVycisteneModel = $bride->initModel('skladky_vycistene');
+      
+      $skladkaVycisteneModel->insert([
+        'id_skladka' => $idSkladka,
+        'id_unknown_user' => (int)$unknownUserData['id'],
+        'created_at' => date('Y-m-d H:i:s')
       ]);
 
       echo Response::getJson([
@@ -612,7 +645,7 @@ try {
       ", (int)$unknownUserData['id']);
 
       $skladkaPotvrdeniaModel = $bride->initModel('skladky_potvrdenia');
-      $skladkaPotvrdeniaData = $skladkaModel->query("
+      $skladkaPotvrdeniaData = $skladkaPotvrdeniaModel->query("
         SELECT 
           *
         FROM {model}

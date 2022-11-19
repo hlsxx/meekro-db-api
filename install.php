@@ -15,6 +15,15 @@ $bride->tablePrefix('ucm');
 
 echo "<small>Meekro-api version: " . APP_VERSION . '</small></br></br>';
 
+$skladkaNahlaseniaModel = $bride->initModel('skladky_vycistene');
+
+$skladkaNahlaseniaModel->defineColumn('id_skladka')->type('int')->size(11)->null(false);
+$skladkaNahlaseniaModel->defineColumn('id_unknown_user')->type('int')->size(11)->null(false);
+$skladkaNahlaseniaModel->defineColumn('created_at')->type('datetime')->null(false);
+$skladkaNahlaseniaModel->initTable();
+
+exit();
+
 /** UCM_SKLADKY */
 $skladkyModel = $bride->initModel('skladky');
 
@@ -121,6 +130,20 @@ $skladkyGalleryModel->defineColumn('id_gallery')->type('int')->size(11)->null(fa
 $skladkyGalleryModel->defineColumn('id_unknown_user')->type('int')->size(11)->null(false);
 $skladkyGalleryModel->initTable();
 
+/** UCM_SKLADKY_NAHLASENIA */
+$skladkaNahlaseniaModel = $bride->initModel('skladky_nahlasenia');
+
+$skladkaNahlaseniaModel->defineColumn('id_skladka')->type('int')->size(11)->null(false);
+$skladkaNahlaseniaModel->defineColumn('id_unknown_user')->type('int')->size(11)->null(false);
+$skladkaNahlaseniaModel->initTable();
+
+/** UCM_SKLADKY_VYCISTENE */
+$skladkaNahlaseniaModel = $bride->initModel('skladky_vycistene');
+
+$skladkaNahlaseniaModel->defineColumn('id_skladka')->type('int')->size(11)->null(false);
+$skladkaNahlaseniaModel->defineColumn('id_unknown_user')->type('int')->size(11)->null(false);
+$galleryModel->defineColumn('created_at')->type('datetime')->null(false);
+$skladkaNahlaseniaModel->initTable();
 
 /** UCM_NOTIFICATIONS */
 /*$skladkaPotvrdenieModel = $bride->initModel('notifications');
