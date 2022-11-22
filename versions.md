@@ -22,3 +22,6 @@
 #VERSION 0.16:
 - fix pre ucet-prehlad pocitanie
 - pridanie vycistit page
+
+#VERSION 0.17:
+- update pred ostrym serverom

@@ -24,7 +24,6 @@ require_once(__DIR__ . '/debug.php');
 DB::$user = DB_USER;
 DB::$password = DB_PASSWORD;
 DB::$dbName = DB_NAME;
-DB::$encoding = 'utf8mb4_general_ci'; 
 
 $bride = new \Bride\Bride(DB_NAME, DB_USER, DB_PASSWORD);
 $bride->tablePrefix('ucm');
@@ -252,7 +251,8 @@ try {
         $skladkaTypyCrossModel->insert([
           'id_skladka' => $insertedIdSkladka,
           'id_skladka_typ' => $usedType,
-          'pocet_potvrdeni' => 1
+          'pocet_potvrdeni' => 1,
+          'id_unknown_user' => (int)$unknownUserData['id']
         ]);
       }
 

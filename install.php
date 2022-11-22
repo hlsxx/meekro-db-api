@@ -15,15 +15,6 @@ $bride->tablePrefix('ucm');
 
 echo "<small>Meekro-api version: " . APP_VERSION . '</small></br></br>';
 
-$skladkaNahlaseniaModel = $bride->initModel('skladky_vycistene');
-
-$skladkaNahlaseniaModel->defineColumn('id_skladka')->type('int')->size(11)->null(false);
-$skladkaNahlaseniaModel->defineColumn('id_unknown_user')->type('int')->size(11)->null(false);
-$skladkaNahlaseniaModel->defineColumn('created_at')->type('datetime')->null(false);
-$skladkaNahlaseniaModel->initTable();
-
-exit();
-
 /** UCM_SKLADKY */
 $skladkyModel = $bride->initModel('skladky');
 
@@ -81,7 +72,7 @@ $skladkaTypCrossModel = $bride->initModel('skladky_typy_cross');
 $skladkaTypCrossModel->defineColumn('id_skladka')->type('int')->size(11)->null(false);
 $skladkaTypCrossModel->defineColumn('id_skladka_typ')->type('int')->size(11)->null(false);
 $skladkaTypCrossModel->defineColumn('pocet_potvrdeni')->type('int')->size(4)->default(0)->null(false);
-$skladkaTypCrossModel->defineColumn('unknown_user_uid')->type('varchar')->size(30)->null(false);
+$skladkaTypCrossModel->defineColumn('id_unknown_user')->type('varchar')->size(30)->null(false);
 $skladkaTypCrossModel->initTable();
 
 /** UCM_SKLADKY_POTVRDENIA */
