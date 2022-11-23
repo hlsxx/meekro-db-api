@@ -257,13 +257,46 @@ try {
       }
 
       /** Images upload */
-      if (!empty($_FILES)) {
+      if (isset($postData['image'])) {
         $filePath = FILES_DIR . '/nelegalne-skladky/' . $insertedIdSkladka;
 
         $galleryModel = $bride->initModel('gallery');
         $skladkyGalleryModel = $bride->initModel('skladky_gallery');
 
-        foreach ($_FILES as $file) {
+        if (!file_exists($filePath)) {
+          if (!mkdir($filePath, 0755, true)) {
+            Response::throwException('Error with creating folder');
+          }
+        }
+        
+        if (strpos($postData['image'], 'data:image') !== false) {
+          $image = base64_decode(preg_replace('#^data:image/\w+;base64,#i', '', $postData['image']));
+        } else {
+          $image = base64_decode($postData['image']);
+        }
+
+        $countExistingImages = count(scandir($filePath)) - 2;
+        $newName = ($countExistingImages + 1) . '.jpg';
+
+        $imagePath = $filePath . '/' . $newName;
+      
+        if (!file_put_contents($imagePath, $image)) {
+          Response::throwException('Error with images uploading');
+        }
+
+        $idGallery = $galleryModel->insert([
+          'link' => $newName,
+          'created_at' => date('Y-m-d H:i:s')
+        ]);
+
+        $skladkyGalleryModel->insert([
+          'id_skladka' => (int)$insertedIdSkladka,
+          'id_gallery' => (int)$idGallery,
+          'id_unknown_user' => (int)$unknownUserData['id']
+        ]);
+
+        // $_FILES deprecated
+        /*foreach ($_FILES as $file) {
           if ($file['size'] > 0) {
             if (!file_exists($filePath)) {
               if (!mkdir($filePath, 0755, true)) {
@@ -297,7 +330,7 @@ try {
               'id_unknown_user' => (int)$unknownUserData['id']
             ]);
           }
-        }
+        }*/
       }
 
       echo Response::getJson([
@@ -387,7 +420,7 @@ try {
         SELECT
           *
         FROM {$skladkaPotvrdenieModel->tableName}
-        WHERE id_skladka = %i AND unknown_user_id = %i
+        WHERE id_skladka = %i AND id_unknown_user = %i
       ", (int)$postData['idSkladka'], (int)$unknownUserData['id']);
 
       echo Response::getJson([
@@ -660,7 +693,7 @@ try {
           'reported' => count($skladkyData),
           'confirmed' => count($skladkaPotvrdeniaData),
           'cleared' => 0,
-          'points' => $points
+          'points' => (int)$points
         ]
       ]);
     break;
@@ -713,6 +746,12 @@ try {
       $mailer = new Mailer();
       var_dump($mailer->sendRegistrationCode("test@xxxx.com", rand(1000, 9999)));
     break;
+    case 'test-image':
+      $postData = Request::getPostData();
+
+      $data = base64_decode(preg_replace('#^data:image/\w+;base64,#i', '', $postData['image']));
+      file_put_contents('image.png', $data);
+      break;
     default:
       Response::throwException('PAGE: {' . Request::getParam('page') . '} doesnt exists');
     break;

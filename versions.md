@@ -25,3 +25,6 @@
 
 #VERSION 0.17:
 - update pred ostrym serverom
+
+#VERSION 0.18:
+- image upload base64
