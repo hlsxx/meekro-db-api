@@ -28,3 +28,6 @@
 
 #VERSION 0.18:
 - image upload base64
+
+#VERSION 0.19:
+- nahlasit .jpg, .jpeg extensions

@@ -271,12 +271,16 @@ try {
         
         if (strpos($postData['image'], 'data:image') !== false) {
           $image = base64_decode(preg_replace('#^data:image/\w+;base64,#i', '', $postData['image']));
+          $ext = '.jpg';
         } else {
-          $image = base64_decode($postData['image']);
+          // IOS
+          $image = str_replace(" ", "+", $postData['image']);
+          $image = base64_decode($image);
+          $ext = '.jpeg';
         }
 
         $countExistingImages = count(scandir($filePath)) - 2;
-        $newName = ($countExistingImages + 1) . '.jpg';
+        $newName = ($countExistingImages + 1) . $ext;
 
         $imagePath = $filePath . '/' . $newName;
       
@@ -749,8 +753,10 @@ try {
     case 'test-image':
       $postData = Request::getPostData();
 
-      $data = base64_decode(preg_replace('#^data:image/\w+;base64,#i', '', $postData['image']));
-      file_put_contents('image.png', $data);
+      $data = str_replace(" ", "+", $postData['image']);
+      $data = base64_decode($data);
+
+      file_put_contents('test_peter/image.jpeg', $data);
       break;
     default:
       Response::throwException('PAGE: {' . Request::getParam('page') . '} doesnt exists');
