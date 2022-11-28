@@ -41,6 +41,8 @@ require_once(__DIR__ . '/lib/TokenModel.php');
 // Mailer
 require_once(__DIR__ . '/lib/Mailer.php');
 
+require_once(__DIR__ . '/common.php');
+
 // Logs
 $logInfo = new Monolog\Logger('MeekroAPI-Log-System');
 $logInfo->pushHandler(
@@ -63,6 +65,8 @@ try {
     Response::throwException('GET param: {page} not set');
   }
   
+  Common::androidOrIos();
+
   switch (Request::getParam('page')) {
     case 'skladky-vsetky': // GET
       $skladkaModel = new SkladkaModel();
@@ -748,7 +752,7 @@ try {
     break;
     case 'test-mail': // TEST PURPOSE
       $mailer = new Mailer();
-      var_dump($mailer->sendRegistrationCode("test@xxxx.com", rand(1000, 9999)));
+      var_dump($mailer->sendRegistrationCode("holespato@gmail.com", rand(1000, 9999)));
     break;
     case 'test-image':
       $postData = Request::getPostData();

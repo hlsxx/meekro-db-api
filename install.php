@@ -133,7 +133,7 @@ $skladkaNahlaseniaModel = $bride->initModel('skladky_vycistene');
 
 $skladkaNahlaseniaModel->defineColumn('id_skladka')->type('int')->size(11)->null(false);
 $skladkaNahlaseniaModel->defineColumn('id_unknown_user')->type('int')->size(11)->null(false);
-$galleryModel->defineColumn('created_at')->type('datetime')->null(false);
+$skladkaNahlaseniaModel->defineColumn('created_at')->type('datetime')->null(false);
 $skladkaNahlaseniaModel->initTable();
 
 /** UCM_NOTIFICATIONS */
@@ -142,3 +142,11 @@ $skladkaNahlaseniaModel->initTable();
 $skladkaPotvrdenieModel->defineColumn('id_skladka')->type('int')->size(11)->null(false);
 $skladkaPotvrdenieModel->defineColumn('unknown_user_uid')->type('varchar')->size(30)->null(false);
 $skladkaPotvrdenieModel->initTable();*/
+
+/** UCM_DEVICES_LOGS */
+$deviceLogModel = $bride->initModel('devices_logs');
+
+$deviceLogModel->defineColumn('device_type')->type('int')->size(1)->null(false);
+$deviceLogModel->defineColumn('page')->type('varchar')->size(30)->null(false);
+$deviceLogModel->defineColumn('created_at')->type('datetime')->null(false);
+$deviceLogModel->initTable();

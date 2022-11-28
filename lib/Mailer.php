@@ -14,10 +14,10 @@ class Mailer {
 
     try {
       //$this->mail->SMTPDebug = SMTP::DEBUG_SERVER;
-      //$this->mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;  
+      $this->mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;  
       $this->mail->isSMTP();
-      $this->mail->Host = SMTP_HOST;
       $this->mail->SMTPAuth = true;
+      $this->mail->Host = SMTP_HOST;
       $this->mail->Port = SMTP_PORT;
       $this->mail->Username = SMTP_USERNAME;
       $this->mail->Password = SMTP_PASSWORD;

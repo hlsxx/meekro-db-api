@@ -31,3 +31,6 @@
 
 #VERSION 0.19:
 - nahlasit .jpg, .jpeg extensions
+
+#VERSION 0.20:
+- androidOrIos
