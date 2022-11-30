@@ -129,7 +129,6 @@ class SkladkaModel extends Model {
               "okres" => $this->getMixedDataValue("okres"),
               "nazov" => $this->getMixedDataValue("nazov"),
               "obec" => $this->getMixedDataValue("obec"),
-              "trieda" => $this->getMixedDataValue("trieda"),
               "prevadzkovatel" => $this->getMixedDataValue("prevadzkovatel"),
               "sidlo" => $this->getMixedDataValue("sidlo"),
               "rok_zacatia" => $this->getMixedDataValue("rok_zacatia"),

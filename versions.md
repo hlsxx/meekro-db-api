@@ -34,3 +34,6 @@
 
 #VERSION 0.20:
 - androidOrIos
+
+#VERSION 0.21:
+- trieda delete
