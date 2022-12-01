@@ -37,3 +37,10 @@
 
 #VERSION 0.21:
 - trieda delete
+
+#VERSION 0.22 (MAJOR UPDATE):
+- Pridane zmena-hesla, zmena-mena
+- Mail v registracii
+- Slovenske exception hlasky
+- Mail v token expiracii
+- password_1 password_2 v registracii povinne

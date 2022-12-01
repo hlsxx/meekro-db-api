@@ -368,7 +368,6 @@ class Mailer {
     //$this->mail->AltBody = 'This is the body in plain text for non-HTML mail clients';
 
     $this->mail->send();
-    echo 'Message has been sent';
   }
 
   public function test() {

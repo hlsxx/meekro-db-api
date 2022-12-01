@@ -159,7 +159,7 @@ try {
 
       $unknownUserData = $unknownUserModel->getByCustom('uid', $getData['uid']);
 
-      if (empty($unknownUserData)) Response::throwException('Invalid UID');
+      if (empty($unknownUserData)) Response::throwException('Vaše zariadenie nebolo rozpoznané v systéme');
       if ($unknownUserData['id_user'] == NULL) Response::throwException('You must be registered before');
 
       $skladkyData = $skladkaModel->query("
@@ -219,12 +219,12 @@ try {
       Request::validatePostParam('lng');
       Request::validatePostParam('uid');
 
-      if ($postData['choosenTypes'] == '') Response::throwException('Vyberte typ');
+      if ($postData['choosenTypes'] == '') Response::throwException('Vyberte aspoň jeden typ odpadu nachádzajúci sa na skládke');
 
       $unknownUserModel = $bride->initModel('unknown_users');
       $unknownUserData = $unknownUserModel->getByCustom('uid', $postData['uid']);
 
-      if (empty($unknownUserData)) Response::throwException('Invalid UID');
+      if (empty($unknownUserData)) Response::throwException('Vaše zariadenie nebolo rozpoznané v systéme');
 
       $skladkaModel = new SkladkaModel();
 
@@ -355,7 +355,7 @@ try {
       $unknownUserModel = $bride->initModel('unknown_users');
       $unknownUserData = $unknownUserModel->getByCustom('uid', $postData['uid']);
 
-      if (empty($unknownUserData)) Response::throwException('Invalid UID');
+      if (empty($unknownUserData)) Response::throwException('Vaše zariadenie nebolo rozpoznané v systéme');
 
       $idSkladka = (int)$postData['idSkladka'];
 
@@ -387,7 +387,7 @@ try {
       $unknownUserModel = $bride->initModel('unknown_users');
       $unknownUserData = $unknownUserModel->getByCustom('uid', $postData['uid']);
 
-      if (empty($unknownUserData)) Response::throwException('Invalid UID');
+      if (empty($unknownUserData)) Response::throwException('Vaše zariadenie nebolo rozpoznané v systéme');
 
       $idSkladka = (int)$postData['idSkladka'];
 
@@ -420,7 +420,7 @@ try {
       $unknownUserModel = $bride->initModel('unknown_users');
       $unknownUserData = $unknownUserModel->getByCustom('uid', $postData['uid']);
 
-      if (empty($unknownUserData)) Response::throwException('Invalid UID');
+      if (empty($unknownUserData)) Response::throwException('Vaše zariadenie nebolo rozpoznané v systéme');
 
       $skladkaPotvrdenieModel = new SkladkaPotvrdenieModel();
 
@@ -485,7 +485,7 @@ try {
         'created_at' => date('Y-m-d H:i:s', time())
       ]);
 
-      if ($insertedUnknownUserId === false) Response::throwException('Unknown Error creating UID');
+      if ($insertedUnknownUserId === false) Response::throwException('Nastala neočakávana chyba');
 
       echo Response::getJson([
         'status' => 'success',
@@ -500,7 +500,7 @@ try {
       $unknownUserModel = $bride->initModel('unknown_users');
       $unknownUserData = $unknownUserModel->getByCustom('uid', $postData['uid']);
 
-      if (empty($unknownUserData)) Response::throwException('Invalid UID');
+      if (empty($unknownUserData)) Response::throwException('Vaše zariadenie nebolo rozpoznané v systéme');
 
       $unknownUserModel->update(
         [
@@ -517,31 +517,36 @@ try {
       $postData = Request::getPostData();
 
       Request::validatePostParam('email');
-      Request::validatePostParam('password');
+      Request::validatePostParam('password_1');
+      Request::validatePostParam('password_2');
       Request::validatePostParam('uid');
 
       if (!filter_var($postData['email'], FILTER_VALIDATE_EMAIL)) {
-        Response::throwException('Incorrect email format');
+        Response::throwException('Nesprávny formát e-mailu');
       }
 
-      if (strlen($postData['password']) < 8) {
-        Response::throwException('Password musst have at least 8 symbols');
+      if (strlen($postData['password_1']) < 8) {
+        Response::throwException('Heslo musí obsahovať aspoň 8 znakov');
+      }
+
+      if ($postData['password_1'] != $postData['password_2']) {
+        Response::throwException('Hesla sa nezhodujú');
       }
 
       $unknownUserModel = $bride->initModel('unknown_users');
       $unknownUserData = $unknownUserModel->getByCustom('uid', $postData['uid']);
 
-      if (empty($unknownUserData)) Response::throwException('Invalid UID');
+      if (empty($unknownUserData)) Response::throwException('Vaše zariadenie nebolo rozpoznané v systéme');
 
       $userModel = $bride->initModel('users');
       $userAlreadyExists = $userModel->getByCustom('email', $postData['email']);
 
-      if (!empty($userAlreadyExists)) Response::throwException('User email already exists');
+      if (!empty($userAlreadyExists)) Response::throwException('Tento e-mail je už použitý');
 
       $createdAt = date('Y-m-d H:i:s');
       $idUser = $userModel->insert([
         'email' => $postData['email'],
-        'password' => password_hash($postData['password'], PASSWORD_BCRYPT),
+        'password' => password_hash($postData['password_1'], PASSWORD_BCRYPT),
         'created_at' => $createdAt
       ]);
 
@@ -557,10 +562,17 @@ try {
         'created_at' => $createdAt
       ]);
 
+      if (!strpos($postData['email'], 'testx') == false) {
+        $mailer = new Mailer();
+        $mailer->sendRegistrationCode($postData['email'], $tokenNumber);
+      }
+      
       echo Response::getJson([
         'status' => 'success',
         'data' => [
-          'email' => $postData['email']
+          'email' => $postData['email'],
+          'id_user' => $idUser,
+          'name' => ''
         ]
       ]);
     break;
@@ -574,22 +586,22 @@ try {
       $unknownUserModel = $bride->initModel('unknown_users');
       $unknownUserData = $unknownUserModel->getByCustom('uid', $postData['uid']);
 
-      if (empty($unknownUserData)) Response::throwException('Invalid UID');
+      if (empty($unknownUserData)) Response::throwException('Vaše zariadenie nebolo rozpoznané v systéme');
 
       if (!filter_var($postData['email'], FILTER_VALIDATE_EMAIL)) {
-        Response::throwException('Incorrect email format');
+        Response::throwException('Nesprávny formát e-mailu');
       }
 
       $userModel = $bride->initModel('users');
       $userData = $userModel->getByCustom('email', $postData['email']);
 
-      if (empty($userData)) Response::throwException('Email doesnt exists');
+      if (empty($userData)) Response::throwException('Zadaná e-mailová adresa neexistuje');
 
       if (!password_verify($postData['password'], $userData['password'])) {
-        Response::throwException('Password is incorrect');
+        Response::throwException('Heslo je nesprávne');
       }
 
-      if ((bool)$userData['verified'] == false) Response::throwException('Account is not verified');
+      if ((bool)$userData['verified'] == false) Response::throwException('Váš účet nie je overený');
 
       echo Response::getJson([
         'status' => 'success',
@@ -607,7 +619,7 @@ try {
       $unknownUserModel = $bride->initModel('unknown_users');
       $unknownUserData = $unknownUserModel->getByCustom('uid', $postData['uid']);
 
-      if (empty($unknownUserData)) Response::throwException('Invalid UID');
+      if (empty($unknownUserData)) Response::throwException('Vaše zariadenie nebolo rozpoznané v systéme');
 
       $tokenModel = $bride->initModel('tokens');
 
@@ -619,14 +631,13 @@ try {
         AND type = 1
       ", (int)$unknownUserData['id']);
 
-      if (empty($tokenData)) Response::throwException('Token not exists for UID: ' . $postData['uid']);
+      if (empty($tokenData)) Response::throwException('Token neexistuje pre vaše zariadenie: ' . $postData['uid']);
       
       $timeToTokenValid = strtotime($tokenData['created_at'] . ' + 10 minute');
 
       if (date('Y-m-d H:i:s', $timeToTokenValid) < date('Y-m-d H:i:s')) {
         $tokenModel->delete($tokenData['id']);
 
-        // TODO: SEND MAIL WITH NEW TOKEN
         $tokenNumber = (new TokenModel())->getTokenNumber();
 
         $tokenModel = $bride->initModel('tokens');
@@ -639,7 +650,17 @@ try {
           'created_at' => date('Y-m-d H:i:s')
         ]);
 
-        Response::throwException('The token has been expired. We sent you another one.');
+        $userModel = $bride->initModel('users');
+        $userData = $userModel->getById((int)$tokenData['id_user']);
+
+        if (empty($userData)) Response::throwException('Nastala chyba, uživateľ nebol rozpoznaný');
+
+        if (!strpos($userData['email'], 'testx') == false) {
+          $mailer = new Mailer();
+          $mailer->sendRegistrationCode($postData['email'], $tokenNumber);
+        }
+
+        Response::throwException('Token už expiroval. Zaslali sme Vám nový.');
       }
 
       if ((int)$tokenData['token_number'] == (int)$postData['token_number']) {
@@ -663,7 +684,7 @@ try {
           'attempt' => (int)$tokenData['attempt'] - 1
         ], $tokenData['id']);
 
-        Response::throwException('Code is invalid, try again');
+        Response::throwException('Zadaný kód je nesprávny, skúste to znovu');
       }
     break;
     case 'ucet-prehlad': // GET
@@ -674,7 +695,7 @@ try {
       $unknownUserModel = $bride->initModel('unknown_users');
       $unknownUserData = $unknownUserModel->getByCustom('uid', $getData['uid']);
 
-      if (empty($unknownUserData)) Response::throwException('Invalid UID');
+      if (empty($unknownUserData)) Response::throwException('Vaše zariadenie nebolo rozpoznané v systéme');
 
       $skladkaModel = $bride->initModel('skladky');
 
@@ -718,7 +739,7 @@ try {
       $skladkaModel = $bride->initModel('skladky');
       $skladkaData = $skladkaModel->getById($postData['idSkladka']);
 
-      if (empty($skladkaData)) Response::throwException('Skladka does not exists');
+      if (empty($skladkaData)) Response::throwException('Skládka neexistuje');
 
       $filePath = FILES_DIR . '/nelegalne-skladky/' . $skladkaData['id'];
 
@@ -732,7 +753,7 @@ try {
           $fileExtension = explode('.', $file['name']);
 
           if (!in_array(end($fileExtension), ['jpeg','jpg','png'])) {
-            Response::throwException('Allowed format of images: jpeg, jpg, png');
+            Response::throwException('Povolené formáty: jpeg, jpg, png');
           }
 
           $imagePath = $filePath . '/' . $file['name'];
@@ -750,22 +771,75 @@ try {
         Response::throwException('Error with images uploading');
       }
     break;
-    case 'test-mail': // TEST PURPOSE
-      $mailer = new Mailer();
-      var_dump($mailer->sendRegistrationCode("holespato@gmail.com", rand(1000, 9999)));
-    break;
-    case 'test-image':
+    case 'test-image': // TEST PURPOSE
       $postData = Request::getPostData();
 
       $data = str_replace(" ", "+", $postData['image']);
       $data = base64_decode($data);
 
       file_put_contents('test_peter/image.jpeg', $data);
-      break;
+    break;
+    case 'zmena-mena': // POST
+      $postData = Request::getPostData();
+
+      Request::validatePostParam('id_user');
+      Request::validatePostParam('name');
+
+      if ((strlen($postData['name']) < 2)) Response::throwException('Prezývka musí obsahovať aspoň 2 znaky');
+
+      $userModel = $bride->initModel('users');
+
+      $allUsersData = $userModel->getAll();
+
+      foreach ($allUsersData as $data) {
+        if ($data['name'] == $postData['name']) Response::throwException('Táto prezývka je už obsadená');
+      }
+
+      $userData = $userModel->getById((int)$postData['id_user']);
+
+      if (empty($userData)) Response::throwException('Unknown user');
+
+      $userModel->update([
+        'name' => $postData['name']
+      ], (int)$postData['id_user']);
+
+      echo Response::getJson([
+        'status' => 'success',
+        'message' => 'Prezývka úspešne zmenená'
+      ]);
+    break;
+    case 'zmena-hesla': // POST
+      $postData = Request::getPostData();
+
+      Request::validatePostParam('id_user');
+      Request::validatePostParam('old_password');
+      Request::validatePostParam('new_password');
+
+      $userModel = $bride->initModel('users');
+      $userData = $userModel->getById((int)$postData['id_user']);
+
+      if (empty($userData)) Response::throwException('Unknown user');
+
+      if (!password_verify($postData['old_password'], $userData['password'])){
+        Response::throwException('Vaše súčasné heslo nie je správne');
+      }
+
+      if (strlen($postData['new_password']) < 8) {
+        Response::throwException('Nové heslo musí obsahovať aspoň 8 znakov');
+      }
+
+      $userModel->update([
+        'password' => password_hash($postData['new_password'], PASSWORD_BCRYPT)
+      ], (int)$postData['id_user']);
+
+      echo Response::getJson([
+        'status' => 'success',
+        'message' => 'Heslo úspešne zmenené'
+      ]);
+    break;
     default:
       Response::throwException('PAGE: {' . Request::getParam('page') . '} doesnt exists');
     break;
-
   }
 } catch(\Exception $e) {
   $logError->error($e->getMessage());
