@@ -44,3 +44,9 @@
 - Slovenske exception hlasky
 - Mail v token expiracii
 - password_1 password_2 v registracii povinne
+
+#VERSION 0.23:
+- zabudnute-heslo
+- zabudnute-heslo-validacia
+- zabudnute-heslo-nove-heslo
+

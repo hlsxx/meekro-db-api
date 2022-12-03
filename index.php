@@ -897,7 +897,7 @@ try {
           *
         FROM {$tokenModel->tableName} 
         WHERE id_unknown_user = %i
-        AND type = 1
+        AND type = 2
       ", (int)$unknownUserData['id']);
 
       if (empty($tokenData)) Response::throwException('Token neexistuje pre vaše zariadenie: ' . $postData['uid']);
@@ -914,7 +914,7 @@ try {
           'id_user' => (int)$tokenData['id_user'],
           'id_unknown_user' => (int)$unknownUserData['id'],
           'attempt' => 3,
-          'type' => 1,
+          'type' => 2,
           'token_number' => $tokenNumber,
           'created_at' => date('Y-m-d H:i:s')
         ]);
@@ -945,6 +945,35 @@ try {
 
         Response::throwException('Zadaný kód je nesprávny, skúste to znovu');
       }
+    break;
+    case 'zabudnute-heslo-nove-heslo': // POST
+      $postData = Request::getPostData();
+
+      Request::validatePostParam('id_user');
+      Request::validatePostParam('new_password');
+      Request::validatePostParam('new_password2');
+
+      $userModel = $bride->initModel('users');
+      $userData = $userModel->getById((int)$postData['id_user']);
+
+      if (empty($userData)) Response::throwException('Unknown user');
+
+      if (strlen($postData['new_password']) < 8) {
+        Response::throwException('Nové heslo musí obsahovať aspoň 8 znakov');
+      }
+
+      if ($postData['new_password'] != $postData['new_password2']) {
+        Response::throwException('Hesla sa nezhodujú');
+      }
+
+      $userModel->update([
+        'password' => password_hash($postData['new_password'], PASSWORD_BCRYPT)
+      ], (int)$postData['id_user']);
+
+      echo Response::getJson([
+        'status' => 'success',
+        'message' => 'Heslo úspešne nastavené'
+      ]);
     break;
     default:
       Response::throwException('PAGE: {' . Request::getParam('page') . '} doesnt exists');
