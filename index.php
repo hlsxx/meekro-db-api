@@ -837,6 +837,115 @@ try {
         'message' => 'Heslo úspešne zmenené'
       ]);
     break;
+    case 'zabudnute-heslo': // POST
+      $postData = Request::getPostData();
+
+      Request::validatePostParam('email');
+      Request::validatePostParam('uid');
+
+      $unknownUserModel = $bride->initModel('unknown_users');
+      $unknownUserData = $unknownUserModel->getByCustom('uid', $postData['uid']);
+
+      if (empty($unknownUserData)) Response::throwException('Vaše zariadenie nebolo rozpoznané v systéme');
+
+      if (!filter_var($postData['email'], FILTER_VALIDATE_EMAIL)) {
+        Response::throwException('Nesprávny formát e-mailu');
+      }
+
+      $userModel = $bride->initModel('users');
+      $userData = $userModel->getByCustom('email', $postData['email']);
+
+      if (empty($userData)) Response::throwException('Zadaná e-mailová adresa neexistuje');
+
+      $tokenNumber = (new TokenModel())->getTokenNumber();
+
+      $tokenModel = $bride->initModel('tokens');
+      $tokenModel->insert([
+        'id_user' => (int)$userData['id'],
+        'id_unknown_user' => (int)$unknownUserData['id'],
+        'attempt' => 3,
+        'type' => 2,
+        'token_number' => $tokenNumber,
+        'created_at' => date('Y-m-d H:i:s')
+      ]);
+
+      if (!strpos($postData['email'], 'testx') == false) {
+        $mailer = new Mailer();
+        $mailer->sendRegistrationCode($postData['email'], $tokenNumber);
+      }
+
+      echo Response::getJson([
+        'status' => 'success',
+        'message' => 'Na Váš e-mail bol zaslaný overovací kód'
+      ]);
+    break;
+    case 'zabudnute-heslo-validacia': // POSTnavigation.navigate('Ucet');<s
+      $postData = Request::getPostData();
+
+      Request::validatePostParam('token_number');
+      Request::validatePostParam('uid');
+
+      $unknownUserModel = $bride->initModel('unknown_users');
+      $unknownUserData = $unknownUserModel->getByCustom('uid', $postData['uid']);
+
+      if (empty($unknownUserData)) Response::throwException('Vaše zariadenie nebolo rozpoznané v systéme');
+
+      $tokenModel = $bride->initModel('tokens');
+
+      $tokenData = DB::queryFirstRow("
+        SELECT 
+          *
+        FROM {$tokenModel->tableName} 
+        WHERE id_unknown_user = %i
+        AND type = 1
+      ", (int)$unknownUserData['id']);
+
+      if (empty($tokenData)) Response::throwException('Token neexistuje pre vaše zariadenie: ' . $postData['uid']);
+      
+      $timeToTokenValid = strtotime($tokenData['created_at'] . ' + 10 minute');
+
+      if (date('Y-m-d H:i:s', $timeToTokenValid) < date('Y-m-d H:i:s')) {
+        $tokenModel->delete($tokenData['id']);
+
+        $tokenNumber = (new TokenModel())->getTokenNumber();
+
+        $tokenModel = $bride->initModel('tokens');
+        $tokenModel->insert([
+          'id_user' => (int)$tokenData['id_user'],
+          'id_unknown_user' => (int)$unknownUserData['id'],
+          'attempt' => 3,
+          'type' => 1,
+          'token_number' => $tokenNumber,
+          'created_at' => date('Y-m-d H:i:s')
+        ]);
+
+        $userModel = $bride->initModel('users');
+        $userData = $userModel->getById((int)$tokenData['id_user']);
+
+        if (empty($userData)) Response::throwException('Nastala chyba, uživateľ nebol rozpoznaný');
+
+        if (!strpos($userData['email'], 'testx') == false) {
+          $mailer = new Mailer();
+          $mailer->sendRegistrationCode($postData['email'], $tokenNumber);
+        }
+
+        Response::throwException('Token už expiroval. Zaslali sme Vám nový.');
+      }
+
+      if ((int)$tokenData['token_number'] == (int)$postData['token_number']) {
+        $tokenModel->delete($tokenData['id']);
+
+        echo Response::getJson([
+          'status' => 'success'
+        ]);
+      } else {
+        $tokenModel->update([
+          'attempt' => (int)$tokenData['attempt'] - 1
+        ], $tokenData['id']);
+
+        Response::throwException('Zadaný kód je nesprávny, skúste to znovu');
+      }
+    break;
     default:
       Response::throwException('PAGE: {' . Request::getParam('page') . '} doesnt exists');
     break;
