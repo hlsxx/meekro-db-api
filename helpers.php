@@ -62,4 +62,9 @@ class Helper {
 
     return ($angle * $earthRadius) / 1000;
   }
+
+  public static function deleteSpaces(string $string) {
+    return str_replace(' ', '', $string);
+  }
+  
 }

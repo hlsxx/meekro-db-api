@@ -521,7 +521,7 @@ try {
       Request::validatePostParam('password_2');
       Request::validatePostParam('uid');
 
-      if (!filter_var($postData['email'], FILTER_VALIDATE_EMAIL)) {
+      if (!filter_var(Helper::deleteSpaces($postData['email']), FILTER_VALIDATE_EMAIL)) {
         Response::throwException('Nesprávny formát e-mailu');
       }
 
@@ -539,13 +539,13 @@ try {
       if (empty($unknownUserData)) Response::throwException('Vaše zariadenie nebolo rozpoznané v systéme');
 
       $userModel = $bride->initModel('users');
-      $userAlreadyExists = $userModel->getByCustom('email', $postData['email']);
+      $userAlreadyExists = $userModel->getByCustom('email', Helper::deleteSpaces($postData['email']));
 
       if (!empty($userAlreadyExists)) Response::throwException('Tento e-mail je už použitý');
 
       $createdAt = date('Y-m-d H:i:s');
       $idUser = $userModel->insert([
-        'email' => $postData['email'],
+        'email' => Helper::deleteSpaces($postData['email']),
         'password' => password_hash($postData['password_1'], PASSWORD_BCRYPT),
         'created_at' => $createdAt
       ]);
@@ -562,15 +562,15 @@ try {
         'created_at' => $createdAt
       ]);
 
-      if (!strpos($postData['email'], 'testx') == false) {
+      if (!strpos(Helper::deleteSpaces($postData['email']), 'testx') == false) {
         $mailer = new Mailer();
-        $mailer->sendRegistrationCode($postData['email'], $tokenNumber);
+        $mailer->sendRegistrationCode(Helper::deleteSpaces($postData['email']), $tokenNumber);
       }
       
       echo Response::getJson([
         'status' => 'success',
         'data' => [
-          'email' => $postData['email'],
+          'email' => Helper::deleteSpaces($postData['email']),
           'id_user' => $idUser,
           'name' => ''
         ]
@@ -588,12 +588,12 @@ try {
 
       if (empty($unknownUserData)) Response::throwException('Vaše zariadenie nebolo rozpoznané v systéme');
 
-      if (!filter_var($postData['email'], FILTER_VALIDATE_EMAIL)) {
+      if (!filter_var(Helper::deleteSpaces($postData['email']), FILTER_VALIDATE_EMAIL)) {
         Response::throwException('Nesprávny formát e-mailu');
       }
 
       $userModel = $bride->initModel('users');
-      $userData = $userModel->getByCustom('email', $postData['email']);
+      $userData = $userModel->getByCustom('email', Helper::deleteSpaces($postData['email']));
 
       if (empty($userData)) Response::throwException('Zadaná e-mailová adresa neexistuje');
 
@@ -657,7 +657,7 @@ try {
 
         if (!strpos($userData['email'], 'testx') == false) {
           $mailer = new Mailer();
-          $mailer->sendRegistrationCode($postData['email'], $tokenNumber);
+          $mailer->sendRegistrationCode(Helper::deleteSpaces($postData['email']), $tokenNumber);
         }
 
         Response::throwException('Token už expiroval. Zaslali sme Vám nový.');
@@ -848,12 +848,12 @@ try {
 
       if (empty($unknownUserData)) Response::throwException('Vaše zariadenie nebolo rozpoznané v systéme');
 
-      if (!filter_var($postData['email'], FILTER_VALIDATE_EMAIL)) {
+      if (!filter_var(Helper::deleteSpaces($postData['email']), FILTER_VALIDATE_EMAIL)) {
         Response::throwException('Nesprávny formát e-mailu');
       }
 
       $userModel = $bride->initModel('users');
-      $userData = $userModel->getByCustom('email', $postData['email']);
+      $userData = $userModel->getByCustom('email', Helper::deleteSpaces($postData['email']));
 
       if (empty($userData)) Response::throwException('Zadaná e-mailová adresa neexistuje');
 
@@ -869,14 +869,17 @@ try {
         'created_at' => date('Y-m-d H:i:s')
       ]);
 
-      if (!strpos($postData['email'], 'testx') == false) {
+      if (!strpos(Helper::deleteSpaces($postData['email']), 'testx') == false) {
         $mailer = new Mailer();
-        $mailer->sendRegistrationCode($postData['email'], $tokenNumber);
+        $mailer->sendRegistrationCode(Helper::deleteSpaces($postData['email']), $tokenNumber);
       }
 
       echo Response::getJson([
         'status' => 'success',
-        'message' => 'Na Váš e-mail bol zaslaný overovací kód'
+        'message' => 'Na Váš e-mail bol zaslaný overovací kód',
+        'data' => [
+          'idUser' => $userData['id']
+        ]
       ]);
     break;
     case 'zabudnute-heslo-validacia': // POSTnavigation.navigate('Ucet');<s
@@ -926,7 +929,7 @@ try {
 
         if (!strpos($userData['email'], 'testx') == false) {
           $mailer = new Mailer();
-          $mailer->sendRegistrationCode($postData['email'], $tokenNumber);
+          $mailer->sendRegistrationCode(Helper::deleteSpaces($postData['email']), $tokenNumber);
         }
 
         Response::throwException('Token už expiroval. Zaslali sme Vám nový.');
@@ -949,26 +952,26 @@ try {
     case 'zabudnute-heslo-nove-heslo': // POST
       $postData = Request::getPostData();
 
-      Request::validatePostParam('id_user');
-      Request::validatePostParam('new_password');
-      Request::validatePostParam('new_password2');
+      Request::validatePostParam('idUser');
+      Request::validatePostParam('newPassword');
+      Request::validatePostParam('newPassword2');
 
       $userModel = $bride->initModel('users');
-      $userData = $userModel->getById((int)$postData['id_user']);
+      $userData = $userModel->getById((int)$postData['idUser']);
 
       if (empty($userData)) Response::throwException('Unknown user');
 
-      if (strlen($postData['new_password']) < 8) {
+      if (strlen($postData['newPassword']) < 8) {
         Response::throwException('Nové heslo musí obsahovať aspoň 8 znakov');
       }
 
-      if ($postData['new_password'] != $postData['new_password2']) {
+      if ($postData['newPassword'] != $postData['newPassword2']) {
         Response::throwException('Hesla sa nezhodujú');
       }
 
       $userModel->update([
-        'password' => password_hash($postData['new_password'], PASSWORD_BCRYPT)
-      ], (int)$postData['id_user']);
+        'password' => password_hash($postData['newPassword'], PASSWORD_BCRYPT)
+      ], (int)$postData['idUser']);
 
       echo Response::getJson([
         'status' => 'success',
