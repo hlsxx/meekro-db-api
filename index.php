@@ -628,7 +628,8 @@ try {
           *
         FROM {$tokenModel->tableName} 
         WHERE id_unknown_user = %i
-        AND type = 1
+        AND type = " . TokenModel::$types['registration'] . "
+        ORDER BY id DESC
       ", (int)$unknownUserData['id']);
 
       if (empty($tokenData)) Response::throwException('Token neexistuje pre vaše zariadenie: ' . $postData['uid']);
@@ -900,7 +901,8 @@ try {
           *
         FROM {$tokenModel->tableName} 
         WHERE id_unknown_user = %i
-        AND type = 2
+        AND type = " . TokenModel::$types['forgotten_password'] . "
+        ORDER BY id DESC
       ", (int)$unknownUserData['id']);
 
       if (empty($tokenData)) Response::throwException('Token neexistuje pre vaše zariadenie: ' . $postData['uid']);
