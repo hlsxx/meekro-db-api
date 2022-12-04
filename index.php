@@ -883,7 +883,7 @@ try {
         ]
       ]);
     break;
-    case 'zabudnute-heslo-validacia': // POSTnavigation.navigate('Ucet');<s
+    case 'zabudnute-heslo-validacia': // POST
       $postData = Request::getPostData();
 
       Request::validatePostParam('token_number');

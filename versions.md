@@ -50,3 +50,8 @@
 - zabudnute-heslo-validacia
 - zabudnute-heslo-nove-heslo
 
+#VERSION 0.24:
+- zabudnute-heslo-nove-heslo fixnutie idUser povinne
+- deleteSpaces funkcia, odstranenie medzier z mailu
+- Token::$types (select, insert)
+- Token fix ORDER BY id desc  
