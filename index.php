@@ -557,7 +557,7 @@ try {
         'id_user' => (int)$idUser,
         'id_unknown_user' => (int)$unknownUserData['id'],
         'attempt' => 3,
-        'type' => 1,
+        'type' => TokenModel::$types['registration'],
         'token_number' => $tokenNumber,
         'created_at' => $createdAt
       ]);
@@ -645,7 +645,7 @@ try {
           'id_user' => (int)$tokenData['id_user'],
           'id_unknown_user' => (int)$unknownUserData['id'],
           'attempt' => 3,
-          'type' => 1,
+          'type' => TokenModel::$types['registration'],
           'token_number' => $tokenNumber,
           'created_at' => date('Y-m-d H:i:s')
         ]);
@@ -864,7 +864,7 @@ try {
         'id_user' => (int)$userData['id'],
         'id_unknown_user' => (int)$unknownUserData['id'],
         'attempt' => 3,
-        'type' => 2,
+        'type' => TokenModel::$types['forgotten_password'],
         'token_number' => $tokenNumber,
         'created_at' => date('Y-m-d H:i:s')
       ]);
@@ -917,7 +917,7 @@ try {
           'id_user' => (int)$tokenData['id_user'],
           'id_unknown_user' => (int)$unknownUserData['id'],
           'attempt' => 3,
-          'type' => 2,
+          'type' => TokenModel::$types['forgotten_password'],
           'token_number' => $tokenNumber,
           'created_at' => date('Y-m-d H:i:s')
         ]);

@@ -4,6 +4,11 @@ class TokenModel extends Model {
 
   public string $tableName = "ucm_tokens";
 
+  public static array $types = [
+    "registration" => 1,
+    "forgotten_password" => 2
+  ];
+
   public function getTokenNumber() {
     $tokenNumber = rand(1000, 9999);
 
