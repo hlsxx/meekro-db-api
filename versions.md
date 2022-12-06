@@ -55,3 +55,8 @@
 - deleteSpaces funkcia, odstranenie medzier z mailu
 - Token::$types (select, insert)
 - Token fix ORDER BY id desc  
+
+#VERSION 0.25:
+- nahlasit, porovnanie ci neexistuje v blizkosti ina skladka
+- Response::throwExceptionWithData
+- registracia-validacia vratenie zostavajucih pokusov

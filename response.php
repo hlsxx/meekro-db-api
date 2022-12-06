@@ -36,8 +36,8 @@ class Response {
    */
   public static function getErrorJson(Exception $e) {
     return json_encode([
-      "status" => "error",
-      "message" => $e->getMessage()
+      'status' => 'error',
+      'message' => $e->getMessage()
     ]);
   } 
 
@@ -47,6 +47,21 @@ class Response {
    */
   public static function throwException(string $errorMessage) {
     throw new Exception($errorMessage);
+  }
+
+  /**
+   * @param string $errorMessage
+   * @param array $data
+   * @return void
+   */
+  public static function throwExceptionWithData(string $errorMessage, array $data) {
+    return json_encode([
+      'status' => 'error',
+      'message' => $errorMessage,
+      'data' => $data
+    ]);
+
+    exit;
   }
 
 }

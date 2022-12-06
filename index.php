@@ -160,7 +160,7 @@ try {
       $unknownUserData = $unknownUserModel->getByCustom('uid', $getData['uid']);
 
       if (empty($unknownUserData)) Response::throwException('Vaše zariadenie nebolo rozpoznané v systéme');
-      if ($unknownUserData['id_user'] == NULL) Response::throwException('You must be registered before');
+      if ($unknownUserData['id_user'] == NULL) Response::throwException('Váš uživateľský účet je neplatný');
 
       $skladkyData = $skladkaModel->query("
         SELECT 
@@ -218,6 +218,7 @@ try {
       Request::validatePostParam('lat');
       Request::validatePostParam('lng');
       Request::validatePostParam('uid');
+      // + POST PARAM disable near
 
       if ($postData['choosenTypes'] == '') Response::throwException('Vyberte aspoň jeden typ odpadu nachádzajúci sa na skládke');
 
@@ -226,9 +227,39 @@ try {
 
       if (empty($unknownUserData)) Response::throwException('Vaše zariadenie nebolo rozpoznané v systéme');
 
-      $skladkaModel = new SkladkaModel();
+      $skladkaModel = $bride->initModel('skladky');
 
       $uniqueId = uniqid();
+
+      $checkNear = 
+        (isset($postData['disableNear']) && (bool)$postData['disableNear'])
+        ? false
+        : true
+      ;
+
+      if ($checkNear) {
+        $reserDistance = 0.0001;
+        $reportedNearData = $skladkaModel->query("
+          SELECT 
+            *
+          FROM {model}
+          WHERE lat > " . ((float)$postData['lat'] - $reserDistance) . " AND lat < " . ((float)$postData['lat'] + $reserDistance)
+          . "OR lng > " . ((float)$postData['lng'] - $reserDistance) . " AND lng < " . ((float)$postData['lng'] + $reserDistance)
+        );
+      }
+
+      if (!empty($reportedNearData)) {
+        echo Response::getJson([
+          'status' => 'warning',
+          'message' => 'V blískosti sa nachádza nahlásená skládka. Nejedná sa o skládku ktorú chcete nahlásiť?',
+          'data' => [
+            'near_count' => count($reportedNearData),
+            'data' => $reportedNearData
+          ]
+        ]); 
+
+        exit();
+      }
 
       $insertedIdSkladka = $skladkaModel->insert([
         'nazov' => "{$uniqueId}_nazov",
@@ -383,6 +414,7 @@ try {
 
       Request::validatePostParam('idSkladka');
       Request::validatePostParam('uid');
+      Request::validatePostParam('image');
 
       $unknownUserModel = $bride->initModel('unknown_users');
       $unknownUserData = $unknownUserModel->getByCustom('uid', $postData['uid']);
@@ -685,7 +717,12 @@ try {
           'attempt' => (int)$tokenData['attempt'] - 1
         ], $tokenData['id']);
 
-        Response::throwException('Zadaný kód je nesprávny, skúste to znovu');
+        Response::throwExceptionWithData(
+          'Zadaný kód je nesprávny, skúste to znovu',
+          [
+            'remainingsAttempts' => (int)$tokenData['attempt'] - 1
+          ]
+        );
       }
     break;
     case 'ucet-prehlad': // GET
@@ -779,6 +816,10 @@ try {
       $data = base64_decode($data);
 
       file_put_contents('test_peter/image.jpeg', $data);
+    break;
+    case 'test-mail':
+      $mailer = new Mailer();
+      $mailer->sendRegistrationCode("peter.hafner9@gmail.com", 1111);
     break;
     case 'zmena-mena': // POST
       $postData = Request::getPostData();
@@ -979,6 +1020,12 @@ try {
         'status' => 'success',
         'message' => 'Heslo úspešne nastavené'
       ]);
+    break;
+    case 'dev-tokens':
+      $tokenModel = $bride->initModel('tokens');
+      foreach($tokenModel->getAll() as $token) {
+        echo "IDUSER: <b>{$token['id_user']}</b> IDUID: <b>{$token['id_unknown_user']}</b> TOKEN: <b>{$token['token_number']}</b> VYTVORENE:{$token['created_at']} <br>";
+      }
     break;
     default:
       Response::throwException('PAGE: {' . Request::getParam('page') . '} doesnt exists');
