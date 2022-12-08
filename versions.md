@@ -60,3 +60,8 @@
 - nahlasit, porovnanie ci neexistuje v blizkosti ina skladka
 - Response::throwExceptionWithData
 - registracia-validacia vratenie zostavajucih pokusov
+
+#VERSION 0.26:
+- prihlasenie vratenie id a name
+- zmena-hesla-validacia vratenie zvysnych pokusov
+- disable near fix

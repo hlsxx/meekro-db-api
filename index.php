@@ -231,13 +231,9 @@ try {
 
       $uniqueId = uniqid();
 
-      $checkNear = 
-        (isset($postData['disableNear']) && (bool)$postData['disableNear'])
-        ? false
-        : true
-      ;
+      $disableNear = (isset($postData['disableNear']) && (bool)$postData['disableNear'] == true);
 
-      if ($checkNear) {
+      if (!$disableNear) {
         $reserDistance = 0.0001;
         $reportedNearData = $skladkaModel->query("
           SELECT 
@@ -638,7 +634,9 @@ try {
       echo Response::getJson([
         'status' => 'success',
         'data' => [
-          'email' => $userData['email']
+          'email' => Helper::deleteSpaces($userData['email']),
+          'id_user' => $userData['id'],
+          'name' => $userData['name']
         ]
       ]);
     break;
@@ -989,7 +987,12 @@ try {
           'attempt' => (int)$tokenData['attempt'] - 1
         ], $tokenData['id']);
 
-        Response::throwException('Zadaný kód je nesprávny, skúste to znovu');
+        Response::throwExceptionWithData(
+          'Zadaný kód je nesprávny, skúste to znovu',
+          [
+            'remainingsAttempts' => (int)$tokenData['attempt'] - 1
+          ]
+        );
       }
     break;
     case 'zabudnute-heslo-nove-heslo': // POST
