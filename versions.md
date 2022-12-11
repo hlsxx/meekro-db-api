@@ -65,3 +65,9 @@
 - prihlasenie vratenie id a name
 - zmena-hesla-validacia vratenie zvysnych pokusov
 - disable near fix
+
+#VERSION 0.27:
+- pivinny image pri nahlasovani
+- fix pretypovanie array ucet-prehlad
+- skaldky-vycistene
+- skladky detail types

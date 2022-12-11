@@ -186,13 +186,28 @@ try {
       Request::validateGetParam('id');
       Request::validateGetParam('type');
 
-      $skladkaModel = new SkladkaModel();
+      $skladkaModel = $bride->initModel('skladky');
+      $skladkaTypCrossModel = $bride->initModel('skladky_typy_cross');
+      $skladkaTypModel = $bride->initModel('skladky_typy');
+
+      $skladkaTypyOdpaduData = $skladkaModel->query("
+        SELECT
+          {$skladkaTypModel->tableName}.nazov as nazov,
+          {$skladkaTypCrossModel->tableName}.pocet_potvrdeni
+        FROM {model}
+        LEFT JOIN {$skladkaTypCrossModel->tableName} 
+        ON {model}.id = {$skladkaTypCrossModel->tableName}.id_skladka
+        LEFT JOIN {$skladkaTypModel->tableName} 
+        ON {$skladkaTypCrossModel->tableName}.id_skladka_typ = {$skladkaTypModel->tableName}.id
+        WHERE {model}.id = " . (int)Request::getParam('id') . "
+      ");
 
       echo Response::getJson([
         'status' => 'success',
-        'data' => $skladkaModel->getById(
-          (int)Request::getParam('id')
-        )
+        'data' => [
+          'detail' => $skladkaModel->getById((int)Request::getParam('id')),
+          'types' => $skladkaTypyOdpaduData
+        ]
       ]);
     break;
     case 'skladka-by-coors': // POST
@@ -218,8 +233,9 @@ try {
       Request::validatePostParam('lat');
       Request::validatePostParam('lng');
       Request::validatePostParam('uid');
-      // + POST PARAM disable near
+      Request::validatePostParam('image');
 
+      if ($postData['image'] == '') Response::throwException('Pre nahlásenie nelegálnej skládky musíte nahrať obrázok');
       if ($postData['choosenTypes'] == '') Response::throwException('Vyberte aspoň jeden typ odpadu nachádzajúci sa na skládke');
 
       $unknownUserModel = $bride->initModel('unknown_users');
@@ -249,7 +265,7 @@ try {
           'status' => 'warning',
           'message' => 'V blískosti sa nachádza nahlásená skládka. Nejedná sa o skládku ktorú chcete nahlásiť?',
           'data' => [
-            'near_count' => count($reportedNearData),
+            'nearCount' => count($reportedNearData),
             'data' => $reportedNearData
           ]
         ]); 
@@ -268,13 +284,6 @@ try {
         'id_unknown_user' => (int)$unknownUserData['id']
       ]); 
 
-      /* $skladkaUnknownUserModel = new SkladkaUnknownUserModel();
-
-      $skladkaUnknownUserModel->insert([
-        'id_skladka' => $insertedIdSkladka,
-        'unknown_user_uid' => $postData['uid']
-      ]);*/
-      
       $skladkaTypyCrossModel = new SkladkaTypCrossModel();
 
       $usedTypes = explode(',', $postData['choosenTypes']);
@@ -412,6 +421,8 @@ try {
       Request::validatePostParam('uid');
       Request::validatePostParam('image');
 
+      if ($postData['image'] == '') Response::throwException('Musíte nahrať obrázok vyčisteného miesta skládky');
+
       $unknownUserModel = $bride->initModel('unknown_users');
       $unknownUserData = $unknownUserModel->getByCustom('uid', $postData['uid']);
 
@@ -424,7 +435,7 @@ try {
       $currentSkladka = $skladkaModel->getById($idSkladka);
       
       $skladkaModel->update([
-        'existujuca' => 0
+        'vycistena' => 1
       ], $idSkladka);
 
       $skladkaVycisteneModel = $bride->initModel('skladky_vycistene');
@@ -750,13 +761,23 @@ try {
         WHERE id_unknown_user = %i
       ", (int)$unknownUserData['id']);
 
+      $skladkyDataCount = count((array)$skladkyData);
+      $confirmedCount = count((array)$skladkaPotvrdeniaData);
+
+      $percentageTogether = 100 / ($skladkyDataCount + $confirmedCount);
+
+      $skladkyDataPercentage = $percentageTogether * $skladkyDataCount;
+      $confirmedPercentage = $percentageTogether * $confirmedCount;
+
       $points = (count($skladkyData) * 10) + (count($skladkyData) * 3);
 
       echo Response::getJson([
         'status' => 'success',
         'data' => [
-          'reported' => count($skladkyData),
-          'confirmed' => count($skladkaPotvrdeniaData),
+          'reported' => $skladkyDataCount,
+          'reportedPercentage' =>  $skladkyDataPercentage,
+          'confirmed' => $confirmedCount,
+          'confirmedPercentage' => $confirmedPercentage,
           'cleared' => 0,
           'points' => (int)$points
         ]
@@ -837,7 +858,7 @@ try {
 
       $userData = $userModel->getById((int)$postData['id_user']);
 
-      if (empty($userData)) Response::throwException('Unknown user');
+      if (empty($userData)) Response::throwException('Neznámy užívateľ');
 
       $userModel->update([
         'name' => $postData['name']

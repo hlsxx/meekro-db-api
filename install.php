@@ -27,7 +27,7 @@ $skladkyModel->defineColumn('sidlo')->type('varchar')->size(60)->null(true);
 $skladkyModel->defineColumn('rok_zacatia')->type('datetime')->null(false);
 $skladkyModel->defineColumn('typ')->type('tinyint')->size(1)->default(2)->null(false);
 $skladkyModel->defineColumn('pocet_nahlaseni')->type('int')->size(4)->default(0)->null(false);
-$skladkyModel->defineColumn('existujuca')->type('tinyint')->size(1)->default(1)->null(false);
+$skladkyModel->defineColumn('vycistena')->type('tinyint')->size(1)->default(0)->null(false);
 $skladkyModel->defineColumn('lat')->type('double')->default(0)->null(false);
 $skladkyModel->defineColumn('lng')->type('double')->default(0)->null(false);
 $skladkyModel->defineColumn('id_unknown_user')->type('int')->size(11)->null(false);
@@ -131,8 +131,19 @@ $skladkaNahlaseniaModel->initTable();
 /** UCM_SKLADKY_VYCISTENE */
 $skladkaNahlaseniaModel = $bride->initModel('skladky_vycistene');
 
-$skladkaNahlaseniaModel->defineColumn('id_skladka')->type('int')->size(11)->null(false);
-$skladkaNahlaseniaModel->defineColumn('id_unknown_user')->type('int')->size(11)->null(false);
+$skladkaNahlaseniaModel->defineColumn('okres')->type('varchar')->size(60)->null(false);
+//$skladkaNahlaseniaModel->defineColumn('nazov')->type('varchar')->size(60)->null(false);
+$skladkaNahlaseniaModel->defineColumn('obec')->type('varchar')->size(60)->null(false);
+//$skladkaNahlaseniaModel->defineColumn('prevadzkovatel')->type('varchar')->size(60)->null(true);
+$skladkaNahlaseniaModel->defineColumn('sidlo')->type('varchar')->size(60)->null(true);
+$skladkaNahlaseniaModel->defineColumn('rok_zacatia')->type('datetime')->null(false);
+//$skladkaNahlaseniaModel->defineColumn('typ')->type('tinyint')->size(1)->default(2)->null(false);
+//$skladkaNahlaseniaModel->defineColumn('pocet_nahlaseni')->type('int')->size(4)->default(0)->null(false);
+//$skladkaNahlaseniaModel->defineColumn('vycistena')->type('tinyint')->size(1)->default(1)->null(false);
+$skladkaNahlaseniaModel->defineColumn('lat')->type('double')->default(0)->null(false);
+$skladkaNahlaseniaModel->defineColumn('lng')->type('double')->default(0)->null(false);
+$skladkaNahlaseniaModel->defineColumn('id_unknown_user_reported')->type('int')->size(11)->null(false);
+$skladkaNahlaseniaModel->defineColumn('id_unknown_user_cleared')->type('int')->size(11)->null(false);
 $skladkaNahlaseniaModel->defineColumn('created_at')->type('datetime')->null(false);
 $skladkaNahlaseniaModel->initTable();
 
