@@ -808,11 +808,14 @@ try {
       $getData = Request::getGetData();
 
       Request::validateGetParam('uid');
+      Request::validateGetParam('idUser');
+
+      $userModel = $bride->initModel('users');
+      $userData = $userModel->getById($getData['idUser']);
+      if (empty($userData)) Response::throwWarning('Účet nebol rozpoznaný');
 
       $unknownUserModel = $bride->initModel('unknown_users');
       $unknownUserData = $unknownUserModel->getByCustom('uid', $getData['uid']);
-
-      if (empty($unknownUserData)) Response::throwException('Vaše zariadenie nebolo rozpoznané v systéme');
 
       $skladkaModel = $bride->initModel('skladky');
 
@@ -834,7 +837,10 @@ try {
       $skladkyDataCount = count((array)$skladkyData);
       $confirmedCount = count((array)$skladkaPotvrdeniaData);
 
-      $percentageTogether = 100 / ($skladkyDataCount + $confirmedCount);
+      $percentageTogether = ($skladkyDataCount + $confirmedCount) != 0 ?
+        100 / ($skladkyDataCount + $confirmedCount)
+        : 0 
+      ;
 
       $skladkyDataPercentage = $percentageTogether * $skladkyDataCount;
       $confirmedPercentage = $percentageTogether * $confirmedCount;
@@ -849,7 +855,56 @@ try {
           'confirmed' => $confirmedCount,
           'confirmedPercentage' => $confirmedPercentage,
           'cleared' => 0,
-          'points' => (int)$points
+          'points' => (int)$points,
+          'rank' => 5
+        ]
+      ]);
+    break;
+    case 'prehlad':
+      $userModel = $bride->initModel('users');
+      $unknownUserModel = $bride->initModel('unknown_users');
+      $skladkaModel = $bride->initModel('skladky');
+      $skladkaPotvrdenieModel = $bride->initModel('skladky_potvrdenia');
+
+      $nelegalneSkladkyData = $skladkaModel->query("
+        SELECT
+          IFNULL({$userModel->tableName}.name, '') as name,
+          (
+            IFNULL(nested.confirmedPoints, 0) 
+              + 
+            IFNULL(nested.reportedPoints, 0)
+          ) as total
+        FROM (
+          SELECT
+            id_unknown_user, 
+            (
+              SELECT
+                (COUNT(*) * 3) as count
+              FROM {$skladkaPotvrdenieModel->tableName}
+              WHERE {$skladkaPotvrdenieModel->tableName}.id_unknown_user = {model}.id_unknown_user
+              GROUP BY {$skladkaPotvrdenieModel->tableName}.id_unknown_user
+              ORDER BY count DESC
+            ) as confirmedPoints,
+            (COUNT(*) * 10) as reportedPoints
+          FROM {model}
+          WHERE typ = 2
+          GROUP BY {model}.id_unknown_user
+          ORDER BY reportedPoints DESC
+        ) as nested
+        LEFT JOIN {$unknownUserModel->tableName} 
+        ON {$unknownUserModel->tableName}.id = nested.id_unknown_user
+        LEFT JOIN {$userModel->tableName} 
+        ON {$userModel->tableName}.id = {$unknownUserModel->tableName}.id_user
+        ORDER BY total DESC
+        LIMIT 5
+      ");
+
+      echo Response::getJson([
+        'status' => 'success',
+        'data' => [
+          'topUsers' => $nelegalneSkladkyData,
+          'allReported' => 200,
+          'allCleared' => 120
         ]
       ]);
     break;

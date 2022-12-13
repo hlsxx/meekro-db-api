@@ -82,3 +82,6 @@
 #VERSION 0.29:
 - zaznamenat-aktivitu automaticke prihlasovanie overovanie
 - Response throwWarning
+- delenie nulou error ucet-prehlad pridanaie 
+- logovanie android ios iba pre vynbrane pages
+- pridany page prehlad
