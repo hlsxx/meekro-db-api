@@ -587,6 +587,8 @@ try {
       $postData = Request::getPostData();
 
       Request::validatePostParam('uid');
+      Request::validatePostParam('idUser');
+      Request::validatePostParam('password');
 
       $unknownUserModel = $bride->initModel('unknown_users');
       $unknownUserData = $unknownUserModel->getByCustom('uid', $postData['uid']);
@@ -598,6 +600,21 @@ try {
           'last_login' => date('Y-m-d H:i:s', time())
         ],
         (int)$unknownUserData['id']
+      );
+
+      $userModel = $bride->initModel('users');
+      $userData = $userModel->getById($postData['idUser']);
+      if (empty($userData)) Response::throwWarning('Nepodarilo sa prihlásiť');
+
+      if ($postData['password'] != $userData['password']) {
+        Response::throwWarning('Nepodarilo sa prihlásiť');
+      }
+
+      $userModel->update(
+        [
+          'last_login' => date('Y-m-d H:i:s', time())
+        ],
+        (int)$userData['id']
       );
 
       echo Response::getJson([
@@ -698,8 +715,9 @@ try {
         'status' => 'success',
         'data' => [
           'email' => Helper::deleteSpaces($userData['email']),
-          'id_user' => $userData['id'],
-          'name' => $userData['name']
+          'idUser' => $userData['id'],
+          'name' => $userData['name'],
+          'password' => $userData['password']
         ]
       ]);
     break;

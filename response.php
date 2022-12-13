@@ -49,6 +49,19 @@ class Response {
     throw new Exception($errorMessage);
   }
 
+   /**
+   * @param string $warningMessage
+   * @return string 
+   */
+  public static function throwWarning(string $warningMessage) {
+    echo self::getJson([
+      'status' => 'warning',
+      'message' => $warningMessage
+    ]);
+
+    exit;
+  }
+
   /**
    * @param string $errorMessage
    * @param array $data

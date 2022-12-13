@@ -78,3 +78,7 @@
 - oprava error messages
 - pridane install skladky_vycistene_gallery, skladky_vycistene
 - install fedd pridanie leg skladok
+
+#VERSION 0.29:
+- zaznamenat-aktivitu automaticke prihlasovanie overovanie
+- Response throwWarning

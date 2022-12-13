@@ -200,6 +200,11 @@ if (rrmdir(FILES_DIR)) {
   echo "Úspešne odstránene ___files <br>";
   if (mkdir(FILES_DIR)) {
     echo "Uspesne vytvorene ___files <br>";
+    if (mkdir(FILES_DIR . '/nelegalne-skladky')) {
+      echo "Uspesne vytvorene ___files/nelegalne-skladky <br>";
+    } else {
+      echo "Nastala chyba pri vytvarani ___files/nelegalne-skladky<br>";
+    }
   } else {
     echo "Nastala chyba pri vytvarani ___files<br>";
   }
