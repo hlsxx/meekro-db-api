@@ -30,8 +30,24 @@ $skladkyModel->defineColumn('pocet_nahlaseni')->type('int')->size(4)->default(0)
 $skladkyModel->defineColumn('vycistena')->type('tinyint')->size(1)->default(0)->null(false);
 $skladkyModel->defineColumn('lat')->type('double')->default(0)->null(false);
 $skladkyModel->defineColumn('lng')->type('double')->default(0)->null(false);
-$skladkyModel->defineColumn('id_unknown_user')->type('int')->size(11)->null(false);
+$skladkyModel->defineColumn('id_unknown_user')->type('int')->size(11)->null(true);
 $skladkyModel->initTable();
+
+for($i=0;$i<10;$i++) {
+  $uid = uniqid();
+  $skladkyModel->insert([
+    'okres' => $uid . '_okres',
+    'nazov' => $uid . '_nazov',
+    'obec' => $uid . '_obec',
+    'prevadzkovatel' => $uid . '_prevadzkovatel',
+    'sidlo' => $uid . '_sidlo',
+    'rok_zacatia' => date('Y-m-d H:i:s'),
+    'typ' => 1,
+    'pocet_nahlaseni' => 0,
+    'lat' => 48.5378458 + (rand(100, 1000) / 100000),
+    'lng' => 18.7923297 + (rand(100, 1000) / 100000)
+  ]);
+}
 
 /** UCM_SKLADKY_TYPY */
 $skladkaTypModel = $bride->initModel('skladky_typy');
@@ -39,7 +55,7 @@ $skladkaTypModel = $bride->initModel('skladky_typy');
 $skladkaTypModel->defineColumn('nazov')->type('varchar')->size(25)->null(false);
 $skladkaTypModel->initTable();
 
-$typy = ['bio', 'papier', 'plat', 'kov', 'sklo', 'elektro', 'zmiesany', 'iny'];
+$typy = ['Bio', 'Papier', 'Plast', 'Kov', 'Sklo', 'Elektro', 'Zmiešaný', 'Iný'];
 
 foreach ($typy as $typ) {
   $skladkaTypModel->insert([
@@ -147,6 +163,14 @@ $skladkaNahlaseniaModel->defineColumn('id_unknown_user_cleared')->type('int')->s
 $skladkaNahlaseniaModel->defineColumn('created_at')->type('datetime')->null(false);
 $skladkaNahlaseniaModel->initTable();
 
+/** UCM_SKLADKY_VYCISTENE_GALLERY */
+$skladkyGalleryModel = $bride->initModel('skladky_vycistene_gallery');
+
+$skladkyGalleryModel->defineColumn('id_skladka_vycistena')->type('int')->size(11)->null(false);
+$skladkyGalleryModel->defineColumn('id_gallery')->type('int')->size(11)->null(false);
+$skladkyGalleryModel->defineColumn('id_unknown_user')->type('int')->size(11)->null(false);
+$skladkyGalleryModel->initTable();
+
 /** UCM_NOTIFICATIONS */
 /*$skladkaPotvrdenieModel = $bride->initModel('notifications');
 
@@ -161,3 +185,24 @@ $deviceLogModel->defineColumn('device_type')->type('int')->size(1)->null(false);
 $deviceLogModel->defineColumn('page')->type('varchar')->size(30)->null(false);
 $deviceLogModel->defineColumn('created_at')->type('datetime')->null(false);
 $deviceLogModel->initTable();
+
+/**
+ * CLEAR ___FILES DIR
+*/
+
+function rrmdir(string $directory): bool {
+  array_map(fn (string $file) => is_dir($file) ? rrmdir($file) : unlink($file), glob($directory . '/' . '*'));
+
+  return rmdir($directory);
+}
+
+if (rrmdir(FILES_DIR)) {
+  echo "Úspešne odstránene ___files <br>";
+  if (mkdir(FILES_DIR)) {
+    echo "Uspesne vytvorene ___files <br>";
+  } else {
+    echo "Nastala chyba pri vytvarani ___files<br>";
+  }
+} else {
+  echo "Nastala chyba pri odstraneni ___files<br>";
+}

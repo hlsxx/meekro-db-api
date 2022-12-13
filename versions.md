@@ -71,3 +71,10 @@
 - fix pretypovanie array ucet-prehlad
 - skaldky-vycistene
 - skladky detail types
+
+#VERSION 0.28 (MAJOR UPDATE):
+- install.php fixnutie nazvov pre typy odpadu skladky
+- vycistit dorobenie funkcionality
+- oprava error messages
+- pridane install skladky_vycistene_gallery, skladky_vycistene
+- install fedd pridanie leg skladok

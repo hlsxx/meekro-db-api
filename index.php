@@ -192,6 +192,7 @@ try {
 
       $skladkaTypyOdpaduData = $skladkaModel->query("
         SELECT
+          {$skladkaTypModel->tableName}.id as id,
           {$skladkaTypModel->tableName}.nazov as nazov,
           {$skladkaTypCrossModel->tableName}.pocet_potvrdeni
         FROM {model}
@@ -305,7 +306,7 @@ try {
 
         if (!file_exists($filePath)) {
           if (!mkdir($filePath, 0755, true)) {
-            Response::throwException('Error with creating folder');
+            Response::throwException('Nastala chyba pri nahrávaní obrázku');
           }
         }
         
@@ -344,7 +345,7 @@ try {
           if ($file['size'] > 0) {
             if (!file_exists($filePath)) {
               if (!mkdir($filePath, 0755, true)) {
-                Response::throwException('Error with creating folder');
+                Response::throwException('Nastala chyba pri nahrávaní obrázku');
               }
             }
 
@@ -433,6 +434,8 @@ try {
       $skladkaModel = $bride->initModel('skladky');
 
       $currentSkladka = $skladkaModel->getById($idSkladka);
+
+      if (empty($currentSkladka)) Response::throwException('Skládka nebola rozpoznaná v systéme');
       
       $skladkaModel->update([
         'vycistena' => 1
@@ -440,10 +443,59 @@ try {
 
       $skladkaVycisteneModel = $bride->initModel('skladky_vycistene');
       
-      $skladkaVycisteneModel->insert([
+      $idSkladkaVycistena = $skladkaVycisteneModel->insert([
         'id_skladka' => $idSkladka,
         'id_unknown_user' => (int)$unknownUserData['id'],
+        'okres' => $currentSkladka['okres'],
+        'obec' => $currentSkladka['obec'],
+        'sidlo' => $currentSkladka['sidlo'],
+        'rok_zacatia' => $currentSkladka['rok_zacatia'],
+        'lat' => $currentSkladka['lat'],
+        'lng' => $currentSkladka['lng'],
+        'id_unknown_user_reported' => (int)$currentSkladka['id_unknown_user'],
+        'id_unknown_user_cleared' => (int)$unknownUserData['id'],
         'created_at' => date('Y-m-d H:i:s')
+      ]);
+
+      $filePath = FILES_DIR . '/nelegalne-skladky/' . $idSkladka;
+
+      $galleryModel = $bride->initModel('gallery');
+      $skladkyVycisteneGalleryModel = $bride->initModel('skladky_vycistene_gallery');
+
+      if (!file_exists($filePath)) {
+        if (!mkdir($filePath, 0755, true)) {
+          Response::throwException('Nastala chyba pri nahrávaní obrázku');
+        }
+      }
+      
+      if (strpos($postData['image'], 'data:image') !== false) {
+        $image = base64_decode(preg_replace('#^data:image/\w+;base64,#i', '', $postData['image']));
+        $ext = '.jpg';
+      } else {
+        // IOS
+        $image = str_replace(" ", "+", $postData['image']);
+        $image = base64_decode($image);
+        $ext = '.jpeg';
+      }
+
+      $countExistingImages = count(scandir($filePath)) - 2;
+      $newName = ($countExistingImages + 1) . '_cleared' . $ext;
+
+      $imagePath = $filePath . '/' . $newName;
+    
+      if (!file_put_contents($imagePath, $image)) {
+        Response::throwException('Nastala chyba pri nahrávaní obrázku');
+      }
+
+      $idGallery = $galleryModel->insert([
+        'link' => $newName,
+        'created_at' => date('Y-m-d H:i:s')
+      ]);
+
+      $skladkyVycisteneGalleryModel->insert([
+        'id_skladka_vycistena' => (int)$idSkladkaVycistena,
+        'id_gallery' => (int)$idGallery,
+        'id_unknown_user' => (int)$unknownUserData['id']
       ]);
 
       echo Response::getJson([
