@@ -186,6 +186,15 @@ $deviceLogModel->defineColumn('page')->type('varchar')->size(30)->null(false);
 $deviceLogModel->defineColumn('created_at')->type('datetime')->null(false);
 $deviceLogModel->initTable();
 
+/** UCM_APP_TEXTS */
+$appTextModel = $bride->initModel('app_texts');
+
+$appTextModel->defineColumn('device_type')->type('int')->size(1)->null(false)->default(1);
+$appTextModel->defineColumn('page')->type('varchar')->size(30)->null(false);
+$appTextModel->defineColumn('type')->type('varchar')->size(30)->null(false);
+$appTextModel->defineColumn('text')->type('varchar')->size(100)->null(false);
+$appTextModel->initTable();
+
 /**
  * CLEAR ___FILES DIR
 */

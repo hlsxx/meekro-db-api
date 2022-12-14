@@ -91,3 +91,4 @@
 - potvrdil-som vracia confirmedByUser a reportedByUser
 - debug securiter
 - fix a pridane FILES_URL
+- priadanie texts app

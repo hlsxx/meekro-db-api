@@ -1213,6 +1213,34 @@ try {
         'message' => 'Heslo úspešne nastavené'
       ]);
     break;
+    case 'texty':
+      $getData = Request::getGetData();
+
+      Request::validateGetParam('textPage');
+      Request::validateGetParam('device_type');
+
+      $appTextModel = $bride->initModel('app_texts');
+  
+      $textsData = $appTextModel->query("
+        SELECT
+          *
+        FROM {model}
+        WHERE page = %s AND device_type = %i
+      ", $getData['textPage'], (int)$getData['device_type']);
+
+      $returnTextsData = [];
+      foreach ($textsData as $textData) {
+        $returnTextsData[$textData['type']][] = [
+          'id' => $textData['id'],
+          'text' => $textData['text']
+        ];
+      }
+
+      echo Response::getJson([
+        'status' => 'success',
+        'data' => $returnTextsData
+      ]);
+    break;
     case 'dev-tokens':
       $tokenModel = $bride->initModel('tokens');
       foreach($tokenModel->getAll() as $token) {
