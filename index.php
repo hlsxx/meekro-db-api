@@ -207,10 +207,11 @@ try {
       $skladkaGalleryModel = $bride->initModel('skladky_gallery');
       $galleryModel = $bride->initModel('gallery');
 
-      $nelegalneSkladkyImagesFolder = ROOT_URL . '/___files/nelegalne-skladky/';
+      $nelegalneSkladkyImagesFolder = FILES_URL . '/nelegalne-skladky/';
+
       $skladkaGalleryData = $skladkaGalleryModel->query("
         SELECT
-          CONCAT('". $nelegalneSkladkyImagesFolder ."', link) as link
+          CONCAT('". $nelegalneSkladkyImagesFolder ."', {model}.id, '/', link) as link
         FROM {model}
         LEFT JOIN {$galleryModel->tableName} 
         ON {$galleryModel->tableName}.id = {model}.id_gallery
@@ -926,12 +927,27 @@ try {
         LIMIT 5
       ");
 
+      $allIllegal = count($skladkaModel->query("
+        SELECT
+          *
+        FROM {model}
+        WHERE typ = 2
+      "));
+
+      $allLegal = count($skladkaModel->query("
+        SELECT
+          *
+        FROM {model}
+        WHERE typ = 1
+      "));
+
       echo Response::getJson([
         'status' => 'success',
         'data' => [
           'topUsers' => $nelegalneSkladkyData,
-          'allReported' => 200,
-          'allCleared' => 120
+          'illegalCount' => $allIllegal,
+          'legalCount' => $allLegal,
+          'clearedCount' => 33
         ]
       ]);
     break;

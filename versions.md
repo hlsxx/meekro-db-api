@@ -90,3 +90,4 @@
 - skladka vracia pole images s link obrazkom
 - potvrdil-som vracia confirmedByUser a reportedByUser
 - debug securiter
+- fix a pridane FILES_URL
