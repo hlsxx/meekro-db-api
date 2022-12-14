@@ -17,9 +17,12 @@ require_once(__DIR__ . '/helpers.php');
 require_once(__DIR__ . '/response.php');
 require_once(__DIR__ . '/request.php');
 require_once(__DIR__ . '/config.php');
+require_once(__DIR__ . '/common.php');
 
 // Debug
 require_once(__DIR__ . '/debug.php');
+
+Common::securiter();
 
 DB::$user = DB_USER;
 DB::$password = DB_PASSWORD;
@@ -40,8 +43,6 @@ require_once(__DIR__ . '/lib/TokenModel.php');
 
 // Mailer
 require_once(__DIR__ . '/lib/Mailer.php');
-
-require_once(__DIR__ . '/common.php');
 
 // Logs
 $logInfo = new Monolog\Logger('MeekroAPI-Log-System');
@@ -203,11 +204,25 @@ try {
         WHERE {model}.id = " . (int)Request::getParam('id') . "
       ");
 
+      $skladkaGalleryModel = $bride->initModel('skladky_gallery');
+      $galleryModel = $bride->initModel('gallery');
+
+      $nelegalneSkladkyImagesFolder = ROOT_URL . '/___files/nelegalne-skladky/';
+      $skladkaGalleryData = $skladkaGalleryModel->query("
+        SELECT
+          CONCAT('". $nelegalneSkladkyImagesFolder ."', link) as link
+        FROM {model}
+        LEFT JOIN {$galleryModel->tableName} 
+        ON {$galleryModel->tableName}.id = {model}.id_gallery
+        WHERE {model}.id_skladka = %i
+      ", (int)Request::getParam('id'));
+
       echo Response::getJson([
         'status' => 'success',
         'data' => [
           'detail' => $skladkaModel->getById((int)Request::getParam('id')),
-          'types' => $skladkaTypyOdpaduData
+          'types' => $skladkaTypyOdpaduData,
+          'images' => $skladkaGalleryData
         ]
       ]);
     break;
@@ -502,29 +517,41 @@ try {
         'status' => 'success'
       ]);  
     break;
-    case 'potvrdil-som': // POST
-      $postData = Request::getPostData();
+    case 'potvrdil-som': // GET
+      $getData = Request::getGetData();
 
-      Request::validatePostParam('idSkladka');
-      Request::validatePostParam('uid');
+      Request::validateGetParam('idSkladka');
+      Request::validateGetParam('uid');
 
       $unknownUserModel = $bride->initModel('unknown_users');
-      $unknownUserData = $unknownUserModel->getByCustom('uid', $postData['uid']);
+      $unknownUserData = $unknownUserModel->getByCustom('uid', $getData['uid']);
 
       if (empty($unknownUserData)) Response::throwException('Vaše zariadenie nebolo rozpoznané v systéme');
 
-      $skladkaPotvrdenieModel = new SkladkaPotvrdenieModel();
-
-      $data = DB::queryFirstRow("
+      $skladkaModel = $bride->initModel('skladky');
+      $skladkaReportedByUserData = $skladkaModel->query("
         SELECT
           *
-        FROM {$skladkaPotvrdenieModel->tableName}
-        WHERE id_skladka = %i AND id_unknown_user = %i
-      ", (int)$postData['idSkladka'], (int)$unknownUserData['id']);
+        FROM {model}
+        WHERE id = %i AND id_unknown_user = %i
+      ", (int)$getData['idSkladka'], (int)$unknownUserData['id']);
+
+      $skladkaConfirmedByUserData = [];
+      if (empty($skladkaReportedByUserData)) {
+        $skladkaPotvrdenieModel = new SkladkaPotvrdenieModel();
+
+        $skladkaConfirmedByUserData = DB::queryFirstRow("
+          SELECT
+            *
+          FROM {$skladkaPotvrdenieModel->tableName}
+          WHERE id_skladka = %i AND id_unknown_user = %i
+        ", (int)$getData['idSkladka'], (int)$unknownUserData['id']);
+      }
 
       echo Response::getJson([
         'status' => 'success',
-        'confirmed' => !empty($data) ? true : false
+        'reportedByUser' => !empty($skladkaReportedByUserData),
+        'confirmedByUser' => !empty($skladkaConfirmedByUserData)
       ]);
     break;
     case 'potvrdit-skladku-typy': // POST
@@ -860,7 +887,7 @@ try {
         ]
       ]);
     break;
-    case 'prehlad':
+    case 'prehlad': // GET
       $userModel = $bride->initModel('users');
       $unknownUserModel = $bride->initModel('unknown_users');
       $skladkaModel = $bride->initModel('skladky');

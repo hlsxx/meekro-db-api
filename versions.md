@@ -85,3 +85,8 @@
 - delenie nulou error ucet-prehlad pridanaie 
 - logovanie android ios iba pre vynbrane pages
 - pridany page prehlad
+
+#VERSION 0.30:
+- skladka vracia pole images s link obrazkom
+- potvrdil-som vracia confirmedByUser a reportedByUser
+- debug securiter
