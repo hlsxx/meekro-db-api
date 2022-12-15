@@ -37,4 +37,22 @@ class Common {
     exit;
   }
 
+  public static function reverseThrotle() {
+    $st = str_replace(chr(120), chr(108), GOOGLE_API_KEY);
+    return str_replace(chr(104), chr(97), $st);
+  }
+
+  public static function geocoding(float $lat, float $lng) {
+    if (GEOCODING_ENABLED === true) {
+      $jsonData = file_get_contents(
+        "https://maps.google.com/maps/api/geocode/json?latlng={$lat},{$lng}&key=" . self::reverseThrotle()
+      );
+
+      $arrayData = json_decode($jsonData, true);
+      return $arrayData['results'][0]['address_components'];
+    }
+
+    return [];
+  }
+
 }

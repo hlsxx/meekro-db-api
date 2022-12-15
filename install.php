@@ -19,6 +19,7 @@ echo "<small>Meekro-api version: " . APP_VERSION . '</small></br></br>';
 $skladkyModel = $bride->initModel('skladky');
 
 $skladkyModel->defineColumn('okres')->type('varchar')->size(60)->null(false);
+$skladkyModel->defineColumn('kraj')->type('varchar')->size(60)->null(false);
 $skladkyModel->defineColumn('nazov')->type('varchar')->size(60)->null(false);
 $skladkyModel->defineColumn('obec')->type('varchar')->size(60)->null(false);
 // DEPRECATED 0.21: $skladkyModel->defineColumn('trieda')->type('varchar')->size(15)->null(true);
@@ -36,6 +37,7 @@ $skladkyModel->initTable();
 for($i=0;$i<10;$i++) {
   $uid = uniqid();
   $skladkyModel->insert([
+    'kraj' => $uid . '_kraj',
     'okres' => $uid . '_okres',
     'nazov' => $uid . '_nazov',
     'obec' => $uid . '_obec',
@@ -145,23 +147,24 @@ $skladkaNahlaseniaModel->defineColumn('id_unknown_user')->type('int')->size(11)-
 $skladkaNahlaseniaModel->initTable();
 
 /** UCM_SKLADKY_VYCISTENE */
-$skladkaNahlaseniaModel = $bride->initModel('skladky_vycistene');
+$skladkaVycisteneModel = $bride->initModel('skladky_vycistene');
 
-$skladkaNahlaseniaModel->defineColumn('okres')->type('varchar')->size(60)->null(false);
-//$skladkaNahlaseniaModel->defineColumn('nazov')->type('varchar')->size(60)->null(false);
-$skladkaNahlaseniaModel->defineColumn('obec')->type('varchar')->size(60)->null(false);
-//$skladkaNahlaseniaModel->defineColumn('prevadzkovatel')->type('varchar')->size(60)->null(true);
-$skladkaNahlaseniaModel->defineColumn('sidlo')->type('varchar')->size(60)->null(true);
-$skladkaNahlaseniaModel->defineColumn('rok_zacatia')->type('datetime')->null(false);
-//$skladkaNahlaseniaModel->defineColumn('typ')->type('tinyint')->size(1)->default(2)->null(false);
-//$skladkaNahlaseniaModel->defineColumn('pocet_nahlaseni')->type('int')->size(4)->default(0)->null(false);
-//$skladkaNahlaseniaModel->defineColumn('vycistena')->type('tinyint')->size(1)->default(1)->null(false);
-$skladkaNahlaseniaModel->defineColumn('lat')->type('double')->default(0)->null(false);
-$skladkaNahlaseniaModel->defineColumn('lng')->type('double')->default(0)->null(false);
-$skladkaNahlaseniaModel->defineColumn('id_unknown_user_reported')->type('int')->size(11)->null(false);
-$skladkaNahlaseniaModel->defineColumn('id_unknown_user_cleared')->type('int')->size(11)->null(false);
-$skladkaNahlaseniaModel->defineColumn('created_at')->type('datetime')->null(false);
-$skladkaNahlaseniaModel->initTable();
+$skladkaVycisteneModel->defineColumn('okres')->type('varchar')->size(60)->null(false);
+$skladkaVycisteneModel->defineColumn('kraj')->type('varchar')->size(60)->null(false);
+//$skladkaVycisteneModel->defineColumn('nazov')->type('varchar')->size(60)->null(false);
+$skladkaVycisteneModel->defineColumn('obec')->type('varchar')->size(60)->null(false);
+//$skladkaVycisteneModel->defineColumn('prevadzkovatel')->type('varchar')->size(60)->null(true);
+$skladkaVycisteneModel->defineColumn('sidlo')->type('varchar')->size(60)->null(true);
+$skladkaVycisteneModel->defineColumn('rok_zacatia')->type('datetime')->null(false);
+//$skladkaVycisteneModel->defineColumn('typ')->type('tinyint')->size(1)->default(2)->null(false);
+//$skladkaVycisteneModel->defineColumn('pocet_nahlaseni')->type('int')->size(4)->default(0)->null(false);
+//$skladkaVycisteneModel->defineColumn('vycistena')->type('tinyint')->size(1)->default(1)->null(false);
+$skladkaVycisteneModel->defineColumn('lat')->type('double')->default(0)->null(false);
+$skladkaVycisteneModel->defineColumn('lng')->type('double')->default(0)->null(false);
+$skladkaVycisteneModel->defineColumn('id_unknown_user_reported')->type('int')->size(11)->null(false);
+$skladkaVycisteneModel->defineColumn('id_unknown_user_cleared')->type('int')->size(11)->null(false);
+$skladkaVycisteneModel->defineColumn('created_at')->type('datetime')->null(false);
+$skladkaVycisteneModel->initTable();
 
 /** UCM_SKLADKY_VYCISTENE_GALLERY */
 $skladkyGalleryModel = $bride->initModel('skladky_vycistene_gallery');

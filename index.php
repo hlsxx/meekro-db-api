@@ -290,10 +290,23 @@ try {
         exit();
       }
 
+      $geocodeData = Common::geocoding($postData['lat'], $postData['lng']);
+
+      if (!empty($geocodeData)) {
+        $kraj = $geocodeData[2]['long_name'];
+        $okres = $geocodeData[3]['long_name'];
+        $obec = $geocodeData[1]['long_name'];
+      } else {
+        $kraj = "{$uniqueId}_kraj";
+        $okres = "{$uniqueId}_okres";
+        $obec = "{$uniqueId}_obec";
+      }
+
       $insertedIdSkladka = $skladkaModel->insert([
         'nazov' => "{$uniqueId}_nazov",
-        'okres' => "{$uniqueId}_okres",
-        'obec' => "{$uniqueId}_obec",
+        'kraj' => $kraj,
+        'okres' => $okres,
+        'obec' => $obec,
         'rok_zacatia' => Date('Y-m-d'),
         'typ' => 2,
         'lat' => (float)$postData['lat'],
@@ -463,6 +476,7 @@ try {
         'id_skladka' => $idSkladka,
         'id_unknown_user' => (int)$unknownUserData['id'],
         'okres' => $currentSkladka['okres'],
+        'kraj' => $currentSkladka['kraj'],
         'obec' => $currentSkladka['obec'],
         'sidlo' => $currentSkladka['sidlo'],
         'rok_zacatia' => $currentSkladka['rok_zacatia'],
@@ -1213,7 +1227,7 @@ try {
         'message' => 'Heslo úspešne nastavené'
       ]);
     break;
-    case 'texty':
+    case 'texty': // GET
       $getData = Request::getGetData();
 
       Request::validateGetParam('textPage');

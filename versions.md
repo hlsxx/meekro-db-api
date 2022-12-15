@@ -92,3 +92,7 @@
 - debug securiter
 - fix a pridane FILES_URL
 - priadanie texts app
+
+#VERSION 0.31:
+- geocoding nahlasit
+- pridany install skladky kraj
