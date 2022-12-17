@@ -96,3 +96,4 @@
 #VERSION 0.31:
 - geocoding nahlasit
 - pridany install skladky kraj
+- pridana validacia prihlasit, reg parzdy mail a hesla

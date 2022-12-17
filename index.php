@@ -671,6 +671,15 @@ try {
       Request::validatePostParam('password_2');
       Request::validatePostParam('uid');
 
+      $unknownUserModel = $bride->initModel('unknown_users');
+      $unknownUserData = $unknownUserModel->getByCustom('uid', $postData['uid']);
+
+      if (empty($unknownUserData)) Response::throwException('Vaše zariadenie nebolo rozpoznané v systéme');
+
+      if ($postData['email'] == '') Response::throwException('Nezadali ste e-mailovú adresu');
+      if ($postData['password_1'] == '') Response::throwException('Nezadali heslo');
+      if ($postData['password_2'] == '') Response::throwException('Nezadali ste overovacie heslo');
+
       if (!filter_var(Helper::deleteSpaces($postData['email']), FILTER_VALIDATE_EMAIL)) {
         Response::throwException('Nesprávny formát e-mailu');
       }
@@ -682,11 +691,6 @@ try {
       if ($postData['password_1'] != $postData['password_2']) {
         Response::throwException('Hesla sa nezhodujú');
       }
-
-      $unknownUserModel = $bride->initModel('unknown_users');
-      $unknownUserData = $unknownUserModel->getByCustom('uid', $postData['uid']);
-
-      if (empty($unknownUserData)) Response::throwException('Vaše zariadenie nebolo rozpoznané v systéme');
 
       $userModel = $bride->initModel('users');
       $userAlreadyExists = $userModel->getByCustom('email', Helper::deleteSpaces($postData['email']));
@@ -737,6 +741,9 @@ try {
       $unknownUserData = $unknownUserModel->getByCustom('uid', $postData['uid']);
 
       if (empty($unknownUserData)) Response::throwException('Vaše zariadenie nebolo rozpoznané v systéme');
+
+      if ($postData['email'] == '') Response::throwException('Nezadali ste e-mailovú adresu');
+      if ($postData['password'] == '') Response::throwException('Nezadali heslo');
 
       if (!filter_var(Helper::deleteSpaces($postData['email']), FILTER_VALIDATE_EMAIL)) {
         Response::throwException('Nesprávny formát e-mailu');
