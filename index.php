@@ -69,13 +69,43 @@ try {
   Common::androidOrIos();
 
   switch (Request::getParam('page')) {
-    case 'skladky-vsetky': // GET
-      $skladkaModel = new SkladkaModel();
+    case 'skladky-vsetky': // POST
+      $postData = Request::getPostData();
 
-      echo Request::getParam('pagination') 
-        ? Response::getJson($skladkaModel->getPaginationDataComplex()) 
-        : Response::getJson($skladkaModel->getAllComplex())
+      Request::validatePostParam('filter');
+
+      $skladkaFilterModel = new SkladkaModel();
+      $skladkaModel = $bride->initModel('skladky');
+      $skladkaTypy = $bride->initModel('skladky_typy');
+      $skladkaTypyCross = $bride->initModel('skladky_typy_cross');
+
+      $filteredSkladkaData = Request::getParam('pagination') 
+        ? $skladkaFilterModel->getPaginationDataFiltered(
+            Response::getArray($postData['filter'])
+          )
+        : $skladkaFilterModel->getAllFiltered(
+            Response::getArray($postData['filter'])
+          )
       ;
+
+      $skladkaFullData = [];
+      foreach ($filteredSkladkaData as $skladkaKey => $skladkaVal) {
+        $skladkaFullData[$skladkaKey] = $skladkaVal;
+
+        $skladkaFullData[$skladkaKey]['types'] = $skladkaTypyCross->query("
+          SELECT
+            {$skladkaTypy->tableName}.id as id,
+            {$skladkaTypy->tableName}.nazov as nazov
+          FROM {$skladkaTypyCross->tableName}
+          LEFT JOIN {$skladkaTypy->tableName} ON {$skladkaTypy->tableName}.id = {model}.id_skladka_typ
+          WHERE {model}.id_skladka = %i
+        ", (int)$skladkaVal['id']);
+      }
+
+      echo Response::getJson([
+        'status' => 'success',
+        'data' => $skladkaFullData
+      ]); 
     break;
     case 'skladky-vsetky-simple': // GET | POST for filter
       $skladkaModel = new SkladkaModel();
@@ -191,6 +221,10 @@ try {
       $skladkaTypCrossModel = $bride->initModel('skladky_typy_cross');
       $skladkaTypModel = $bride->initModel('skladky_typy');
 
+      $skladkaDetailData = $skladkaModel->getById((int)Request::getParam('id'));
+
+      if (empty($skladkaDetailData)) Response::throwException('Skládka neexistuje');
+
       $skladkaTypyOdpaduData = $skladkaModel->query("
         SELECT
           {$skladkaTypModel->tableName}.id as id,
@@ -211,7 +245,7 @@ try {
 
       $skladkaGalleryData = $skladkaGalleryModel->query("
         SELECT
-          CONCAT('". $nelegalneSkladkyImagesFolder ."', {model}.id, '/', link) as link
+          CONCAT('". $nelegalneSkladkyImagesFolder ."', {model}.id_skladka, '/', link) as link
         FROM {model}
         LEFT JOIN {$galleryModel->tableName} 
         ON {$galleryModel->tableName}.id = {model}.id_gallery
@@ -221,7 +255,7 @@ try {
       echo Response::getJson([
         'status' => 'success',
         'data' => [
-          'detail' => $skladkaModel->getById((int)Request::getParam('id')),
+          'detail' => $skladkaDetailData,
           'types' => $skladkaTypyOdpaduData,
           'images' => $skladkaGalleryData
         ]
@@ -644,23 +678,35 @@ try {
         (int)$unknownUserData['id']
       );
 
-      $userModel = $bride->initModel('users');
-      $userData = $userModel->getById($postData['idUser']);
-      if (empty($userData)) Response::throwWarning('Nepodarilo sa prihlásiť');
+      // Logged user
+      $userLoggedData = [];
+      if ((int)$postData['idUser'] > 0) {
+        $userModel = $bride->initModel('users');
+        $userData = $userModel->getById($postData['idUser']);
+        if (empty($userData)) Response::throwWarning('Nepodarilo sa prihlásiť');
 
-      if ($postData['password'] != $userData['password']) {
-        Response::throwWarning('Nepodarilo sa prihlásiť');
+        if ($postData['password'] != $userData['password']) {
+          Response::throwWarning('Nepodarilo sa prihlásiť');
+        }
+
+        $userModel->update(
+          [
+            'last_login' => date('Y-m-d H:i:s', time())
+          ],
+          (int)$userData['id']
+        );
+
+        $userLoggedData = [
+          'email' => Helper::deleteSpaces($userData['email']),
+          'idUser' => $userData['id'],
+          'name' => $userData['name'],
+          'password' => $userData['password']
+        ];
       }
 
-      $userModel->update(
-        [
-          'last_login' => date('Y-m-d H:i:s', time())
-        ],
-        (int)$userData['id']
-      );
-
       echo Response::getJson([
-        'status' => 'success'
+        'status' => 'success',
+        'data' => $userLoggedData
       ]); 
     break;
     case 'registracia': // POST
@@ -894,7 +940,7 @@ try {
       $skladkyDataPercentage = $percentageTogether * $skladkyDataCount;
       $confirmedPercentage = $percentageTogether * $confirmedCount;
 
-      $points = (count($skladkyData) * 10) + (count($skladkyData) * 3);
+      $points = ($skladkyDataCount * 10) + ($confirmedCount * 3);
 
       echo Response::getJson([
         'status' => 'success',
@@ -1035,14 +1081,16 @@ try {
       Request::validatePostParam('id_user');
       Request::validatePostParam('name');
 
-      if ((strlen($postData['name']) < 2)) Response::throwException('Prezývka musí obsahovať aspoň 2 znaky');
+      if ((strlen($postData['name']) < 2)) Response::throwException('Meno musí obsahovať aspoň 2 znaky');
 
       $userModel = $bride->initModel('users');
 
       $allUsersData = $userModel->getAll();
 
+      if (strlen($postData['name']) > 30) Response::throwException('Povolená dĺžka mena je 30 znakov.');
+
       foreach ($allUsersData as $data) {
-        if ($data['name'] == $postData['name']) Response::throwException('Táto prezývka je už obsadená');
+        if ($data['name'] == $postData['name']) Response::throwException('Toto meno je už obsadené, skúste iné.');
       }
 
       $userData = $userModel->getById((int)$postData['id_user']);
@@ -1055,7 +1103,7 @@ try {
 
       echo Response::getJson([
         'status' => 'success',
-        'message' => 'Prezývka úspešne zmenená'
+        'message' => 'Meno úspešne zmenené'
       ]);
     break;
     case 'zmena-hesla': // POST

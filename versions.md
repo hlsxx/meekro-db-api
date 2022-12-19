@@ -97,3 +97,13 @@
 - geocoding nahlasit
 - pridany install skladky kraj
 - pridana validacia prihlasit, reg parzdy mail a hesla
+
+#VERSION 0.32
+- skladky-vsetky vracanie types
+- fixnutie chyby pri zaznamenat-aktivitu (vracanie udajov ak je uzivatel prihalseny)
+- dlzka mena do 30 znakov
+- skladka neexistuje osetrenie v skladka (detail)
+- skaldka detail fix id_skaldka v url pre images
+
+#VERSION 0.33
+- text install.php pridane init texty

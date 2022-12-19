@@ -198,6 +198,29 @@ $appTextModel->defineColumn('type')->type('varchar')->size(30)->null(false);
 $appTextModel->defineColumn('text')->type('varchar')->size(100)->null(false);
 $appTextModel->initTable();
 
+$commonTexts = [
+  'Aktuálna verzia TrashRunnera: TEST',
+  'Nahlasujete nelegálne skládky ihneď',
+  'Prehľadávajte už nahlásené skládky',
+  'Máte nápad? Kontaktujte nás'
+];
+
+foreach ($commonTexts as $text) {
+  $appTextModel->insert([
+    'device_type' => 1,
+    'page' => 'home',
+    'type' => 'welcome',
+    'text' => $text
+  ]);
+
+  $appTextModel->insert([
+    'device_type' => 2,
+    'page' => 'home',
+    'type' => 'welcome',
+    'text' => $text
+  ]);
+}
+
 /**
  * CLEAR ___FILES DIR
 */
