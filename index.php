@@ -286,6 +286,10 @@ try {
       Request::validatePostParam('uid');
       Request::validatePostParam('image');
 
+      if (Common::getDeviceType() == 2) {
+        Request::validatePostParam('size');
+      }
+
       if ($postData['image'] == '') Response::throwException('Pre nahlásenie nelegálnej skládky musíte nahrať obrázok');
       if ($postData['choosenTypes'] == '') Response::throwException('Vyberte aspoň jeden typ odpadu nachádzajúci sa na skládke');
 
@@ -345,6 +349,7 @@ try {
         'typ' => 2,
         'lat' => (float)$postData['lat'],
         'lng' => (float)$postData['lng'],
+        'velkost' => Common::getDeviceType() == 2 ? (float)$postData['size'] : null,
         'id_unknown_user' => (int)$unknownUserData['id']
       ]); 
 
@@ -516,6 +521,7 @@ try {
         'rok_zacatia' => $currentSkladka['rok_zacatia'],
         'lat' => $currentSkladka['lat'],
         'lng' => $currentSkladka['lng'],
+        'velkost' => $currentSkladka['velkost'],
         'id_unknown_user_reported' => (int)$currentSkladka['id_unknown_user'],
         'id_unknown_user_cleared' => (int)$unknownUserData['id'],
         'created_at' => date('Y-m-d H:i:s')
@@ -1315,6 +1321,11 @@ try {
       foreach($tokenModel->getAll() as $token) {
         echo "IDUSER: <b>{$token['id_user']}</b> IDUID: <b>{$token['id_unknown_user']}</b> TOKEN: <b>{$token['token_number']}</b> VYTVORENE:{$token['created_at']} <br>";
       }
+    break;
+    case 'cron-mesiac':
+      // DELETE ALL TOKENS
+      $tokenModel = $bride->initModel('tokens');
+      $tokenModel->query("TRUNCATE {model}");
     break;
     default:
       Response::throwException('PAGE: {' . Request::getParam('page') . '} doesnt exists');
