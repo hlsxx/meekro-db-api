@@ -21,6 +21,11 @@ class Common {
     }
   }
 
+
+  public static function getDeviceType() {
+    return (int)Request::getParamIsset('device_type');
+  }
+
   public static function securiter() {
     if (DEBUG_MODE === false) {
       $getData = Request::getGetData();

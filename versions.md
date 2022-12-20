@@ -107,3 +107,4 @@
 
 #VERSION 0.33
 - text install.php pridane init texty
+- nahlasit a skladky pridany inpout velkost

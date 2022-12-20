@@ -31,6 +31,7 @@ $skladkyModel->defineColumn('pocet_nahlaseni')->type('int')->size(4)->default(0)
 $skladkyModel->defineColumn('vycistena')->type('tinyint')->size(1)->default(0)->null(false);
 $skladkyModel->defineColumn('lat')->type('double')->default(0)->null(false);
 $skladkyModel->defineColumn('lng')->type('double')->default(0)->null(false);
+$skladkyModel->defineColumn('velkost')->type('double')->default(0)->null(true);
 $skladkyModel->defineColumn('id_unknown_user')->type('int')->size(11)->null(true);
 $skladkyModel->initTable();
 
@@ -161,6 +162,7 @@ $skladkaVycisteneModel->defineColumn('rok_zacatia')->type('datetime')->null(fals
 //$skladkaVycisteneModel->defineColumn('vycistena')->type('tinyint')->size(1)->default(1)->null(false);
 $skladkaVycisteneModel->defineColumn('lat')->type('double')->default(0)->null(false);
 $skladkaVycisteneModel->defineColumn('lng')->type('double')->default(0)->null(false);
+$skladkaVycisteneModel->defineColumn('velkost')->type('double')->default(0)->null(true);
 $skladkaVycisteneModel->defineColumn('id_unknown_user_reported')->type('int')->size(11)->null(false);
 $skladkaVycisteneModel->defineColumn('id_unknown_user_cleared')->type('int')->size(11)->null(false);
 $skladkaVycisteneModel->defineColumn('created_at')->type('datetime')->null(false);
