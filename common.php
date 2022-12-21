@@ -23,7 +23,7 @@ class Common {
 
 
   public static function getDeviceType() {
-    return (int)Request::getParamIsset('device_type');
+    return (int)Request::getParam('device_type');
   }
 
   public static function securiter() {
