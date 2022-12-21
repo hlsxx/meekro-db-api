@@ -38,7 +38,10 @@
 <body>
   <div class="container mb-5">
     <div class="card bg-secondary card-body mt-5">
-    <ul class="list-group"><?php echo $html ?></ul>
+    <ul class="list-group text-center">
+      <?php 
+        echo $html == '' ? "<b class='text-light'>Žiadne existujúce tokeny</b>" : $html;
+      ?></ul>
     </div>
   </div>
 </body>
