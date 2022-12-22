@@ -107,4 +107,20 @@
 
 #VERSION 0.33
 - text install.php pridane init texty
-- nahlasit a skladky pridany inpout velkost
+- nahlasit a skladky pridany inpout velkost pre IOS
+- cron mesacny 
+- tokens stranka
+- commno getDeviceTyp fix 
+
+#VERSION 0.34
+- nahalsit velkost if 0 retype to null
+- sidlo geocoidng cela adresa
+
+TODO: 
+- GEOCODING vracanie ulice (!!!)
+- FILTROVANIE vracianie zoradenie podla vzdialenosti
+- FILTROVANIE pomocou typu odpadu
+- FILTROVANIE pomocou krajov (NEEXISTUJE V APPKE)
+- PREHLAD vracanie poslednej nahlasenej skladky (NEEXISTUJE V APPKE)
+- PREHLAD, PREHLAD-UCET prepocet bodov
+- UCET vymazanie uctu

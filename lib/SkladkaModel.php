@@ -98,6 +98,7 @@ class SkladkaModel extends Model {
         // Check distance from FILTERED value
         if ($distance <= (int)$filterData["distance"]) {
           $filterDataByDistance[] = $skladka;
+          //$filterDataByDistance['distance'] = $distance;
         }
       }
     }

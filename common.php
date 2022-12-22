@@ -31,7 +31,7 @@ class Common {
       $getData = Request::getGetData();
 
       if (!isset($getData['hash'])) self::get405('permission');
-      if (in_array($getData['hash'], ['ucm34'])) self::get405('permission');
+      if (in_array($getData['hash'], ['ucm70'])) self::get405('permission');
     }
   }
 
