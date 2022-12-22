@@ -236,18 +236,21 @@ try {
 
       if (empty($skladkaDetailData)) Response::throwException('Skládka neexistuje');
 
-      $skladkaTypyOdpaduData = $skladkaModel->query("
-        SELECT
-          {$skladkaTypModel->tableName}.id as id,
-          {$skladkaTypModel->tableName}.nazov as nazov,
-          {$skladkaTypCrossModel->tableName}.pocet_potvrdeni
-        FROM {model}
-        LEFT JOIN {$skladkaTypCrossModel->tableName} 
-        ON {model}.id = {$skladkaTypCrossModel->tableName}.id_skladka
-        LEFT JOIN {$skladkaTypModel->tableName} 
-        ON {$skladkaTypCrossModel->tableName}.id_skladka_typ = {$skladkaTypModel->tableName}.id
-        WHERE {model}.id = " . (int)Request::getParam('id') . "
-      ");
+      $skladkaTypyOdpaduData = [];
+      if ((int)$skladkaDetailData['typ'] == 2) {
+        $skladkaTypyOdpaduData = $skladkaModel->query("
+          SELECT
+            {$skladkaTypModel->tableName}.id as id,
+            {$skladkaTypModel->tableName}.nazov as nazov,
+            {$skladkaTypCrossModel->tableName}.pocet_potvrdeni
+          FROM {model}
+          LEFT JOIN {$skladkaTypCrossModel->tableName} 
+          ON {model}.id = {$skladkaTypCrossModel->tableName}.id_skladka
+          LEFT JOIN {$skladkaTypModel->tableName} 
+          ON {$skladkaTypCrossModel->tableName}.id_skladka_typ = {$skladkaTypModel->tableName}.id
+          WHERE {model}.id = " . (int)Request::getParam('id') . "
+        ");
+      }
 
       $skladkaGalleryModel = $bride->initModel('skladky_gallery');
       $galleryModel = $bride->initModel('gallery');
