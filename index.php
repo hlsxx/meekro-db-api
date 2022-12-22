@@ -349,7 +349,9 @@ try {
         'typ' => 2,
         'lat' => (float)$postData['lat'],
         'lng' => (float)$postData['lng'],
-        'velkost' => Common::getDeviceType() == 2 ? (float)$postData['size'] : null,
+        'velkost' => Common::getDeviceType() == 2 
+          ? ((float)$postData['size'] != 0 ? (float)$postData['size'] : null)
+          : null,
         'id_unknown_user' => (int)$unknownUserData['id']
       ]); 
 
