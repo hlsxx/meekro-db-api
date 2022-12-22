@@ -334,10 +334,12 @@ try {
         $kraj = $geocodeData[2]['long_name'];
         $okres = $geocodeData[3]['long_name'];
         $obec = $geocodeData[1]['long_name'];
+        $sidlo = $obec . ' ' . $geocodeData[0]['long_name'];
       } else {
         $kraj = "{$uniqueId}_kraj";
         $okres = "{$uniqueId}_okres";
         $obec = "{$uniqueId}_obec";
+        $sidlo = "{$uniqueId}_sidlo";
       }
 
       $insertedIdSkladka = $skladkaModel->insert([
@@ -345,6 +347,7 @@ try {
         'kraj' => $kraj,
         'okres' => $okres,
         'obec' => $obec,
+        'sidlo' => $sidlo,
         'rok_zacatia' => Date('Y-m-d'),
         'typ' => 2,
         'lat' => (float)$postData['lat'],
