@@ -115,6 +115,8 @@
 #VERSION 0.34
 - nahalsit velkost if 0 retype to null
 - sidlo geocoidng cela adresa
+- disabled app config
+- disable screens in apps
 
 TODO: 
 - GEOCODING vracanie ulice (!!!)

@@ -19,6 +19,16 @@ class Common {
         ]);
       }
     }
+
+    if (self::getDeviceType() == 1) {
+      if (in_array(Request::getParam('screen'), ANDROID_DISABLED_APP_SCREENS)) {
+        Response::throwException('Táto obrazovka nie je dostupná');
+      }
+    } else if(self::getDeviceType() == 2) {
+      if (in_array(Request::getParam('screen'), ANDROID_DISABLED_APP_SCREENS)) {
+        Response::throwException('Táto obrazovka nie je dostupná');
+      }
+    }
   }
 
 
@@ -32,6 +42,10 @@ class Common {
 
       if (!isset($getData['hash'])) self::get405('permission');
       if (in_array($getData['hash'], ['ucm70'])) self::get405('permission');
+    }
+
+    if (DISABLE_APP === true) {
+      Response::throwException('Aplikácia je dočasne pozastavenená');
     }
   }
 

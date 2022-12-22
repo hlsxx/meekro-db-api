@@ -22,8 +22,6 @@ require_once(__DIR__ . '/common.php');
 // Debug
 require_once(__DIR__ . '/debug.php');
 
-Common::securiter();
-
 DB::$user = DB_USER;
 DB::$password = DB_PASSWORD;
 DB::$dbName = DB_NAME;
@@ -59,7 +57,8 @@ $logError->pushHandler(
 require_once(__DIR__ . '/test.php');
 
 try {
-
+  Common::securiter();
+  
   $logInfo->info("REQUEST from {$_SERVER['REMOTE_ADDR']}");
 
   if (!Request::getParam('page')) {
@@ -331,10 +330,10 @@ try {
       $geocodeData = Common::geocoding($postData['lat'], $postData['lng']);
 
       if (!empty($geocodeData)) {
-        $kraj = $geocodeData[2]['long_name'];
+        $kraj = $geocodeData[4]['long_name'];
         $okres = $geocodeData[3]['long_name'];
-        $obec = $geocodeData[1]['long_name'];
-        $sidlo = $obec . ' ' . $geocodeData[0]['long_name'];
+        $obec = $geocodeData[2]['long_name'];
+        $sidlo = $geocodeData[1]['long_name'] . ' ' . $geocodeData[0]['long_name'];
       } else {
         $kraj = "{$uniqueId}_kraj";
         $okres = "{$uniqueId}_okres";
