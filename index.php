@@ -125,10 +125,22 @@ try {
         ;
 
       } else {
-        $data = Request::getParam('pagination') 
-          ? $skladkaModel->getPaginationData()
-          : $skladkaModel->getAll()
-        ;
+        if (Request::getParamIsset('showType')) {
+          $filterSkladkaModel = $bride->initModel('skladky');
+
+          $data = $filterSkladkaModel->query("
+            SELECT 
+              * 
+            FROM {model} 
+            WHERE typ = 2
+            ORDER BY id DESC
+          ");
+        } else {
+          $data = Request::getParam('pagination') 
+            ? $skladkaModel->getPaginationData()
+            : $skladkaModel->getAll()
+          ;
+        }
       }
 
       echo Response::getJson([
