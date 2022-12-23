@@ -299,6 +299,7 @@ try {
       Request::validatePostParam('lng');
       Request::validatePostParam('uid');
       Request::validatePostParam('image');
+      Request::validatePostParam('idUser');
 
       if (Common::getDeviceType() == 2) {
         Request::validatePostParam('size');
@@ -308,7 +309,16 @@ try {
       if ($postData['choosenTypes'] == '') Response::throwException('Vyberte aspoň jeden typ odpadu nachádzajúci sa na skládke');
 
       $unknownUserModel = $bride->initModel('unknown_users');
-      $unknownUserData = $unknownUserModel->getByCustom('uid', $postData['uid']);
+      if ((int)$postData['idUser'] != 0)  {
+        $unknownUserData = $unknownUserModel->queryFirstRow("
+          SELECT
+            *
+          FROM {model}
+          WHERE uid = %s AND id_user = %i
+        ", $postData['uid'], (int)$postData['idUser']);
+      } else {
+        $unknownUserData = $unknownUserModel->getByCustom('uid', $postData['uid']);
+      }
 
       if (empty($unknownUserData)) Response::throwException('Vaše zariadenie nebolo rozpoznané v systéme');
 
@@ -475,9 +485,19 @@ try {
 
       Request::validatePostParam('idSkladka');
       Request::validatePostParam('uid');
+      Request::validatePostParam('idUser');
 
       $unknownUserModel = $bride->initModel('unknown_users');
-      $unknownUserData = $unknownUserModel->getByCustom('uid', $postData['uid']);
+      if ((int)$postData['idUser'] != 0)  {
+        $unknownUserData = $unknownUserModel->queryFirstRow("
+          SELECT
+            *
+          FROM {model}
+          WHERE uid = %s AND id_user = %i
+        ", $postData['uid'], (int)$postData['idUser']);
+      } else {
+        $unknownUserData = $unknownUserModel->getByCustom('uid', $postData['uid']);
+      }
 
       if (empty($unknownUserData)) Response::throwException('Vaše zariadenie nebolo rozpoznané v systéme');
 
@@ -508,11 +528,21 @@ try {
       Request::validatePostParam('idSkladka');
       Request::validatePostParam('uid');
       Request::validatePostParam('image');
+      Request::validatePostParam('idUser');
 
       if ($postData['image'] == '') Response::throwException('Musíte nahrať obrázok vyčisteného miesta skládky');
 
       $unknownUserModel = $bride->initModel('unknown_users');
-      $unknownUserData = $unknownUserModel->getByCustom('uid', $postData['uid']);
+      if ((int)$postData['idUser'] != 0)  {
+        $unknownUserData = $unknownUserModel->queryFirstRow("
+          SELECT
+            *
+          FROM {model}
+          WHERE uid = %s AND id_user = %i
+        ", $postData['uid'], (int)$postData['idUser']);
+      } else {
+        $unknownUserData = $unknownUserModel->getByCustom('uid', $postData['uid']);
+      }
 
       if (empty($unknownUserData)) Response::throwException('Vaše zariadenie nebolo rozpoznané v systéme');
 
@@ -596,9 +626,19 @@ try {
 
       Request::validateGetParam('idSkladka');
       Request::validateGetParam('uid');
+      Request::validateGetParam('idUser');
 
       $unknownUserModel = $bride->initModel('unknown_users');
-      $unknownUserData = $unknownUserModel->getByCustom('uid', $getData['uid']);
+      if ((int)$getData['idUser'] != 0)  {
+        $unknownUserData = $unknownUserModel->queryFirstRow("
+          SELECT
+            *
+          FROM {model}
+          WHERE uid = %s AND id_user = %i
+        ", $getData['uid'], (int)$getData['idUser']);
+      } else {
+        $unknownUserData = $unknownUserModel->getByCustom('uid', $getData['uid']);
+      }
 
       if (empty($unknownUserData)) Response::throwException('Vaše zariadenie nebolo rozpoznané v systéme');
 
@@ -692,7 +732,16 @@ try {
       Request::validatePostParam('password');
 
       $unknownUserModel = $bride->initModel('unknown_users');
-      $unknownUserData = $unknownUserModel->getByCustom('uid', $postData['uid']);
+      if ((int)$postData['idUser'] != 0)  {
+        $unknownUserData = $unknownUserModel->queryFirstRow("
+          SELECT
+            *
+          FROM {model}
+          WHERE uid = %s AND id_user = %i
+        ", $postData['uid'], (int)$postData['idUser']);
+      } else {
+        $unknownUserData = $unknownUserModel->getByCustom('uid', $postData['uid']);
+      }
 
       if (empty($unknownUserData)) Response::throwException('Vaše zariadenie nebolo rozpoznané v systéme');
 
