@@ -775,12 +775,18 @@ try {
         'created_at' => $createdAt
       ]);
 
+      $insertedUnknownUserId = $unknownUserModel->insert([
+        'uid' => $unknownUserData['uid'],
+        'id_user' => (int)$idUser,
+        'created_at' => $createdAt
+      ]);
+
       $tokenNumber = (new TokenModel())->getTokenNumber();
 
       $tokenModel = $bride->initModel('tokens');
       $tokenModel->insert([
         'id_user' => (int)$idUser,
-        'id_unknown_user' => (int)$unknownUserData['id'],
+        'id_unknown_user' => (int)$insertedUnknownUserId,
         'attempt' => 3,
         'type' => TokenModel::$types['registration'],
         'token_number' => $tokenNumber,
@@ -848,7 +854,7 @@ try {
       Request::validatePostParam('uid');
 
       $unknownUserModel = $bride->initModel('unknown_users');
-      $unknownUserData = $unknownUserModel->getByCustom('uid', $postData['uid']);
+      $unknownUserData = $unknownUserModel->getByCustomLast('uid', $postData['uid']);
 
       if (empty($unknownUserData)) Response::throwException('Vaše zariadenie nebolo rozpoznané v systéme');
 
@@ -935,7 +941,12 @@ try {
       if (empty($userData)) Response::throwWarning('Účet nebol rozpoznaný');
 
       $unknownUserModel = $bride->initModel('unknown_users');
-      $unknownUserData = $unknownUserModel->getByCustom('uid', $getData['uid']);
+      $unknownUserData = $unknownUserModel->queryFirstRow("
+        SELECT
+          *
+        FROM {model}
+        WHERE uid = %s AND id_user = %i
+      ", $getData['uid'], (int)$userData['id']);
 
       $skladkaModel = $bride->initModel('skladky');
 
@@ -976,7 +987,8 @@ try {
           'confirmedPercentage' => $confirmedPercentage,
           'cleared' => 0,
           'points' => (int)$points,
-          'rank' => 5
+          'rank' => 5,
+          'name' => $userData['name'] ?: 'Anonym'
         ]
       ]);
     break;

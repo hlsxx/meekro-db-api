@@ -117,6 +117,8 @@
 - sidlo geocoidng cela adresa
 - disabled app config
 - disable screens in apps
+- skladky-simple typ 2
+- fix ratanie bodov a registracia users
 
 TODO: 
 - GEOCODING vracanie ulice (!!!)
@@ -126,3 +128,4 @@ TODO:
 - PREHLAD vracanie poslednej nahlasenej skladky (NEEXISTUJE V APPKE)
 - PREHLAD, PREHLAD-UCET prepocet bodov
 - UCET vymazanie uctu
+- PRIHLASENIE ak nie je ucet verifikovany tak poslat mail ak preslo viac nez 10 min
