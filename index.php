@@ -1224,7 +1224,13 @@ try {
 
       echo Response::getJson([
         'status' => 'success',
-        'message' => 'Heslo úspešne zmenené'
+        'message' => 'Heslo úspešne zmenené',
+        'data' => [
+          'email' => Helper::deleteSpaces($userData['email']),
+          'idUser' => $userData['id'],
+          'name' => $userData['name'],
+          'password' => $postData['new_password']
+        ]
       ]);
     break;
     case 'zabudnute-heslo': // POST
