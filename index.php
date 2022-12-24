@@ -922,6 +922,9 @@ try {
       
       $timeToTokenValid = strtotime($tokenData['created_at'] . ' + 10 minute');
 
+      $userModel = $bride->initModel('users');
+      $userData = $userModel->getById((int)$tokenData['id_user']);
+
       if (date('Y-m-d H:i:s', $timeToTokenValid) < date('Y-m-d H:i:s')) {
         $tokenModel->delete($tokenData['id']);
 
@@ -936,9 +939,6 @@ try {
           'token_number' => $tokenNumber,
           'created_at' => date('Y-m-d H:i:s')
         ]);
-
-        $userModel = $bride->initModel('users');
-        $userData = $userModel->getById((int)$tokenData['id_user']);
 
         if (empty($userData)) Response::throwException('Nastala chyba, uživateľ nebol rozpoznaný');
 
@@ -964,7 +964,13 @@ try {
 
         echo Response::getJson([
           'status' => 'success',
-          'message' => 'Successful verified'
+          'message' => 'Successful verified',
+          'data' => [
+            'email' => Helper::deleteSpaces($userData['email']),
+            'idUser' => $userData['id'],
+            'name' => '',
+            'password' => $userData['password']
+          ]
         ]);
       } else {
         $tokenModel->update([
