@@ -1106,7 +1106,7 @@ try {
           'topUsers' => $nelegalneSkladkyData,
           'illegalCount' => $allIllegal,
           'legalCount' => $allLegal,
-          'clearedCount' => 33
+          'clearedCount' => 0
         ]
       ]);
     break;
