@@ -1005,12 +1005,25 @@ try {
       if (empty($userData)) Response::throwWarning('Účet nebol rozpoznaný');
 
       $unknownUserModel = $bride->initModel('unknown_users');
-      $unknownUserData = $unknownUserModel->queryFirstRow("
+
+      $unknownUserData = $unknownUserModel->query("
+        SELECT
+          id
+        FROM {model}
+        WHERE id_user = %i
+      ", (int)$userData['id']);
+
+      $unknowUsersIds = [];
+      foreach ($unknownUserData as $item) {
+        $unknowUsersIds[] = $item['id'];
+      }
+
+      /*$unknownUserData = $unknownUserModel->queryFirstRow("
         SELECT
           *
         FROM {model}
         WHERE uid = %s AND id_user = %i
-      ", $getData['uid'], (int)$userData['id']);
+      ", $getData['uid'], (int)$userData['id']);*/
 
       $skladkaModel = $bride->initModel('skladky');
 
@@ -1018,16 +1031,16 @@ try {
         SELECT 
           *
         FROM {model}
-        WHERE id_unknown_user = %i
-      ", (int)$unknownUserData['id']);
+        WHERE id_unknown_user IN (".implode(", ", $unknowUsersIds).") 
+      ");
 
       $skladkaPotvrdeniaModel = $bride->initModel('skladky_potvrdenia');
       $skladkaPotvrdeniaData = $skladkaPotvrdeniaModel->query("
         SELECT 
           *
         FROM {model}
-        WHERE id_unknown_user = %i
-      ", (int)$unknownUserData['id']);
+        WHERE id_unknown_user IN (".implode(", ", $unknowUsersIds).")
+      ");
 
       $skladkyDataCount = count((array)$skladkyData);
       $confirmedCount = count((array)$skladkaPotvrdeniaData);
