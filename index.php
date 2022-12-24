@@ -891,7 +891,7 @@ try {
         'data' => [
           'email' => Helper::deleteSpaces($userData['email']),
           'idUser' => $userData['id'],
-          'name' => $userData['name'],
+          'name' => (string)$userData['name'],
           'password' => $userData['password']
         ]
       ]);
