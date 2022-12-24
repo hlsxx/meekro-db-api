@@ -886,6 +886,15 @@ try {
 
       if ((bool)$userData['verified'] == false) Response::throwException('Váš účet nie je overený');
 
+      // Ak sa prihlasim z ineho zariadenia pridam ho
+      if ((int)$unknownUserData['id_user'] != (int)$userData['id']) {
+        $unknownUserModel->insert([
+          'uid' =>  $postData['uid'],
+          'id_user' => (int)$userData['id'],
+          'created_at' => date('Y-m-d H:i:s')
+        ]);
+      }
+
       echo Response::getJson([
         'status' => 'success',
         'data' => [
