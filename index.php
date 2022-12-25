@@ -1069,6 +1069,23 @@ try {
         ]
       ]);
     break;
+    case 'ucet-vymazat':
+      $postData = Request::getPostData();
+
+      Request::validatePostParam('idUser');
+
+      $userModel = $bride->initModel('users');
+      $userData = $userModel->getById((int)$tokenData['id_user']);
+
+      if (empty($userData)) Response::throwException('Nastala chyba, uživateľ nebol rozpoznaný');
+
+      //$userModel->delete();
+
+      echo Response::getJson([
+        'status' => 'success',
+        'message' => 'Ucet úspešne odstránený'
+      ]);
+    break;
     case 'prehlad': // GET
       $userModel = $bride->initModel('users');
       $unknownUserModel = $bride->initModel('unknown_users');
