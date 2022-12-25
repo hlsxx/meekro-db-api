@@ -1080,7 +1080,7 @@ try {
 
       if (empty($userData)) Response::throwException('Nastala chyba, uživateľ nebol rozpoznaný');
 
-      //$userModel->delete();
+      $userModel->delete((int)$userData['id']);
 
       echo Response::getJson([
         'status' => 'success',
