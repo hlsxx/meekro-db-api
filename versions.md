@@ -120,6 +120,13 @@
 - skladky-simple typ 2
 - fix ratanie bodov a registracia users
 
+#VERSION 0.35
+- idUser is necessary
+- registracia-validacia vracanie login data
+- zmena-hesla vracanie userData
+- bug fix prihlasenie ak sa prihalsim z cudzieho mobilu
+- ucet-vymazat
+
 TODO: 
 - GEOCODING vracanie ulice (!!!)
 - FILTROVANIE vracianie zoradenie podla vzdialenosti
