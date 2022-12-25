@@ -223,6 +223,16 @@ foreach ($commonTexts as $text) {
   ]);
 }
 
+/** UCM_IDEAS */
+$ideaModel = $bride->initModel('ideas');
+
+$ideaModel->defineColumn('email')->type('varchar')->size(50)->null(false);
+$ideaModel->defineColumn('image')->type('varchar')->size(50)->null(true);
+$ideaModel->defineColumn('device_type')->type('int')->size(1)->null(false)->default(1);
+$ideaModel->defineColumn('type')->type('int')->size(1)->null(false)->default(1);
+$ideaModel->defineColumn('text')->type('text')->null(false);
+$ideaModel->initTable();
+
 /**
  * CLEAR ___FILES DIR
 */

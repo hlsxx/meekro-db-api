@@ -1,5 +1,7 @@
 <?php
 
+use function PHPSTORM_META\map;
+
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
@@ -1458,6 +1460,25 @@ try {
       // DELETE ALL TOKENS
       $tokenModel = $bride->initModel('tokens');
       $tokenModel->query("TRUNCATE {model}");
+    break;
+    case 'insert-idea':
+      $postData = Request::getPostData();
+
+      Request::validatePostParam('device_type');
+      Request::validatePostParam('type');
+      Request::validatePostParam('text');
+
+      $ideaModel = $bride->initModel('ideas');
+      $ideaModel->insert([
+        'email' => $postData['email'],
+        'device_type' => (int)$postData['device_type'],
+        'type' => (int)$postData['type'],
+        'text' => $postData['text']
+      ]);
+
+      echo Response::getJson([
+        'status' => 'success'
+      ]);
     break;
     default:
       Response::throwException('PAGE: {' . Request::getParam('page') . '} doesnt exists');
