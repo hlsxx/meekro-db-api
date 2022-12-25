@@ -1075,7 +1075,8 @@ try {
       Request::validatePostParam('idUser');
 
       $userModel = $bride->initModel('users');
-      $userData = $userModel->getById((int)$tokenData['id_user']);
+
+      $userData = $userModel->getById((int)$postData['idUser']);
 
       if (empty($userData)) Response::throwException('Nastala chyba, uživateľ nebol rozpoznaný');
 
