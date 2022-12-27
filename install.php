@@ -233,6 +233,14 @@ $ideaModel->defineColumn('type')->type('int')->size(1)->null(false)->default(1);
 $ideaModel->defineColumn('text')->type('text')->null(false);
 $ideaModel->initTable();
 
+/** UCM_UNKNOWN_USERS_USERS_CROSS */
+$unknownUserUserCrossModel = $bride->initModel('unknown_users_users_cross');
+
+$unknownUserUserCrossModel->defineColumn('id_unknown_user')->type('int')->size(11)->null(false);
+$unknownUserUserCrossModel->defineColumn('id_user')->type('int')->size(11)->null(false);
+
+$unknownUserUserCrossModel->initTable();
+
 /**
  * CLEAR ___FILES DIR
 */
