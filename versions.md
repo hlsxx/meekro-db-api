@@ -128,8 +128,10 @@
 - ucet-vymazat
 - insert-ideas
 
-#VERSION 0.36
-- unknown_users_users_cross 
+#VERSION 0.36 (MAJOR)
+- unknown_users_users_cross
+- skladky, potvrdenia pridany id_user, id_uknonw_user ako nullable
+- change logic with id_user 
 
 TODO: 
 - GEOCODING vracanie ulice (!!!)
