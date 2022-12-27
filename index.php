@@ -1186,25 +1186,22 @@ try {
           ) as total
         FROM (
           SELECT
-            id_unknown_user, 
+            id_user,
             (
               SELECT
                 (COUNT(*) * 3) as count
               FROM {$skladkaPotvrdenieModel->tableName}
-              WHERE {$skladkaPotvrdenieModel->tableName}.id_unknown_user = {model}.id_unknown_user
-              GROUP BY {$skladkaPotvrdenieModel->tableName}.id_unknown_user
+              WHERE {$skladkaPotvrdenieModel->tableName}.id_user = {model}.id_user
+              GROUP BY {$skladkaPotvrdenieModel->tableName}.id_user
               ORDER BY count DESC
             ) as confirmedPoints,
             (COUNT(*) * 10) as reportedPoints
           FROM {model}
-          WHERE typ = 2
-          GROUP BY {model}.id_unknown_user
+          WHERE typ = 2 AND id_user IS NOT NULL
+          GROUP BY {model}.id_user
           ORDER BY reportedPoints DESC
         ) as nested
-        LEFT JOIN {$unknownUserModel->tableName} 
-        ON {$unknownUserModel->tableName}.id = nested.id_unknown_user
-        LEFT JOIN {$userModel->tableName} 
-        ON {$userModel->tableName}.id = {$unknownUserModel->tableName}.id_user
+        LEFT JOIN {$userModel->tableName} ON {$userModel->tableName}.id = nested.id_user
         ORDER BY total DESC
         LIMIT 5
       ");
