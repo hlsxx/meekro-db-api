@@ -407,7 +407,7 @@ try {
       }
 
       /** Images upload */
-      /*if (isset($postData['image'])) {
+      if (isset($postData['image'])) {
         $filePath = FILES_DIR . '/nelegalne-skladky/' . $insertedIdSkladka;
 
         $galleryModel = $bride->initModel('gallery');
@@ -485,7 +485,7 @@ try {
             ]);
           }
         }*/
-      //}
+      }
 
       echo Response::getJson([
         'status' => 'success',
