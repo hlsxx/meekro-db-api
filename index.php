@@ -203,6 +203,7 @@ try {
 
       if (empty($unknownUserData)) Response::throwException('Vaše zariadenie nebolo rozpoznané v systéme');
       if ($unknownUserData['id_user'] == NULL) Response::throwException('Váš uživateľský účet je neplatný');
+      // TODO: DOROROBIT POD ID_USER
 
       $skladkyData = $skladkaModel->query("
         SELECT 
@@ -826,9 +827,17 @@ try {
 
       $insertedUnknownUserId = $unknownUserModel->insert([
         'uid' => $unknownUserData['uid'],
-        'id_user' => (int)$idUser,
         'created_at' => $createdAt
       ]);
+
+      // TODO: PREROBIT
+      /*
+        $unknownUserUserCrossModel = $bride->initModel('unknown_users_users_cross');
+        $unknownUserUserCrossModel->insert([
+          'id_unknown_user' => (int)$unknownUserData['id'],
+          'id_user' => (int)$idUser
+        ]);
+      */
 
       $tokenNumber = (new TokenModel())->getTokenNumber();
 
@@ -887,6 +896,23 @@ try {
       if ((bool)$userData['verified'] == false) Response::throwException('Váš účet nie je overený');
 
       // Ak sa prihlasim z ineho zariadenia pridam ho
+      // TODO: PREROBIT
+      /*$unknownUserUserCrossModel = $bride->initModel('unknown_users_users_cross');
+      $unknownUserUserCrossData = $unknownUserUserCrossModel->queryFirstRow("
+        SELECT
+          *
+        FROM {model}
+        WHERE id_unknown_user = %i AND id_user = %i
+      ", (int)$unknownUserData, (int)$userData['id']);
+
+      if (empty($unknownUserUserCrossData)) {
+        $unknownUserUserCrossModel->insert([
+          'id_unknown_user' => (int)$unknownUserData['id'],
+          'id_user' => (int)$userData['id']
+        ]);
+      }*/
+
+      // DEPRECATED
       if ((int)$unknownUserData['id_user'] != (int)$userData['id']) {
         $unknownUserModel->insert([
           'uid' =>  $postData['uid'],

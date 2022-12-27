@@ -126,6 +126,10 @@
 - zmena-hesla vracanie userData
 - bug fix prihlasenie ak sa prihalsim z cudzieho mobilu
 - ucet-vymazat
+- insert-ideas
+
+#VERSION 0.36
+- unknown_users_users_cross 
 
 TODO: 
 - GEOCODING vracanie ulice (!!!)
