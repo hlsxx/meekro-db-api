@@ -33,6 +33,7 @@ $skladkyModel->defineColumn('lat')->type('double')->default(0)->null(false);
 $skladkyModel->defineColumn('lng')->type('double')->default(0)->null(false);
 $skladkyModel->defineColumn('velkost')->type('double')->default(0)->null(true);
 $skladkyModel->defineColumn('id_unknown_user')->type('int')->size(11)->null(true);
+$skladkyModel->defineColumn('id_user')->type('int')->size(11)->null(true);
 $skladkyModel->initTable();
 
 for($i=0;$i<10;$i++) {
@@ -98,7 +99,8 @@ $skladkaTypCrossModel->initTable();
 $skladkaPotvrdenieModel = $bride->initModel('skladky_potvrdenia');
 
 $skladkaPotvrdenieModel->defineColumn('id_skladka')->type('int')->size(11)->null(false);
-$skladkaPotvrdenieModel->defineColumn('id_unknown_user')->type('int')->size(11)->null(false);
+$skladkaPotvrdenieModel->defineColumn('id_unknown_user')->type('int')->size(11)->null(true);
+$skladkaPotvrdenieModel->defineColumn('id_user')->type('int')->size(11)->null(true);
 $skladkaPotvrdenieModel->initTable();
 
 /** UCM_USERS */
@@ -163,8 +165,9 @@ $skladkaVycisteneModel->defineColumn('rok_zacatia')->type('datetime')->null(fals
 $skladkaVycisteneModel->defineColumn('lat')->type('double')->default(0)->null(false);
 $skladkaVycisteneModel->defineColumn('lng')->type('double')->default(0)->null(false);
 $skladkaVycisteneModel->defineColumn('velkost')->type('double')->default(0)->null(true);
-$skladkaVycisteneModel->defineColumn('id_unknown_user_reported')->type('int')->size(11)->null(false);
 $skladkaVycisteneModel->defineColumn('id_unknown_user_cleared')->type('int')->size(11)->null(false);
+$skladkaVycisteneModel->defineColumn('id_unknown_user_reported')->type('int')->size(11)->null(true);
+$skladkaVycisteneModel->defineColumn('id_user_reported')->type('int')->size(11)->null(true);
 $skladkaVycisteneModel->defineColumn('created_at')->type('datetime')->null(false);
 $skladkaVycisteneModel->initTable();
 

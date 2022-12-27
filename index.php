@@ -310,7 +310,17 @@ try {
       if ($postData['choosenTypes'] == '') Response::throwException('Vyberte aspoň jeden typ odpadu nachádzajúci sa na skládke');
 
       $unknownUserModel = $bride->initModel('unknown_users');
+      $unknownUserData = $unknownUserModel->getByCustom('uid', $postData['uid']);
+
       if ((int)$postData['idUser'] != 0)  {
+        $userModel = $bride->initModel('users');
+        $userData = $userModel->getById($postData['idUser']);
+
+        if (empty($userData)) Response::throwException('Používateľ neexistuje');
+      }
+
+      // DEPRECATED 0.36
+      /*if ((int)$postData['idUser'] != 0)  {
         $unknownUserData = $unknownUserModel->queryFirstRow("
           SELECT
             *
@@ -319,7 +329,7 @@ try {
         ", $postData['uid'], (int)$postData['idUser']);
       } else {
         $unknownUserData = $unknownUserModel->getByCustom('uid', $postData['uid']);
-      }
+      }*/
 
       if (empty($unknownUserData)) Response::throwException('Vaše zariadenie nebolo rozpoznané v systéme');
 
@@ -380,7 +390,8 @@ try {
         'velkost' => Common::getDeviceType() == 2 
           ? ((float)$postData['size'] != 0 ? (float)$postData['size'] : null)
           : null,
-        'id_unknown_user' => (int)$unknownUserData['id']
+        'id_unknown_user' => (int)$postData['idUser'] != 0 ? null : (int)$unknownUserData['id'],
+        'id_user' => (int)$postData['idUser'] != 0 ? (int)$postData['idUser'] : null
       ]); 
 
       $skladkaTypyCrossModel = new SkladkaTypCrossModel();
@@ -396,7 +407,7 @@ try {
       }
 
       /** Images upload */
-      if (isset($postData['image'])) {
+      /*if (isset($postData['image'])) {
         $filePath = FILES_DIR . '/nelegalne-skladky/' . $insertedIdSkladka;
 
         $galleryModel = $bride->initModel('gallery');
@@ -474,7 +485,7 @@ try {
             ]);
           }
         }*/
-      }
+      //}
 
       echo Response::getJson([
         'status' => 'success',
@@ -489,7 +500,19 @@ try {
       Request::validatePostParam('idUser');
 
       $unknownUserModel = $bride->initModel('unknown_users');
+      $unknownUserData = $unknownUserModel->getByCustom('uid', $postData['uid']);
+
+      if (empty($unknownUserData)) Response::throwException('Vaše zariadenie nebolo rozpoznané v systéme');
+
       if ((int)$postData['idUser'] != 0)  {
+        $userModel = $bride->initModel('users');
+        $userData = $userModel->getById($postData['idUser']);
+
+        if (empty($userData)) Response::throwException('Používateľ neexistuje');
+      }
+
+      // DEPRECATED 0.36
+      /*if ((int)$postData['idUser'] != 0)  {
         $unknownUserData = $unknownUserModel->queryFirstRow("
           SELECT
             *
@@ -498,9 +521,7 @@ try {
         ", $postData['uid'], (int)$postData['idUser']);
       } else {
         $unknownUserData = $unknownUserModel->getByCustom('uid', $postData['uid']);
-      }
-
-      if (empty($unknownUserData)) Response::throwException('Vaše zariadenie nebolo rozpoznané v systéme');
+      }*/
 
       $idSkladka = (int)$postData['idSkladka'];
 
@@ -516,7 +537,8 @@ try {
       
       $skladkaPotvrdenieModel->insert([
         'id_skladka' => $idSkladka,
-        'id_unknown_user' => (int)$unknownUserData['id']
+        'id_unknown_user' => (int)$postData['idUser'] != 0 ? null : (int)$unknownUserData['id'],
+        'id_user' => (int)$postData['idUser'] != 0 ? (int)$postData['idUser'] : null
       ]);
 
       echo Response::getJson([
@@ -572,8 +594,9 @@ try {
         'lat' => $currentSkladka['lat'],
         'lng' => $currentSkladka['lng'],
         'velkost' => $currentSkladka['velkost'],
-        'id_unknown_user_reported' => (int)$currentSkladka['id_unknown_user'],
         'id_unknown_user_cleared' => (int)$unknownUserData['id'],
+        'id_unknown_user_reported' => (int)$currentSkladka['idUser'] != 0 ? null : (int)$currentSkladka['id_unknown_user'],
+        'id_user_reported' => (int)$currentSkladka['idUser'] != 0 ? (int)$currentSkladka['idUser'] : null,
         'created_at' => date('Y-m-d H:i:s')
       ]);
 
@@ -1030,7 +1053,8 @@ try {
       $userData = $userModel->getById($getData['idUser']);
       if (empty($userData)) Response::throwWarning('Účet nebol rozpoznaný');
 
-      $unknownUserModel = $bride->initModel('unknown_users');
+      // DEPRECATED 0.36
+      /*$unknownUserModel = $bride->initModel('unknown_users');
 
       $unknownUserData = $unknownUserModel->query("
         SELECT
@@ -1042,7 +1066,7 @@ try {
       $unknowUsersIds = [];
       foreach ($unknownUserData as $item) {
         $unknowUsersIds[] = $item['id'];
-      }
+      }*/
 
       /*$unknownUserData = $unknownUserModel->queryFirstRow("
         SELECT
@@ -1057,16 +1081,16 @@ try {
         SELECT 
           *
         FROM {model}
-        WHERE id_unknown_user IN (".implode(", ", $unknowUsersIds).") 
-      ");
+        WHERE id_user = %i 
+      ", (int)$userData['id']);
 
       $skladkaPotvrdeniaModel = $bride->initModel('skladky_potvrdenia');
       $skladkaPotvrdeniaData = $skladkaPotvrdeniaModel->query("
         SELECT 
           *
         FROM {model}
-        WHERE id_unknown_user IN (".implode(", ", $unknowUsersIds).")
-      ");
+        WHERE id_user = %i 
+      ", (int)$userData['id']);
 
       $skladkyDataCount = count((array)$skladkyData);
       $confirmedCount = count((array)$skladkaPotvrdeniaData);
@@ -1118,6 +1142,39 @@ try {
       $unknownUserModel = $bride->initModel('unknown_users');
       $skladkaModel = $bride->initModel('skladky');
       $skladkaPotvrdenieModel = $bride->initModel('skladky_potvrdenia');
+
+      /*$nelegalneSkladkyData = $skladkaModel->query("
+        SELECT
+          IFNULL({$userModel->tableName}.name, '') as name,
+          (
+            IFNULL(nested.confirmedPoints, 0) 
+              + 
+            IFNULL(nested.reportedPoints, 0)
+          ) as total
+        FROM (
+          SELECT
+            id_unknown_user, 
+            (
+              SELECT
+                (COUNT(*) * 3) as count
+              FROM {$skladkaPotvrdenieModel->tableName}
+              WHERE {$skladkaPotvrdenieModel->tableName}.id_unknown_user = {model}.id_unknown_user
+              GROUP BY {$skladkaPotvrdenieModel->tableName}.id_unknown_user
+              ORDER BY count DESC
+            ) as confirmedPoints,
+            (COUNT(*) * 10) as reportedPoints
+          FROM {model}
+          WHERE typ = 2
+          GROUP BY {model}.id_unknown_user
+          ORDER BY reportedPoints DESC
+        ) as nested
+        LEFT JOIN {$unknownUserModel->tableName} 
+        ON {$unknownUserModel->tableName}.id = nested.id_unknown_user
+        LEFT JOIN {$userModel->tableName} 
+        ON {$userModel->tableName}.id = {$unknownUserModel->tableName}.id_user
+        ORDER BY total DESC
+        LIMIT 5
+      ");*/
 
       $nelegalneSkladkyData = $skladkaModel->query("
         SELECT
