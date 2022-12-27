@@ -653,7 +653,59 @@ try {
       Request::validateGetParam('idUser');
 
       $unknownUserModel = $bride->initModel('unknown_users');
+      $unknownUserData = $unknownUserModel->getByCustom('uid', $getData['uid']);
+
+      if (empty($unknownUserData)) Response::throwException('Vaše zariadenie nebolo rozpoznané v systéme');
+
+      $skladkaModel = $bride->initModel('skladky');
+
       if ((int)$getData['idUser'] != 0)  {
+        $userModel = $bride->initModel('users');
+        $userData = $userModel->getById($getData['idUser']);
+
+        if (empty($userData)) Response::throwException('Používateľ neexistuje');
+
+        $skladkaReportedByUserData = $skladkaModel->query("
+          SELECT
+            *
+          FROM {model}
+          WHERE id = %i AND id_user = %i
+        ", (int)$getData['idSkladka'], (int)$userData['id']);
+
+        if (empty($skladkaReportedByUserData)) {
+          $skladkaPotvrdenieModel = new SkladkaPotvrdenieModel();
+  
+          $skladkaConfirmedByUserData = [];
+          $skladkaConfirmedByUserData = DB::queryFirstRow("
+            SELECT
+              *
+            FROM {$skladkaPotvrdenieModel->tableName}
+            WHERE id_skladka = %i AND id_user = %i
+          ", (int)$getData['idSkladka'], (int)$userData['id']);
+        }
+      } else {
+        $skladkaReportedByUserData = $skladkaModel->query("
+          SELECT
+            *
+          FROM {model}
+          WHERE id = %i AND id_unknown_user = %i
+        ", (int)$getData['idSkladka'], (int)$unknownUserData['id']);
+  
+        $skladkaConfirmedByUserData = [];
+        if (empty($skladkaReportedByUserData)) {
+          $skladkaPotvrdenieModel = new SkladkaPotvrdenieModel();
+  
+          $skladkaConfirmedByUserData = DB::queryFirstRow("
+            SELECT
+              *
+            FROM {$skladkaPotvrdenieModel->tableName}
+            WHERE id_skladka = %i AND id_unknown_user = %i
+          ", (int)$getData['idSkladka'], (int)$unknownUserData['id']);
+        }
+      }
+
+      //DEPRECATED 0.36
+      /*if ((int)$getData['idUser'] != 0)  {
         $unknownUserData = $unknownUserModel->queryFirstRow("
           SELECT
             *
@@ -662,29 +714,7 @@ try {
         ", $getData['uid'], (int)$getData['idUser']);
       } else {
         $unknownUserData = $unknownUserModel->getByCustom('uid', $getData['uid']);
-      }
-
-      if (empty($unknownUserData)) Response::throwException('Vaše zariadenie nebolo rozpoznané v systéme');
-
-      $skladkaModel = $bride->initModel('skladky');
-      $skladkaReportedByUserData = $skladkaModel->query("
-        SELECT
-          *
-        FROM {model}
-        WHERE id = %i AND id_unknown_user = %i
-      ", (int)$getData['idSkladka'], (int)$unknownUserData['id']);
-
-      $skladkaConfirmedByUserData = [];
-      if (empty($skladkaReportedByUserData)) {
-        $skladkaPotvrdenieModel = new SkladkaPotvrdenieModel();
-
-        $skladkaConfirmedByUserData = DB::queryFirstRow("
-          SELECT
-            *
-          FROM {$skladkaPotvrdenieModel->tableName}
-          WHERE id_skladka = %i AND id_unknown_user = %i
-        ", (int)$getData['idSkladka'], (int)$unknownUserData['id']);
-      }
+      }*/
 
       echo Response::getJson([
         'status' => 'success',
