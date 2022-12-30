@@ -68,6 +68,39 @@ class Common {
       );
 
       $arrayData = json_decode($jsonData, true);
+      $fullDataAddress = $arrayData['results'][0]['address_components'];
+
+      $returnAddress = [
+        'adresa' => '',
+        'obec' => '',
+        'okres' => '',
+        'kraj' => ''
+      ];
+      
+      foreach ($fullDataAddress as $address) {
+        foreach ($address['types'] as $type) {
+          if ($type == 'premise') {
+            $returnAddress['adresa'] = $address['long_name'];
+            break;
+          }
+
+          if ($type == 'locality') {
+            $returnAddress['obec'] = $address['long_name'];
+            break;
+          }
+
+          if ($type == 'administrative_area_level_2') {
+            $returnAddress['okres'] = $address['long_name'];
+            break;
+          }
+
+          if ($type == 'administrative_area_level_1') {
+            $returnAddress['kraj'] = $address['long_name'];
+            break;
+          }
+        }
+      }
+
       return $arrayData['results'][0]['address_components'];
     }
 
