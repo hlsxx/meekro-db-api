@@ -366,10 +366,10 @@ try {
       $geocodeData = Common::geocoding($postData['lat'], $postData['lng']);
 
       if (!empty($geocodeData)) {
-        $kraj = $geocodeData[4]['long_name'];
-        $okres = $geocodeData[3]['long_name'];
-        $obec = $geocodeData[2]['long_name'];
-        $sidlo = $geocodeData[1]['long_name'] . ' ' . $geocodeData[0]['long_name'];
+        $kraj = $geocodeData['kraj'];
+        $okres = $geocodeData['okres'];
+        $obec = $geocodeData['obec'];
+        $sidlo = $geocodeData['obec'] . ' ' . $geocodeData['adresa'];
       } else {
         $kraj = "{$uniqueId}_kraj";
         $okres = "{$uniqueId}_okres";
