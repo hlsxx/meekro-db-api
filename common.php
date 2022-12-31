@@ -80,7 +80,12 @@ class Common {
       foreach ($fullDataAddress as $address) {
         foreach ($address['types'] as $type) {
           if ($type == 'premise') {
-            $returnAddress['adresa'] = $address['long_name'];
+            $returnAddress['adresa'] .= $address['long_name'];
+            break;
+          }
+
+          if ($type == 'street_number') {
+            $returnAddress['adresa'] = $address['long_name'] . '/';
             break;
           }
 
@@ -101,7 +106,8 @@ class Common {
         }
       }
 
-      return $arrayData['results'][0]['address_components'];
+      //return $arrayData['results'][0]['address_components'];
+      return $returnAddress;
     }
 
     return [];
