@@ -1,9 +1,9 @@
 <?php
 
-if (php_sapi_name() !== "cli") {
-  header("HTTP/1.0 404 Not Found");
-  exit;
-}
+//if (php_sapi_name() !== "cli") {
+//  header("HTTP/1.0 404 Not Found");
+//  exit;
+//}
 
 require_once(__DIR__ . '/../vendor/autoload.php');
 require_once(__DIR__ . '/../config.php');
