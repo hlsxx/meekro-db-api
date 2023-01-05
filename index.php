@@ -363,13 +363,29 @@ try {
         exit();
       }
 
-      $geocodeData = Common::geocoding($postData['lat'], $postData['lng']);
+      //$geocodeData = Common::geocoding($postData['lat'], $postData['lng']);
+
+      $httpClient = new \GuzzleHttp\Client();
+      $provider = new \Geocoder\Provider\GoogleMaps\GoogleMaps($httpClient, null, Common::reverseThrotle());
+      $geocoder = new \Geocoder\StatefulGeocoder($provider, 'sk');
+
+      $result = $geocoder->reverseQuery(\Geocoder\Query\ReverseQuery::fromCoordinates(
+        $postData['lat'],
+        $postData['lng']
+      ))->first();
+
+      $geocodeData = [
+        'adresa' => $result->getFormattedAddress(),
+        'obec' => $result->getLocality(),
+        'okres' => $result->getAdminLevels()->get(2)->getName(),
+        'kraj' => $result->getAdminLevels()->get(1)->getName()
+      ];
 
       if (!empty($geocodeData)) {
         $kraj = $geocodeData['kraj'];
         $okres = $geocodeData['okres'];
         $obec = $geocodeData['obec'];
-        $sidlo = $geocodeData['obec'] . ' ' . $geocodeData['adresa'];
+        $sidlo = $geocodeData['adresa'];
       } else {
         $kraj = "{$uniqueId}_kraj";
         $okres = "{$uniqueId}_okres";
