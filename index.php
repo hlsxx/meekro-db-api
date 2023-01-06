@@ -1446,10 +1446,6 @@ try {
         ]
       ]);
     break;
-    case 'test-mail':
-      $mailer = new Mailer();
-      $mailer->sendRegistrationCode("holespato@gmail.com", 1111);
-    break;
     case 'zabudnute-heslo-validacia': // POST
       $postData = Request::getPostData();
 
