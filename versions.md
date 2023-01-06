@@ -131,14 +131,16 @@
 #VERSION 0.36 (MAJOR)
 - unknown_users_users_cross
 - skladky, potvrdenia pridany id_user, id_uknonw_user ako nullable
-- change logic with id_user 
+- change logic with id_user
+
+#VERSION 0.37 (FIX)
+- MAIL FIX, test-mail delete
+- config DISABLE_MAIL
+- GEOCODING pozutie libky php
 
 TODO: 
-- GEOCODING vracanie ulice (!!!)
 - FILTROVANIE vracianie zoradenie podla vzdialenosti
 - FILTROVANIE pomocou typu odpadu
 - FILTROVANIE pomocou krajov (NEEXISTUJE V APPKE)
 - PREHLAD vracanie poslednej nahlasenej skladky (NEEXISTUJE V APPKE)
-- PREHLAD, PREHLAD-UCET prepocet bodov
-- UCET vymazanie uctu
 - PRIHLASENIE ak nie je ucet verifikovany tak poslat mail ak preslo viac nez 10 min

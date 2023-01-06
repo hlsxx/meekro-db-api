@@ -1329,10 +1329,6 @@ try {
 
       file_put_contents('test_peter/image.jpeg', $data);
     break;
-    case 'test-mail':
-      $mailer = new Mailer();
-      $mailer->sendRegistrationCode("holespato@gmail.com", 1111);
-    break;
     case 'zmena-mena': // POST
       $postData = Request::getPostData();
 
@@ -1431,9 +1427,11 @@ try {
         'created_at' => date('Y-m-d H:i:s')
       ]);
 
-      if (!strpos(Helper::deleteSpaces($postData['email']), 'testx') == false) {
-        $mailer = new Mailer();
-        $mailer->sendRegistrationCode(Helper::deleteSpaces($postData['email']), $tokenNumber);
+      if (DISABLE_MAIL == FALSE) {
+        if (!strpos(Helper::deleteSpaces($postData['email']), 'testx') == false) {
+          $mailer = new Mailer();
+          $mailer->sendRegistrationCode(Helper::deleteSpaces($postData['email']), $tokenNumber);
+        }
       }
 
       echo Response::getJson([
@@ -1490,9 +1488,11 @@ try {
 
         if (empty($userData)) Response::throwException('Nastala chyba, uživateľ nebol rozpoznaný');
 
-        if (!strpos($userData['email'], 'testx') == false) {
-          $mailer = new Mailer();
-          $mailer->sendRegistrationCode(Helper::deleteSpaces($postData['email']), $tokenNumber);
+        if (DISABLE_MAIL == FALSE) {
+          if (!strpos($userData['email'], 'testx') == false) {
+            $mailer = new Mailer();
+            $mailer->sendRegistrationCode(Helper::deleteSpaces($postData['email']), $tokenNumber);
+          }
         }
 
         Response::throwException('Token už expiroval. Zaslali sme Vám nový.');
