@@ -920,9 +920,11 @@ try {
         'created_at' => $createdAt
       ]);
 
-      if (!strpos(Helper::deleteSpaces($postData['email']), 'testx') == false) {
-        $mailer = new Mailer();
-        $mailer->sendRegistrationCode(Helper::deleteSpaces($postData['email']), $tokenNumber);
+      if (DISABLE_MAIL == FALSE) {
+        if (strpos(Helper::deleteSpaces($postData['email']), 'testx') === false) {
+          $mailer = new Mailer();
+          $mailer->sendRegistrationCode(Helper::deleteSpaces($postData['email']), $tokenNumber);
+        }
       }
       
       echo Response::getJson([
@@ -1046,9 +1048,11 @@ try {
 
         if (empty($userData)) Response::throwException('Nastala chyba, uživateľ nebol rozpoznaný');
 
-        if (!strpos($userData['email'], 'testx') == false) {
-          $mailer = new Mailer();
-          $mailer->sendRegistrationCode(Helper::deleteSpaces($postData['email']), $tokenNumber);
+        if (DISABLE_MAIL == FALSE) {
+          if (!strpos($userData['email'], 'testx') == false) {
+            $mailer = new Mailer();
+            $mailer->sendRegistrationCode(Helper::deleteSpaces($postData['email']), $tokenNumber);
+          }
         }
 
         Response::throwException('Token už expiroval. Zaslali sme Vám nový.');
@@ -1441,6 +1445,10 @@ try {
           'idUser' => $userData['id']
         ]
       ]);
+    break;
+    case 'test-mail':
+      $mailer = new Mailer();
+      $mailer->sendRegistrationCode("holespato@gmail.com", 1111);
     break;
     case 'zabudnute-heslo-validacia': // POST
       $postData = Request::getPostData();
