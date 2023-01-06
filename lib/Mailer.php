@@ -27,7 +27,7 @@ class Mailer {
   }
 
   public function sendRegistrationCode(string $mailTo, int $tokenNumber) {
-    $this->mail->setFrom(SMTP_SENDER_MAIL);
+    $this->mail->setFrom(SMTP_SENDER_MAIL, 'TrashRunner');
     $this->mail->addAddress($mailTo); 
 
     $this->mail->isHTML(true);

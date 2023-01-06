@@ -1331,7 +1331,7 @@ try {
     break;
     case 'test-mail':
       $mailer = new Mailer();
-      $mailer->sendRegistrationCode("peter.hafner9@gmail.com", 1111);
+      $mailer->sendRegistrationCode("holespato@gmail.com", 1111);
     break;
     case 'zmena-mena': // POST
       $postData = Request::getPostData();
