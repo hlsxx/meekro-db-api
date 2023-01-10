@@ -138,6 +138,10 @@
 - config DISABLE_MAIL
 - GEOCODING pozutie libky php
 
+#VERSION 0.38 (FIX)
+- novy mail format
+- fix nefunkcne nahlasovanie
+
 TODO: 
 - FILTROVANIE vracianie zoradenie podla vzdialenosti
 - FILTROVANIE pomocou typu odpadu
