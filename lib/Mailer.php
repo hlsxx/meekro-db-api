@@ -56,7 +56,7 @@ class Mailer {
               </tr>
               <tr>
                 <td style='padding:36px 30px 42px 30px;text-align:center;font-size:60px;letter-spacing: .7rem;'>
-                  4333
+                  " . $tokenNumber . "
                 </td>
               </tr>
               <tr>
