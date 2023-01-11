@@ -63,8 +63,23 @@ class Helper {
     return ($angle * $earthRadius) / 1000;
   }
 
-  public static function deleteSpaces(string $string) {
+  public static function deleteSpaces(string $string): string {
     return str_replace(' ', '', $string);
+  }
+
+  public static function getDateMinusOneDay(string $datetime): string  {
+    return self::incDecOneDay($datetime, "-");
+  }
+
+  public static function getDatePlusOneDay(string $datetime): string {
+    return self::incDecOneDay($datetime, "+");
+  }
+
+  public static function incDecOneDay(string $datetime, string $operator): string {
+    $newDateTime = new DateTime($datetime);
+    $newDateTime->modify("{$operator}1 day");
+
+    return $newDateTime->format('Y-m-d H:i:s');
   }
   
 }
