@@ -142,6 +142,7 @@
 - novy mail format
 - fix nefunkcne nahlasovanie
 - skladka iba na uzemi slovenska
+- skladka vracia reported_by
 
 TODO: 
 - FILTROVANIE vracianie zoradenie podla vzdialenosti
