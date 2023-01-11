@@ -312,7 +312,7 @@ try {
       Request::validatePostParam('lat');
       Request::validatePostParam('lng');
       Request::validatePostParam('uid');
-      //Request::validatePostParam('image');
+      Request::validatePostParam('image');
       Request::validatePostParam('idUser');
 
       if (Common::getDeviceType() == 2) {
@@ -391,7 +391,7 @@ try {
 
       $geocodeData = [
         'adresa' => $result->getFormattedAddress(),
-        'obec' => $result->getLocality(),
+        'obec' => $result->getLocality() != null ? $result->getLocality() : $result->getSubLocality(),
         'okres' => $result->getAdminLevels()->get(2)->getName(),
         'kraj' => $result->getAdminLevels()->get(1)->getName()
       ];
@@ -1629,8 +1629,8 @@ try {
   }
 } catch(\Exception $e) {
   $requestParams = isset($postData) ? $postData : (isset($getData) ? $getData : []);
-  if (empty($requestParams['image'])) $requestParams['image'] = '';
-  
+  if (!empty($requestParams['image'])) $requestParams['image'] = '';
+
   $logError->error($e->getMessage() . json_encode($requestParams));
   
   echo Response::getErrorJson($e);
