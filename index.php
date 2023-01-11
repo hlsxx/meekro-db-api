@@ -1628,7 +1628,9 @@ try {
     break;
   }
 } catch(\Exception $e) {
-  $logError->error($e->getMessage());
+  $requestParams = isset($postData) ? $postData : (isset($getData) ? $getData : []);
+  $logError->error($e->getMessage() . json_encode($requestParams));
+  
   echo Response::getErrorJson($e);
 }
 

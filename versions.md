@@ -143,6 +143,7 @@
 - fix nefunkcne nahlasovanie
 - skladka iba na uzemi slovenska
 - skladka vracia reported_by
+- throwException s error logom
 
 TODO: 
 - FILTROVANIE vracianie zoradenie podla vzdialenosti
