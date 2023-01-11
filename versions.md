@@ -141,6 +141,7 @@
 #VERSION 0.38 (FIX)
 - novy mail format
 - fix nefunkcne nahlasovanie
+- skladka iba na uzemi slovenska
 
 TODO: 
 - FILTROVANIE vracianie zoradenie podla vzdialenosti

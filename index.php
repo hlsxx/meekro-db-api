@@ -299,7 +299,7 @@ try {
       Request::validatePostParam('lat');
       Request::validatePostParam('lng');
       Request::validatePostParam('uid');
-      Request::validatePostParam('image');
+      //Request::validatePostParam('image');
       Request::validatePostParam('idUser');
 
       if (Common::getDeviceType() == 2) {
@@ -373,6 +373,8 @@ try {
         $postData['lat'],
         $postData['lng']
       ))->first();
+
+      if ($result->getCountry()->getCode() != 'SK') Response::throwException('Skládka sa musí nachádzať na území Slovenska');
 
       $geocodeData = [
         'adresa' => $result->getFormattedAddress(),
