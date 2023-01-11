@@ -233,7 +233,20 @@ try {
       $skladkaTypCrossModel = $bride->initModel('skladky_typy_cross');
       $skladkaTypModel = $bride->initModel('skladky_typy');
 
-      $skladkaDetailData = $skladkaModel->getById((int)Request::getParam('id'));
+      $userModel = $bride->initModel('users');
+      $unknownUserModel = $bride->initModel('unknown_users');
+
+      $skladkaDetailData = $skladkaModel->queryFirstRow("
+        SELECT 
+          {model}.*,
+          IFNULL({$userModel->tableName}.name, 'Anonym') as reported_by
+        FROM {model}
+        LEFT JOIN {$userModel->tableName} 
+        ON {$userModel->tableName}.id = {model}.id_user
+        LEFT JOIN {$unknownUserModel->tableName} 
+        ON {$unknownUserModel->tableName}.id = {model}.id_unknown_user
+        WHERE {model}.id = %i
+      ", (int)Request::getParam('id'));
 
       if (empty($skladkaDetailData)) Response::throwException('Skládka neexistuje');
 
