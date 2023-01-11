@@ -348,6 +348,17 @@ try {
 
       $skladkaModel = $bride->initModel('skladky');
 
+      $countUserReportsToday = count($skladkaModel->query("
+        SELECT
+          id
+        FROM {model}
+        WHERE " . ((int)$postData['idUser'] != 0 ? "id_user = %i" : "id_unknown_user = %i"). " 
+        AND rok_zacatia < '" . Helper::getDatePlusOneDay(date('Y-m-d H:i:s')) . "' 
+        AND rok_zacatia > '" . Helper::getDateMinusOneDay(date('Y-m-d H:i:s')) . "'
+      ", (int)$postData['idUser'] != 0 ? (int)$postData['idUser'] : (int)$unknownUserData['id']));
+
+      if ($countUserReportsToday == 3) Response::throwException('Môžete nahlásiť iba 3 skládky za jeden deň');
+
       $uniqueId = uniqid();
 
       $disableNear = (isset($postData['disableNear']) && (bool)$postData['disableNear'] == true);
