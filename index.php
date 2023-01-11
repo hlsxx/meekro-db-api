@@ -1629,6 +1629,8 @@ try {
   }
 } catch(\Exception $e) {
   $requestParams = isset($postData) ? $postData : (isset($getData) ? $getData : []);
+  if (empty($requestParams['image'])) $requestParams['image'] = '';
+  
   $logError->error($e->getMessage() . json_encode($requestParams));
   
   echo Response::getErrorJson($e);
