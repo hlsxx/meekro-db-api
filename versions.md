@@ -144,6 +144,7 @@
 - skladka iba na uzemi slovenska
 - skladka vracia reported_by
 - throwException s error logom
+- limitovanie reportov za den na 3
 
 TODO: 
 - FILTROVANIE vracianie zoradenie podla vzdialenosti
