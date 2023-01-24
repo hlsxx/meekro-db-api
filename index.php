@@ -592,10 +592,10 @@ try {
 
       Request::validatePostParam('idSkladka');
       Request::validatePostParam('uid');
-      Request::validatePostParam('image');
+      Request::validatePostParam('afterPhoto');
       Request::validatePostParam('idUser');
 
-      if ($postData['image'] == '') Response::throwException('Musíte nahrať obrázok vyčisteného miesta skládky');
+      if ($postData['afterPhoto'] == '') Response::throwException('Musíte nahrať obrázok vyčisteného miesta skládky');
 
       $unknownUserModel = $bride->initModel('unknown_users');
       if ((int)$postData['idUser'] != 0)  {
@@ -653,12 +653,12 @@ try {
         }
       }
       
-      if (strpos($postData['image'], 'data:image') !== false) {
-        $image = base64_decode(preg_replace('#^data:image/\w+;base64,#i', '', $postData['image']));
+      if (strpos($postData['afterPhoto'], 'data:image') !== false) {
+        $image = base64_decode(preg_replace('#^data:image/\w+;base64,#i', '', $postData['afterPhoto']));
         $ext = '.jpg';
       } else {
         // IOS
-        $image = str_replace(" ", "+", $postData['image']);
+        $image = str_replace(" ", "+", $postData['afterPhoto']);
         $image = base64_decode($image);
         $ext = '.jpeg';
       }
