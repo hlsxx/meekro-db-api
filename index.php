@@ -1634,6 +1634,27 @@ try {
         'status' => 'success'
       ]);
     break;
+    case 'ml-image-recognition':
+      $postData = Request::getPostData();
+
+      Request::validatePostParam('labels');
+
+      $mlImageModel = $bride->initModel('ml_images');
+      $uid = uniqid();
+
+      foreach ($postData['labels'] as $label) {
+        $mlImageModel->insert([
+          'ml_index' => (int)$label['index'],
+          'text' => $label['text'],
+          'confidence' => (float)$label['confidence'],
+          'uid' => $uid
+        ]);
+      }
+
+      echo Response::getJson([
+        'status' => 'success'
+      ]);
+    break;
     default:
       Response::throwException('PAGE: {' . Request::getParam('page') . '} doesnt exists');
     break;
