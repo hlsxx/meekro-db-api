@@ -14,7 +14,29 @@ $bride = new \Bride\Bride(DB_NAME, DB_USER, DB_PASSWORD);
 $bride->tablePrefix('ucm');
 
 echo "<small>Meekro-api version: " . APP_VERSION . '</small></br></br>';
+/** UCM_SKLADKY_VYCISTENE */
+$skladkaVycisteneModel = $bride->initModel('skladky_vycistene');
 
+$skladkaVycisteneModel->defineColumn('okres')->type('varchar')->size(60)->null(false);
+$skladkaVycisteneModel->defineColumn('kraj')->type('varchar')->size(60)->null(false);
+//$skladkaVycisteneModel->defineColumn('nazov')->type('varchar')->size(60)->null(false);
+$skladkaVycisteneModel->defineColumn('obec')->type('varchar')->size(60)->null(false);
+//$skladkaVycisteneModel->defineColumn('prevadzkovatel')->type('varchar')->size(60)->null(true);
+$skladkaVycisteneModel->defineColumn('sidlo')->type('varchar')->size(60)->null(true);
+$skladkaVycisteneModel->defineColumn('rok_zacatia')->type('datetime')->null(false);
+//$skladkaVycisteneModel->defineColumn('typ')->type('tinyint')->size(1)->default(2)->null(false);
+//$skladkaVycisteneModel->defineColumn('pocet_nahlaseni')->type('int')->size(4)->default(0)->null(false);
+//$skladkaVycisteneModel->defineColumn('vycistena')->type('tinyint')->size(1)->default(1)->null(false);
+$skladkaVycisteneModel->defineColumn('lat')->type('double')->default(0)->null(false);
+$skladkaVycisteneModel->defineColumn('lng')->type('double')->default(0)->null(false);
+$skladkaVycisteneModel->defineColumn('velkost')->type('double')->default(0)->null(true);
+$skladkaVycisteneModel->defineColumn('id_user_cleared')->type('int')->size(11)->null(true);
+$skladkaVycisteneModel->defineColumn('id_unknown_user_cleared')->type('int')->size(11)->null(true);
+$skladkaVycisteneModel->defineColumn('id_unknown_user_reported')->type('int')->size(11)->null(true);
+$skladkaVycisteneModel->defineColumn('id_user_reported')->type('int')->size(11)->null(true);
+$skladkaVycisteneModel->defineColumn('created_at')->type('datetime')->null(false);
+$skladkaVycisteneModel->initTable();
+exit;
 /** UCM_SKLADKY */
 $skladkyModel = $bride->initModel('skladky');
 
@@ -165,7 +187,8 @@ $skladkaVycisteneModel->defineColumn('rok_zacatia')->type('datetime')->null(fals
 $skladkaVycisteneModel->defineColumn('lat')->type('double')->default(0)->null(false);
 $skladkaVycisteneModel->defineColumn('lng')->type('double')->default(0)->null(false);
 $skladkaVycisteneModel->defineColumn('velkost')->type('double')->default(0)->null(true);
-$skladkaVycisteneModel->defineColumn('id_unknown_user_cleared')->type('int')->size(11)->null(false);
+$skladkaVycisteneModel->defineColumn('id_user_cleared')->type('int')->size(11)->null(true);
+$skladkaVycisteneModel->defineColumn('id_unknown_user_cleared')->type('int')->size(11)->null(true);
 $skladkaVycisteneModel->defineColumn('id_unknown_user_reported')->type('int')->size(11)->null(true);
 $skladkaVycisteneModel->defineColumn('id_user_reported')->type('int')->size(11)->null(true);
 $skladkaVycisteneModel->defineColumn('created_at')->type('datetime')->null(false);
@@ -243,6 +266,15 @@ $unknownUserUserCrossModel->defineColumn('id_unknown_user')->type('int')->size(1
 $unknownUserUserCrossModel->defineColumn('id_user')->type('int')->size(11)->null(false);
 
 $unknownUserUserCrossModel->initTable();
+
+/** UCM_ML_IMAGES */
+$mcImageModel = $bride->initModel('ml_images');
+
+$mcImageModel->defineColumn('index')->type('int')->size(8)->null(false);
+$mcImageModel->defineColumn('text')->type('varchar')->size(50)->null(false);
+$mcImageModel->defineColumn('confidence')->type('double')->null(false);
+
+$mcImageModel->initTable();
 
 /**
  * CLEAR ___FILES DIR

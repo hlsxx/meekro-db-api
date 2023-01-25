@@ -598,18 +598,14 @@ try {
       if ($postData['afterPhoto'] == '') Response::throwException('Musíte nahrať obrázok vyčisteného miesta skládky');
 
       $unknownUserModel = $bride->initModel('unknown_users');
-      if ((int)$postData['idUser'] != 0)  {
-        $unknownUserData = $unknownUserModel->queryFirstRow("
-          SELECT
-            *
-          FROM {model}
-          WHERE uid = %s AND id_user = %i
-        ", $postData['uid'], (int)$postData['idUser']);
-      } else {
-        $unknownUserData = $unknownUserModel->getByCustom('uid', $postData['uid']);
-      }
+      $unknownUserData = $unknownUserModel->getByCustom('uid', $postData['uid']);
 
-      if (empty($unknownUserData)) Response::throwException('Vaše zariadenie nebolo rozpoznané v systéme');
+      if ((int)$postData['idUser'] != 0)  {
+        $userModel = $bride->initModel('users');
+        $userData = $userModel->getById($postData['idUser']);
+
+        if (empty($userData)) Response::throwException('Používateľ neexistuje');
+      }
 
       $idSkladka = (int)$postData['idSkladka'];
 
@@ -624,10 +620,8 @@ try {
       ], $idSkladka);
 
       $skladkaVycisteneModel = $bride->initModel('skladky_vycistene');
-      
+
       $idSkladkaVycistena = $skladkaVycisteneModel->insert([
-        'id_skladka' => $idSkladka,
-        'id_unknown_user' => (int)$unknownUserData['id'],
         'okres' => $currentSkladka['okres'],
         'kraj' => $currentSkladka['kraj'],
         'obec' => $currentSkladka['obec'],
@@ -636,9 +630,10 @@ try {
         'lat' => $currentSkladka['lat'],
         'lng' => $currentSkladka['lng'],
         'velkost' => $currentSkladka['velkost'],
-        'id_unknown_user_cleared' => (int)$unknownUserData['id'],
-        'id_unknown_user_reported' => (int)$currentSkladka['idUser'] != 0 ? null : (int)$currentSkladka['id_unknown_user'],
-        'id_user_reported' => (int)$currentSkladka['idUser'] != 0 ? (int)$currentSkladka['idUser'] : null,
+        'id_user_cleared' => (int)$postData['idUser'] != 0 ? (int)$postData['idUser'] : null,
+        'id_unknown_user_cleared' => (int)$postData['idUser'] != 0 ? null : (int)$unknownUserData['id'],
+        'id_unknown_user_reported' => (int)$currentSkladka['id_user'] != 0 ? null : (int)$currentSkladka['id_unknown_user'],
+        'id_user_reported' => (int)$currentSkladka['id_user'] != 0 ? (int)$currentSkladka['id_user'] : null,
         'created_at' => date('Y-m-d H:i:s')
       ]);
 

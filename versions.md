@@ -146,6 +146,12 @@
 - throwException s error logom
 - limitovanie reportov za den na 3
 
+#VERSION 0.39
+- afterPhoto vycistit
+- ml_recognition tabulka a endpoint
+- id_skladka v skaldky vycistene pridane
+- id_user_cleared
+
 TODO: 
 - FILTROVANIE vracianie zoradenie podla vzdialenosti
 - FILTROVANIE pomocou typu odpadu
