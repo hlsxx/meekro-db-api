@@ -1148,7 +1148,6 @@ try {
       ", $getData['uid'], (int)$userData['id']);*/
 
       $skladkaModel = $bride->initModel('skladky');
-
       $skladkyData = $skladkaModel->query("
         SELECT 
           *
@@ -1163,6 +1162,14 @@ try {
         FROM {model}
         WHERE id_user = %i 
       ", (int)$userData['id']);
+
+      $skladkaVycisteniaModel = $bride->initMOdel('skladky_vycistene');
+      $allCleared = count($skladkaVycisteniaModel->query("
+        SELECT 
+          id
+        FROM {model}
+        WHERE id_user_cleared = %i
+      "), (int)$userData['id']);
 
       $skladkyDataCount = count((array)$skladkyData);
       $confirmedCount = count((array)$skladkaPotvrdeniaData);
@@ -1184,7 +1191,7 @@ try {
           'reportedPercentage' =>  $skladkyDataPercentage,
           'confirmed' => $confirmedCount,
           'confirmedPercentage' => $confirmedPercentage,
-          'cleared' => 0,
+          'cleared' => $allCleared,
           'points' => (int)$points,
           'rank' => 5,
           'name' => $userData['name'] ?: 'Anonym'
@@ -1214,39 +1221,7 @@ try {
       $unknownUserModel = $bride->initModel('unknown_users');
       $skladkaModel = $bride->initModel('skladky');
       $skladkaPotvrdenieModel = $bride->initModel('skladky_potvrdenia');
-
-      /*$nelegalneSkladkyData = $skladkaModel->query("
-        SELECT
-          IFNULL({$userModel->tableName}.name, '') as name,
-          (
-            IFNULL(nested.confirmedPoints, 0) 
-              + 
-            IFNULL(nested.reportedPoints, 0)
-          ) as total
-        FROM (
-          SELECT
-            id_unknown_user, 
-            (
-              SELECT
-                (COUNT(*) * 3) as count
-              FROM {$skladkaPotvrdenieModel->tableName}
-              WHERE {$skladkaPotvrdenieModel->tableName}.id_unknown_user = {model}.id_unknown_user
-              GROUP BY {$skladkaPotvrdenieModel->tableName}.id_unknown_user
-              ORDER BY count DESC
-            ) as confirmedPoints,
-            (COUNT(*) * 10) as reportedPoints
-          FROM {model}
-          WHERE typ = 2
-          GROUP BY {model}.id_unknown_user
-          ORDER BY reportedPoints DESC
-        ) as nested
-        LEFT JOIN {$unknownUserModel->tableName} 
-        ON {$unknownUserModel->tableName}.id = nested.id_unknown_user
-        LEFT JOIN {$userModel->tableName} 
-        ON {$userModel->tableName}.id = {$unknownUserModel->tableName}.id_user
-        ORDER BY total DESC
-        LIMIT 5
-      ");*/
+      $skladkaVycisteniaModel = $bride->initMOdel('skladky_vycistene');
 
       $nelegalneSkladkyData = $skladkaModel->query("
         SELECT
@@ -1280,14 +1255,20 @@ try {
 
       $allIllegal = count($skladkaModel->query("
         SELECT
-          *
+          id
         FROM {model}
         WHERE typ = 2
       "));
 
+      $allCleared = count($skladkaVycisteniaModel->query("
+        SELECT 
+          id
+        FROM {model}
+      "));
+
       $allLegal = count($skladkaModel->query("
         SELECT
-          *
+          id
         FROM {model}
         WHERE typ = 1
       "));
@@ -1298,7 +1279,7 @@ try {
           'topUsers' => $nelegalneSkladkyData,
           'illegalCount' => $allIllegal,
           'legalCount' => $allLegal,
-          'clearedCount' => 0
+          'clearedCount' => $allCleared
         ]
       ]);
     break;

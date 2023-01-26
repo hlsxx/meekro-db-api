@@ -152,6 +152,7 @@
 - id_skladka v skaldky vycistene pridane
 - id_user_cleared
 - weekly cron
+- prehlad, ucet_prehlad vycistene
 
 TODO: 
 - FILTROVANIE vracianie zoradenie podla vzdialenosti
