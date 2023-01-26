@@ -31,8 +31,8 @@ $skladkaVycisteneModel->defineColumn('rok_zacatia')->type('datetime')->null(fals
 $skladkaVycisteneModel->defineColumn('lat')->type('double')->default(0)->null(false);
 $skladkaVycisteneModel->defineColumn('lng')->type('double')->default(0)->null(false);
 $skladkaVycisteneModel->defineColumn('velkost')->type('double')->default(0)->null(true);
-$skladkaVycisteneModel->defineColumn('id_user_cleared')->type('int')->size(11)->null(true);
-$skladkaVycisteneModel->defineColumn('id_unknown_user_cleared')->type('int')->size(11)->null(true);
+$skladkaVycisteneModel->defineColumn('id_user_cleaned')->type('int')->size(11)->null(true);
+$skladkaVycisteneModel->defineColumn('id_unknown_user_cleaned')->type('int')->size(11)->null(true);
 $skladkaVycisteneModel->defineColumn('id_unknown_user_reported')->type('int')->size(11)->null(true);
 $skladkaVycisteneModel->defineColumn('id_user_reported')->type('int')->size(11)->null(true);
 $skladkaVycisteneModel->defineColumn('created_at')->type('datetime')->null(false);
@@ -189,8 +189,8 @@ $skladkaVycisteneModel->defineColumn('rok_zacatia')->type('datetime')->null(fals
 $skladkaVycisteneModel->defineColumn('lat')->type('double')->default(0)->null(false);
 $skladkaVycisteneModel->defineColumn('lng')->type('double')->default(0)->null(false);
 $skladkaVycisteneModel->defineColumn('velkost')->type('double')->default(0)->null(true);
-$skladkaVycisteneModel->defineColumn('id_user_cleared')->type('int')->size(11)->null(true);
-$skladkaVycisteneModel->defineColumn('id_unknown_user_cleared')->type('int')->size(11)->null(true);
+$skladkaVycisteneModel->defineColumn('id_user_cleaned')->type('int')->size(11)->null(true);
+$skladkaVycisteneModel->defineColumn('id_unknown_user_cleaned')->type('int')->size(11)->null(true);
 $skladkaVycisteneModel->defineColumn('id_unknown_user_reported')->type('int')->size(11)->null(true);
 $skladkaVycisteneModel->defineColumn('id_user_reported')->type('int')->size(11)->null(true);
 $skladkaVycisteneModel->defineColumn('created_at')->type('datetime')->null(false);

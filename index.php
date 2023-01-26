@@ -230,6 +230,7 @@ try {
       Request::validateGetParam('type');
 
       $skladkaModel = $bride->initModel('skladky');
+      $skladkaVycisteniaModel = $bride->initModel('skladky_vycistene');
       $skladkaTypCrossModel = $bride->initModel('skladky_typy_cross');
       $skladkaTypModel = $bride->initModel('skladky_typy');
 
@@ -239,12 +240,13 @@ try {
       $skladkaDetailData = $skladkaModel->queryFirstRow("
         SELECT 
           {model}.*,
-          IFNULL({$userModel->tableName}.name, 'Anonym') as reported_by
+          IFNULL({$userModel->tableName}.name, 'Anonym') as reported_by,
+          IFNULL(cleaned_users.name, 'Anonym') as cleaned_by
         FROM {model}
-        LEFT JOIN {$userModel->tableName} 
-        ON {$userModel->tableName}.id = {model}.id_user
-        LEFT JOIN {$unknownUserModel->tableName} 
-        ON {$unknownUserModel->tableName}.id = {model}.id_unknown_user
+        LEFT JOIN {$userModel->tableName} ON {$userModel->tableName}.id = {model}.id_user
+        LEFT JOIN {$unknownUserModel->tableName} ON {$unknownUserModel->tableName}.id = {model}.id_unknown_user
+        LEFT JOIN {$skladkaVycisteniaModel->tableName} ON {$skladkaVycisteniaModel->tableName}.id_skladka = {model}.id
+        LEFT JOIN {$userModel->tableName} cleaned_users ON cleaned_users.id = {$skladkaVycisteniaModel->tableName}.id_user_cleaned
         WHERE {model}.id = %i
       ", (int)Request::getParam('id'));
 
@@ -258,10 +260,8 @@ try {
             {$skladkaTypModel->tableName}.nazov as nazov,
             {$skladkaTypCrossModel->tableName}.pocet_potvrdeni
           FROM {model}
-          LEFT JOIN {$skladkaTypCrossModel->tableName} 
-          ON {model}.id = {$skladkaTypCrossModel->tableName}.id_skladka
-          LEFT JOIN {$skladkaTypModel->tableName} 
-          ON {$skladkaTypCrossModel->tableName}.id_skladka_typ = {$skladkaTypModel->tableName}.id
+          LEFT JOIN {$skladkaTypCrossModel->tableName} ON {model}.id = {$skladkaTypCrossModel->tableName}.id_skladka
+          LEFT JOIN {$skladkaTypModel->tableName} ON {$skladkaTypCrossModel->tableName}.id_skladka_typ = {$skladkaTypModel->tableName}.id
           WHERE {model}.id = " . (int)Request::getParam('id') . "
         ");
       }
@@ -631,8 +631,8 @@ try {
         'lat' => $currentSkladka['lat'],
         'lng' => $currentSkladka['lng'],
         'velkost' => $currentSkladka['velkost'],
-        'id_user_cleared' => (int)$postData['idUser'] != 0 ? (int)$postData['idUser'] : null,
-        'id_unknown_user_cleared' => (int)$postData['idUser'] != 0 ? null : (int)$unknownUserData['id'],
+        'id_user_cleaned' => (int)$postData['idUser'] != 0 ? (int)$postData['idUser'] : null,
+        'id_unknown_user_cleaned' => (int)$postData['idUser'] != 0 ? null : (int)$unknownUserData['id'],
         'id_unknown_user_reported' => (int)$currentSkladka['id_user'] != 0 ? null : (int)$currentSkladka['id_unknown_user'],
         'id_user_reported' => (int)$currentSkladka['id_user'] != 0 ? (int)$currentSkladka['id_user'] : null,
         'created_at' => date('Y-m-d H:i:s')
@@ -660,7 +660,7 @@ try {
       }
 
       $countExistingImages = count(scandir($filePath)) - 2;
-      $newName = ($countExistingImages + 1) . '_cleared' . $ext;
+      $newName = ($countExistingImages + 1) . '_cleaned' . $ext;
 
       $imagePath = $filePath . '/' . $newName;
     
@@ -1164,11 +1164,11 @@ try {
       ", (int)$userData['id']);
 
       $skladkaVycisteniaModel = $bride->initModel('skladky_vycistene');
-      $allCleared = count($skladkaVycisteniaModel->query("
+      $allCleaned = count($skladkaVycisteniaModel->query("
         SELECT 
           id
         FROM {model}
-        WHERE id_user_cleared = %i
+        WHERE id_user_cleaned = %i
       ", (int)$userData['id']));
 
       $skladkyDataCount = count((array)$skladkyData);
@@ -1191,7 +1191,7 @@ try {
           'reportedPercentage' =>  $skladkyDataPercentage,
           'confirmed' => $confirmedCount,
           'confirmedPercentage' => $confirmedPercentage,
-          'cleared' => $allCleared,
+          'cleaned' => $allCleaned,
           'points' => (int)$points,
           'rank' => 5,
           'name' => $userData['name'] ?: 'Anonym'
@@ -1260,7 +1260,7 @@ try {
         WHERE typ = 2
       "));
 
-      $allCleared = count($skladkaVycisteniaModel->query("
+      $allCleaned = count($skladkaVycisteniaModel->query("
         SELECT 
           id
         FROM {model}
@@ -1279,7 +1279,7 @@ try {
           'topUsers' => $nelegalneSkladkyData,
           'illegalCount' => $allIllegal,
           'legalCount' => $allLegal,
-          'clearedCount' => $allCleared
+          'cleanedCount' => $allCleaned
         ]
       ]);
     break;

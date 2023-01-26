@@ -153,6 +153,7 @@
 - id_user_cleared
 - weekly cron
 - prehlad, ucet_prehlad vycistene
+- name conventions cleared to cleaned
 
 TODO: 
 - FILTROVANIE vracianie zoradenie podla vzdialenosti
