@@ -332,18 +332,6 @@ try {
         if (empty($userData)) Response::throwException('Používateľ neexistuje');
       }
 
-      // DEPRECATED 0.36
-      /*if ((int)$postData['idUser'] != 0)  {
-        $unknownUserData = $unknownUserModel->queryFirstRow("
-          SELECT
-            *
-          FROM {model}
-          WHERE uid = %s AND id_user = %i
-        ", $postData['uid'], (int)$postData['idUser']);
-      } else {
-        $unknownUserData = $unknownUserModel->getByCustom('uid', $postData['uid']);
-      }*/
-
       if (empty($unknownUserData)) Response::throwException('Vaše zariadenie nebolo rozpoznané v systéme');
 
       $skladkaModel = $bride->initModel('skladky');
@@ -490,43 +478,6 @@ try {
           'id_gallery' => (int)$idGallery,
           'id_unknown_user' => (int)$unknownUserData['id']
         ]);
-
-        // $_FILES deprecated
-        /*foreach ($_FILES as $file) {
-          if ($file['size'] > 0) {
-            if (!file_exists($filePath)) {
-              if (!mkdir($filePath, 0755, true)) {
-                Response::throwException('Nastala chyba pri nahrávaní obrázku');
-              }
-            }
-
-            $fileExtension = explode('.', $file['name']);
-
-            if (!in_array(end($fileExtension), ['jpeg', 'jpg', 'png'])) {
-              Response::throwException('Allowed format of images: jpeg, jpg, png');
-            }
-
-            $countExistingImages = count(scandir($filePath)) - 2;
-            $newName = ($countExistingImages + 1) . '.' . end($fileExtension);
-
-            $imagePath = $filePath . '/' . $newName;
-
-            if (!move_uploaded_file($file['tmp_name'], $imagePath)) {
-              Response::throwException('Error with images uploading');
-            }
-
-            $idGallery = $galleryModel->insert([
-              'link' => $newName,
-              'created_at' => date('Y-m-d H:i:s')
-            ]);
-
-            $skladkyGalleryModel->insert([
-              'id_skladka' => (int)$insertedIdSkladka,
-              'id_gallery' => (int)$idGallery,
-              'id_unknown_user' => (int)$unknownUserData['id']
-            ]);
-          }
-        }*/
       }
 
       echo Response::getJson([
@@ -552,18 +503,6 @@ try {
 
         if (empty($userData)) Response::throwException('Používateľ neexistuje');
       }
-
-      // DEPRECATED 0.36
-      /*if ((int)$postData['idUser'] != 0)  {
-        $unknownUserData = $unknownUserModel->queryFirstRow("
-          SELECT
-            *
-          FROM {model}
-          WHERE uid = %s AND id_user = %i
-        ", $postData['uid'], (int)$postData['idUser']);
-      } else {
-        $unknownUserData = $unknownUserModel->getByCustom('uid', $postData['uid']);
-      }*/
 
       $idSkladka = (int)$postData['idSkladka'];
 
@@ -742,18 +681,6 @@ try {
         }
       }
 
-      //DEPRECATED 0.36
-      /*if ((int)$getData['idUser'] != 0)  {
-        $unknownUserData = $unknownUserModel->queryFirstRow("
-          SELECT
-            *
-          FROM {model}
-          WHERE uid = %s AND id_user = %i
-        ", $getData['uid'], (int)$getData['idUser']);
-      } else {
-        $unknownUserData = $unknownUserModel->getByCustom('uid', $getData['uid']);
-      }*/
-
       echo Response::getJson([
         'status' => 'success',
         'reportedByUser' => !empty($skladkaReportedByUserData),
@@ -921,15 +848,6 @@ try {
         'created_at' => $createdAt
       ]);
 
-      // TODO: PREROBIT
-      /*
-        $unknownUserUserCrossModel = $bride->initModel('unknown_users_users_cross');
-        $unknownUserUserCrossModel->insert([
-          'id_unknown_user' => (int)$unknownUserData['id'],
-          'id_user' => (int)$idUser
-        ]);
-      */
-
       $tokenNumber = (new TokenModel())->getTokenNumber();
 
       $tokenModel = $bride->initModel('tokens');
@@ -988,24 +906,6 @@ try {
 
       if ((bool)$userData['verified'] == false) Response::throwException('Váš účet nie je overený');
 
-      // Ak sa prihlasim z ineho zariadenia pridam ho
-      // TODO: PREROBIT
-      /*$unknownUserUserCrossModel = $bride->initModel('unknown_users_users_cross');
-      $unknownUserUserCrossData = $unknownUserUserCrossModel->queryFirstRow("
-        SELECT
-          *
-        FROM {model}
-        WHERE id_unknown_user = %i AND id_user = %i
-      ", (int)$unknownUserData, (int)$userData['id']);
-
-      if (empty($unknownUserUserCrossData)) {
-        $unknownUserUserCrossModel->insert([
-          'id_unknown_user' => (int)$unknownUserData['id'],
-          'id_user' => (int)$userData['id']
-        ]);
-      }*/
-
-      // DEPRECATED
       if ((int)$unknownUserData['id_user'] != (int)$userData['id']) {
         $unknownUserModel->insert([
           'uid' =>  $postData['uid'],
@@ -1124,28 +1024,6 @@ try {
       $userModel = $bride->initModel('users');
       $userData = $userModel->getById($getData['idUser']);
       if (empty($userData)) Response::throwWarning('Účet nebol rozpoznaný');
-
-      // DEPRECATED 0.36
-      /*$unknownUserModel = $bride->initModel('unknown_users');
-
-      $unknownUserData = $unknownUserModel->query("
-        SELECT
-          id
-        FROM {model}
-        WHERE id_user = %i
-      ", (int)$userData['id']);
-
-      $unknowUsersIds = [];
-      foreach ($unknownUserData as $item) {
-        $unknowUsersIds[] = $item['id'];
-      }*/
-
-      /*$unknownUserData = $unknownUserModel->queryFirstRow("
-        SELECT
-          *
-        FROM {model}
-        WHERE uid = %s AND id_user = %i
-      ", $getData['uid'], (int)$userData['id']);*/
 
       $skladkaModel = $bride->initModel('skladky');
       $skladkyData = $skladkaModel->query("
