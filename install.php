@@ -45,7 +45,6 @@ $skladkyModel->defineColumn('okres')->type('varchar')->size(60)->null(false);
 $skladkyModel->defineColumn('kraj')->type('varchar')->size(60)->null(false);
 $skladkyModel->defineColumn('nazov')->type('varchar')->size(60)->null(false);
 $skladkyModel->defineColumn('obec')->type('varchar')->size(60)->null(false);
-// DEPRECATED 0.21: $skladkyModel->defineColumn('trieda')->type('varchar')->size(15)->null(true);
 $skladkyModel->defineColumn('prevadzkovatel')->type('varchar')->size(60)->null(true);
 $skladkyModel->defineColumn('sidlo')->type('varchar')->size(60)->null(true);
 $skladkyModel->defineColumn('rok_zacatia')->type('datetime')->null(false);
