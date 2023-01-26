@@ -1150,7 +1150,7 @@ try {
       $skladkaModel = $bride->initModel('skladky');
       $skladkyData = $skladkaModel->query("
         SELECT 
-          *
+          id
         FROM {model}
         WHERE id_user = %i 
       ", (int)$userData['id']);
@@ -1158,18 +1158,18 @@ try {
       $skladkaPotvrdeniaModel = $bride->initModel('skladky_potvrdenia');
       $skladkaPotvrdeniaData = $skladkaPotvrdeniaModel->query("
         SELECT 
-          *
+          id
         FROM {model}
         WHERE id_user = %i 
       ", (int)$userData['id']);
 
-      $skladkaVycisteniaModel = $bride->initMOdel('skladky_vycistene');
+      $skladkaVycisteniaModel = $bride->initModel('skladky_vycistene');
       $allCleared = count($skladkaVycisteniaModel->query("
         SELECT 
           id
         FROM {model}
         WHERE id_user_cleared = %i
-      "), (int)$userData['id']);
+      ", (int)$userData['id']));
 
       $skladkyDataCount = count((array)$skladkyData);
       $confirmedCount = count((array)$skladkaPotvrdeniaData);
