@@ -17,6 +17,7 @@ echo "<small>Meekro-api version: " . APP_VERSION . '</small></br></br>';
 /** UCM_SKLADKY_VYCISTENE */
 $skladkaVycisteneModel = $bride->initModel('skladky_vycistene');
 
+$skladkaVycisteneModel->defineColumn('id_skladka')->type('int')->size(11)->null(true);
 $skladkaVycisteneModel->defineColumn('okres')->type('varchar')->size(60)->null(false);
 $skladkaVycisteneModel->defineColumn('kraj')->type('varchar')->size(60)->null(false);
 //$skladkaVycisteneModel->defineColumn('nazov')->type('varchar')->size(60)->null(false);
@@ -174,6 +175,7 @@ $skladkaNahlaseniaModel->initTable();
 /** UCM_SKLADKY_VYCISTENE */
 $skladkaVycisteneModel = $bride->initModel('skladky_vycistene');
 
+$skladkaVycisteneModel->defineColumn('id_skladka')->type('int')->size(11)->null(true);
 $skladkaVycisteneModel->defineColumn('okres')->type('varchar')->size(60)->null(false);
 $skladkaVycisteneModel->defineColumn('kraj')->type('varchar')->size(60)->null(false);
 //$skladkaVycisteneModel->defineColumn('nazov')->type('varchar')->size(60)->null(false);

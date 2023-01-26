@@ -622,6 +622,7 @@ try {
       $skladkaVycisteneModel = $bride->initModel('skladky_vycistene');
 
       $idSkladkaVycistena = $skladkaVycisteneModel->insert([
+        'id_skladka' => $currentSkladka['id'],
         'okres' => $currentSkladka['okres'],
         'kraj' => $currentSkladka['kraj'],
         'obec' => $currentSkladka['obec'],

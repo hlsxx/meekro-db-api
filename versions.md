@@ -151,6 +151,7 @@
 - ml_recognition tabulka a endpoint
 - id_skladka v skaldky vycistene pridane
 - id_user_cleared
+- weekly cron
 
 TODO: 
 - FILTROVANIE vracianie zoradenie podla vzdialenosti
