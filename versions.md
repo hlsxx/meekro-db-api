@@ -155,6 +155,10 @@
 - prehlad, ucet_prehlad vycistene
 - name conventions cleared to cleaned
 
+#VERSION 0.40
+- verzia endpoint
+- refactoring kodu common
+
 TODO: 
 - FILTROVANIE vracianie zoradenie podla vzdialenosti
 - FILTROVANIE pomocou typu odpadu

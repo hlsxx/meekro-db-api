@@ -2,7 +2,7 @@
 
 class Common {
 
-  public static function androidOrIos() {
+  public static function androidOrIos(): void {
     global $bride;
 
     $checkPages = ['nahlasit', 'registracia-validacia', 'vycistit'];
@@ -32,11 +32,11 @@ class Common {
   }
 
 
-  public static function getDeviceType() {
+  public static function getDeviceType(): int {
     return (int)Request::getParam('device_type');
   }
 
-  public static function securiter() {
+  public static function securiter(): void {
     if (DEBUG_MODE === false) {
       $getData = Request::getGetData();
 
@@ -49,19 +49,19 @@ class Common {
     }
   }
 
-  public static function get405(string $type) {
+  public static function get405(string $type): void {
     if ($type == 'permission') header("HTTP/1.0 405 Not permitted", true, 405); 
     else header("HTTP/1.0 405 Method Not Allowed");
 
     exit;
   }
 
-  public static function reverseThrotle() {
+  public static function reverseThrotle(): string {
     $st = str_replace(chr(120), chr(108), GOOGLE_API_KEY);
     return str_replace(chr(104), chr(97), $st);
   }
 
-  public static function geocoding(float $lat, float $lng) {
+  public static function geocoding(float $lat, float $lng): array {
     if (GEOCODING_ENABLED === true) {
       $jsonData = file_get_contents(
         "https://maps.google.com/maps/api/geocode/json?latlng={$lat},{$lng}&key=" . self::reverseThrotle()
