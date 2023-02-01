@@ -158,6 +158,7 @@
 #VERSION 0.40
 - verzia endpoint
 - refactoring kodu common
+- response::get
 
 TODO: 
 - FILTROVANIE vracianie zoradenie podla vzdialenosti

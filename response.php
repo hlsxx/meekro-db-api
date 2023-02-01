@@ -6,8 +6,19 @@ class Response {
    * @param array $dataToReturn
    * @return json data
    */
-  public static function getJson(array $dataToReturn) {
+  public static function getJson(array $dataToReturn): string {
     return json_encode($dataToReturn);
+  }
+
+  /**
+   * @param array $dataToReturn
+   * @return void
+   */
+  public static function get(array $dataToReturn): void {
+    echo self::getJson([
+      'status' => 'success',
+      'data' => $dataToReturn
+    ]);
   }
 
   /**
@@ -20,14 +31,6 @@ class Response {
       ? json_decode($dataToReturn, TRUE)
       : (array)$dataToReturn
     ;
-  }
-
-  /**
-   * @param array $dataToReturn
-   * @return json data
-   */
-  public static function get(array $dataToReturn) {
-    return json_encode($dataToReturn);
   }
 
   /**

@@ -1461,9 +1461,9 @@ try {
     break;
     case 'verzia': // GET
       if (Common::getDeviceType() == 1) {
-        echo Response::getJson(['version' => ANDROID_VERSION]);
+        Response::get(['version' => ANDROID_VERSION]);
       } else if (Common::getDeviceType() == 2) {
-        echo Response::getJson(['version' => IOS_VERSION]);
+        Response::get(['version' => IOS_VERSION]);
       }
     break;
     case 'dev-tokens':
