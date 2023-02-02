@@ -159,6 +159,7 @@
 - verzia endpoint
 - refactoring kodu common
 - response::get
+- mailer fix
 
 TODO: 
 - FILTROVANIE vracianie zoradenie podla vzdialenosti

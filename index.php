@@ -1313,7 +1313,7 @@ try {
       ]);
 
       if (DISABLE_MAIL == FALSE) {
-        if (!strpos(Helper::deleteSpaces($postData['email']), 'testx') == false) {
+        if (strpos(Helper::deleteSpaces($postData['email']), 'testx') == false) {
           $mailer = new Mailer();
           $mailer->sendRegistrationCode(Helper::deleteSpaces($postData['email']), $tokenNumber);
         }
