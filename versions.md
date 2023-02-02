@@ -160,6 +160,8 @@
 - refactoring kodu common
 - response::get
 - mailer fix
+- install udpate before release
+- mail notifications
 
 TODO: 
 - FILTROVANIE vracianie zoradenie podla vzdialenosti
