@@ -95,4 +95,18 @@ class Mailer {
     $this->mail->send();
   }
 
+  public function sendNotification() {
+    $this->mail->setFrom(SMTP_SENDER_MAIL, 'TrashRunner');
+    $this->mail->addAddress(MAIL_NOTIFICATIONS); 
+
+    $this->mail->isHTML(true);
+    $this->mail->Subject = 'TrashRunner - notifikacia';
+    $this->mail->Body = "
+      Akcia: " . Request::getParam('page') . "</br>
+      Zariadenie: " . Request::getParam('device_type'). "
+    ";
+
+    $this->mail->send();
+  }
+
 }

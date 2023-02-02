@@ -480,6 +480,9 @@ try {
         ]);
       }
 
+      $mailer = new Mailer();
+      $mailer->sendNotification();
+
       echo Response::getJson([
         'status' => 'success',
         'insertedId' => $insertedIdSkladka
@@ -617,6 +620,9 @@ try {
         'id_gallery' => (int)$idGallery,
         'id_unknown_user' => (int)$unknownUserData['id']
       ]);
+
+      $mailer = new Mailer();
+      $mailer->sendNotification();
 
       echo Response::getJson([
         'status' => 'success'
@@ -864,6 +870,7 @@ try {
         if (strpos(Helper::deleteSpaces($postData['email']), 'testx') === false) {
           $mailer = new Mailer();
           $mailer->sendRegistrationCode(Helper::deleteSpaces($postData['email']), $tokenNumber);
+          $mailer->sendNotification();
         }
       }
       
