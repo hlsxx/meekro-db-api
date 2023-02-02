@@ -251,6 +251,7 @@ $mcImageModel = $bride->initModel('ml_images');
 $mcImageModel->defineColumn('ml_index')->type('int')->size(8)->null(false);
 $mcImageModel->defineColumn('text')->type('varchar')->size(50)->null(false);
 $mcImageModel->defineColumn('confidence')->type('double')->null(false);
+$mcImageModel->defineColumn('uid')->type('varchar')->size(13)->null(false);
 
 $mcImageModel->initTable();
 
