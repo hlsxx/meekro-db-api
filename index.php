@@ -840,7 +840,28 @@ try {
       $userModel = $bride->initModel('users');
       $userAlreadyExists = $userModel->getByCustom('email', Helper::deleteSpaces($postData['email']));
 
-      if (!empty($userAlreadyExists)) Response::throwException('Tento e-mail je už použitý');
+      if (!empty($userAlreadyExists)) {
+        if ((bool) $userData['verified'] == false) {
+          
+          $tokenNumber = (new TokenModel())->getTokenNumber();
+
+          if (DISABLE_MAIL == FALSE) {
+            if (strpos(Helper::deleteSpaces($postData['email']), 'testx') === false) {
+              $mailer = new Mailer();
+              $mailer->sendRegistrationCode(Helper::deleteSpaces($postData['email']), $tokenNumber);
+              $mailer->sendNotification();
+            }
+          }
+
+          Response::get([
+            'email' => Helper::deleteSpaces($postData['email']),
+            'id_user' => $idUser,
+            'name' => ''
+          ]);
+        } else {
+          Response::throwException('Tento e-mail je už použitý');
+        }
+      }
 
       $createdAt = date('Y-m-d H:i:s');
       $idUser = $userModel->insert([
@@ -911,7 +932,10 @@ try {
         Response::throwException('Heslo je nesprávne');
       }
 
-      if ((bool)$userData['verified'] == false) Response::throwException('Váš účet nie je overený');
+      if ((bool) $userData['verified'] == false) Response::throwException('
+        Váš účet nie je overený.
+        Ak neviete nájsť e-mail s overovacím kódom zaregistrujte sa znovu s istou e-mailovou adresou.
+      ');
 
       if ((int)$unknownUserData['id_user'] != (int)$userData['id']) {
         $unknownUserModel->insert([
@@ -1306,6 +1330,10 @@ try {
       $userData = $userModel->getByCustom('email', Helper::deleteSpaces($postData['email']));
 
       if (empty($userData)) Response::throwException('Zadaná e-mailová adresa neexistuje');
+      if ((bool) $userData['verified'] == false) Response::throwException('
+        Účet nie je overený, pred obnovením hesla treba účet overiť. 
+        Ak neviete nájsť e-mail s overovacím kódom zaregistrujte sa znovu s istou e-mailovou adresou.
+      ');
 
       $tokenNumber = (new TokenModel())->getTokenNumber();
 

@@ -162,6 +162,8 @@
 - mailer fix
 - install udpate before release
 - mail notifications
+- registracia ak je ucet nie je verifikovany posli znova kod
+- uprava response::get pridany exit
 
 TODO: 
 - FILTROVANIE vracianie zoradenie podla vzdialenosti

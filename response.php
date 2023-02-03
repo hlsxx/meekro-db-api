@@ -19,6 +19,8 @@ class Response {
       'status' => 'success',
       'data' => $dataToReturn
     ]);
+
+    exit;
   }
 
   /**
