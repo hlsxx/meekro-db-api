@@ -841,7 +841,7 @@ try {
       $userAlreadyExists = $userModel->getByCustom('email', Helper::deleteSpaces($postData['email']));
 
       if (!empty($userAlreadyExists)) {
-        if ((bool) $userData['verified'] == false) {
+        if ((bool) $userAlreadyExists['verified'] == false) {
           
           $tokenNumber = (new TokenModel())->getTokenNumber();
 
@@ -978,7 +978,7 @@ try {
       ", (int)$unknownUserData['id']);
 
       if (empty($tokenData)) Response::throwException('Token neexistuje pre vaše zariadenie: ' . $postData['uid']);
-      
+
       $timeToTokenValid = strtotime($tokenData['created_at'] . ' + 10 minute');
 
       $userModel = $bride->initModel('users');
