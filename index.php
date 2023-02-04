@@ -1091,7 +1091,7 @@ try {
       $skladkyDataPercentage = $percentageTogether * $skladkyDataCount;
       $confirmedPercentage = $percentageTogether * $confirmedCount;
 
-      $points = ($skladkyDataCount * 10) + ($confirmedCount * 3);
+      $points = ($skladkyDataCount * 10) + ($confirmedCount * 3) + ($allCleaned * 20); 
 
       echo Response::getJson([
         'status' => 'success',
@@ -1139,6 +1139,8 @@ try {
             IFNULL(nested.confirmedPoints, 0) 
               + 
             IFNULL(nested.reportedPoints, 0)
+              + 
+            IFNULL(nested.cleanedPoints, 0)
           ) as total
         FROM (
           SELECT
@@ -1151,6 +1153,14 @@ try {
               GROUP BY {$skladkaPotvrdenieModel->tableName}.id_user
               ORDER BY count DESC
             ) as confirmedPoints,
+            (
+              SELECT
+                (COUNT(*) * 20) as count
+              FROM {$skladkaVycisteniaModel->tableName}
+              WHERE {$skladkaVycisteniaModel->tableName}.id_user_cleaned = {model}.id_user
+              GROUP BY {$skladkaVycisteniaModel->tableName}.id_user_cleaned
+              ORDER BY count DESC
+            ) as cleanedPoints,
             (COUNT(*) * 10) as reportedPoints
           FROM {model}
           WHERE typ = 2 AND id_user IS NOT NULL
