@@ -165,6 +165,10 @@
 - registracia ak je ucet nie je verifikovany posli znova kod
 - uprava response::get pridany exit
 
+#VERSION 0.41
+- prepocet bodov prehlady
+- rok_zacatia na date
+
 TODO: 
 - FILTROVANIE vracianie zoradenie podla vzdialenosti
 - FILTROVANIE pomocou typu odpadu

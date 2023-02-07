@@ -24,7 +24,7 @@ $skladkyModel->defineColumn('nazov')->type('varchar')->size(60)->null(false);
 $skladkyModel->defineColumn('obec')->type('varchar')->size(60)->null(false);
 $skladkyModel->defineColumn('prevadzkovatel')->type('varchar')->size(60)->null(true);
 $skladkyModel->defineColumn('sidlo')->type('varchar')->size(60)->null(true);
-$skladkyModel->defineColumn('rok_zacatia')->type('datetime')->null(false);
+$skladkyModel->defineColumn('rok_zacatia')->type('date')->null(false);
 $skladkyModel->defineColumn('typ')->type('tinyint')->size(1)->default(2)->null(false);
 $skladkyModel->defineColumn('pocet_nahlaseni')->type('int')->size(4)->default(0)->null(false);
 $skladkyModel->defineColumn('vycistena')->type('tinyint')->size(1)->default(0)->null(false);
@@ -44,7 +44,7 @@ $skladkyModel->initTable();
     'obec' => $uid . '_obec',
     'prevadzkovatel' => $uid . '_prevadzkovatel',
     'sidlo' => $uid . '_sidlo',
-    'rok_zacatia' => date('Y-m-d H:i:s'),
+    'rok_zacatia' => date('Y-m-d'),
     'typ' => 1,
     'pocet_nahlaseni' => 0,
     'lat' => 48.5378458 + (rand(100, 1000) / 100000),
@@ -158,7 +158,7 @@ $skladkaVycisteneModel->defineColumn('kraj')->type('varchar')->size(60)->null(fa
 $skladkaVycisteneModel->defineColumn('obec')->type('varchar')->size(60)->null(false);
 //$skladkaVycisteneModel->defineColumn('prevadzkovatel')->type('varchar')->size(60)->null(true);
 $skladkaVycisteneModel->defineColumn('sidlo')->type('varchar')->size(60)->null(true);
-$skladkaVycisteneModel->defineColumn('rok_zacatia')->type('datetime')->null(false);
+$skladkaVycisteneModel->defineColumn('rok_zacatia')->type('date')->null(false);
 //$skladkaVycisteneModel->defineColumn('typ')->type('tinyint')->size(1)->default(2)->null(false);
 //$skladkaVycisteneModel->defineColumn('pocet_nahlaseni')->type('int')->size(4)->default(0)->null(false);
 //$skladkaVycisteneModel->defineColumn('vycistena')->type('tinyint')->size(1)->default(1)->null(false);
