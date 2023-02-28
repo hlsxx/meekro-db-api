@@ -169,6 +169,9 @@
 - prepocet bodov prehlady
 - rok_zacatia na date
 
+#VERSION 0.42
+  - FIX posielanie notifikacii
+
 TODO: 
 - FILTROVANIE vracianie zoradenie podla vzdialenosti
 - FILTROVANIE pomocou typu odpadu

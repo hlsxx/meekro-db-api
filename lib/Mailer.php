@@ -26,7 +26,7 @@ class Mailer {
     }
   }
 
-  public function sendRegistrationCode(string $mailTo, int $tokenNumber) {
+  public function sendRegistrationCode(string $mailTo, int $tokenNumber): void {
     $this->mail->setFrom(SMTP_SENDER_MAIL, 'TrashRunner');
     $this->mail->addAddress($mailTo); 
 
@@ -95,18 +95,20 @@ class Mailer {
     $this->mail->send();
   }
 
-  public function sendNotification() {
-    $this->mail->setFrom(SMTP_SENDER_MAIL, 'TrashRunner');
-    $this->mail->addAddress(MAIL_NOTIFICATIONS); 
+  public function sendNotification(): void {
+    if (ENABLE_MAIL_NOTIFICATIONS) {
+      $this->mail->setFrom(SMTP_SENDER_MAIL, 'TrashRunner');
+      $this->mail->addAddress(MAIL_NOTIFICATIONS); 
 
-    $this->mail->isHTML(true);
-    $this->mail->Subject = 'TrashRunner - notifikacia';
-    $this->mail->Body = "
-      Akcia: " . Request::getParam('page') . "</br>
-      Zariadenie: " . Request::getParam('device_type'). "
-    ";
+      $this->mail->isHTML(true);
+      $this->mail->Subject = 'TrashRunner - notifikacia';
+      $this->mail->Body = "
+        Akcia: " . Request::getParam('page') . "</br>
+        Zariadenie: " . Request::getParam('device_type'). "
+      ";
 
-    $this->mail->send();
+      $this->mail->send();
+    }
   }
 
 }
