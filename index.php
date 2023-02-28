@@ -345,8 +345,10 @@ try {
         AND rok_zacatia > '" . Helper::getDateMinusOneDay(date('Y-m-d H:i:s')) . "'
       ", (int)$postData['idUser'] != 0 ? (int)$postData['idUser'] : (int)$unknownUserData['id']));
 
-      if ($countUserReportsToday == 3) Response::throwException('Môžete nahlásiť iba 3 skládky za jeden deň');
-
+      if (DEBUG_MODE == false) {
+        if ($countUserReportsToday == 3) Response::throwException('Môžete nahlásiť iba 3 skládky za jeden deň');
+      }
+      
       $uniqueId = uniqid();
 
       $disableNear = (isset($postData['disableNear']) && (bool)$postData['disableNear'] == true);

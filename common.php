@@ -37,12 +37,12 @@ class Common {
   }
 
   public static function securiter(): void {
-    if (DEBUG_MODE === false) {
+    /*if (DEBUG_MODE === false) {
       $getData = Request::getGetData();
 
       if (!isset($getData['hash'])) self::get405('permission');
       if (in_array($getData['hash'], ['ucm70'])) self::get405('permission');
-    }
+    }*/
 
     if (DISABLE_APP === true) {
       Response::throwException('Aplikácia je dočasne pozastavenená');
