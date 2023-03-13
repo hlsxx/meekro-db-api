@@ -33,6 +33,7 @@ $skladkyModel->defineColumn('lng')->type('double')->default(0)->null(false);
 $skladkyModel->defineColumn('velkost')->type('double')->default(0)->null(true);
 $skladkyModel->defineColumn('id_unknown_user')->type('int')->size(11)->null(true);
 $skladkyModel->defineColumn('id_user')->type('int')->size(11)->null(true);
+$skladkyModel->defineColumn('is_for_testing')->type('int')->size(1)->default(0);
 $skladkyModel->initTable();
 
 /*for($i=0;$i<10;$i++) {
