@@ -14,5 +14,10 @@
         "geocoder-php/google-maps-provider": "^4.7",
         "php-http/curl-client": "^2.2",
         "nyholm/psr7": "^1.5"
+    },
+    "config": {
+        "allow-plugins": {
+            "php-http/discovery": true
+        }
     }
 }

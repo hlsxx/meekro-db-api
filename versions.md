@@ -172,6 +172,9 @@
 #VERSION 0.42
   - FIX posielanie notifikacii
 
+#VERSION 0.43
+- Pridane images
+
 TODO: 
 - FILTROVANIE vracianie zoradenie podla vzdialenosti
 - FILTROVANIE pomocou typu odpadu

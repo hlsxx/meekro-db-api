@@ -59,7 +59,7 @@ require_once(__DIR__ . '/test.php');
 try {
   Common::securiter();
   
-  $logInfo->info("REQUEST from {$_SERVER['REMOTE_ADDR']}");
+  //$logInfo->info("REQUEST from {$_SERVER['REMOTE_ADDR']}");
 
   if (!Request::getParam('page')) {
     Response::throwException('GET param: {page} not set');
@@ -312,14 +312,17 @@ try {
       Request::validatePostParam('lat');
       Request::validatePostParam('lng');
       Request::validatePostParam('uid');
-      Request::validatePostParam('image');
+      //image deprecated use images 07-09-2023
+      //Request::validatePostParam('image');
+      Request::validatePostParam('images');
       Request::validatePostParam('idUser');
 
       if (Common::getDeviceType() == 2) {
         Request::validatePostParam('size');
       }
 
-      if ($postData['image'] == '') Response::throwException('Pre nahlásenie nelegálnej skládky musíte nahrať obrázok');
+      if (empty($postData['images'])) Response::throwException('Pre nahlásenie nelegálnej skládky musíte nahrať obrázok');
+      //if ($postData['image'] == '') Response::throwException('Pre nahlásenie nelegálnej skládky musíte nahrať obrázok');
       if ($postData['choosenTypes'] == '') Response::throwException('Vyberte aspoň jeden typ odpadu nachádzajúci sa na skládke');
 
       $unknownUserModel = $bride->initModel('unknown_users');
@@ -439,47 +442,55 @@ try {
       }
 
       /** Images upload */
-      if (isset($postData['image'])) {
+      if (!empty($postData['images'])) {
         $filePath = FILES_DIR . '/nelegalne-skladky/' . $insertedIdSkladka;
 
         $galleryModel = $bride->initModel('gallery');
         $skladkyGalleryModel = $bride->initModel('skladky_gallery');
 
         if (!file_exists($filePath)) {
-          if (!mkdir($filePath, 0755, true)) {
+          if (!mkdir($filePath)) {
             Response::throwException('Nastala chyba pri nahrávaní obrázku');
           }
         }
         
-        if (strpos($postData['image'], 'data:image') !== false) {
-          $image = base64_decode(preg_replace('#^data:image/\w+;base64,#i', '', $postData['image']));
-          $ext = '.jpg';
-        } else {
-          // IOS
-          $image = str_replace(" ", "+", $postData['image']);
-          $image = base64_decode($image);
-          $ext = '.jpeg';
+        function uploadImage(string $image = ""): void {
+          global $filePath, $galleryModel, $insertedIdSkladka, $skladkyGalleryModel, $unknownUserData;
+
+          if (strpos($image, 'data:image') !== false) {
+            $image = base64_decode(preg_replace('#^data:image/\w+;base64,#i', '', $image));
+            $ext = '.jpg';
+          } else {
+            // IOS
+            $image = str_replace(" ", "+", $image);
+            $image = base64_decode($image);
+            $ext = '.jpeg';
+          }
+  
+          $countExistingImages = count(scandir($filePath)) - 2;
+          $newName = ($countExistingImages + 1) . $ext;
+  
+          $imagePath = $filePath . '/' . $newName;
+        
+          if (!file_put_contents($imagePath, $image)) {
+            Response::throwException('Error with images uploading');
+          }
+  
+          $idGallery = $galleryModel->insert([
+            'link' => $newName,
+            'created_at' => date('Y-m-d H:i:s')
+          ]);
+  
+          $skladkyGalleryModel->insert([
+            'id_skladka' => (int) $insertedIdSkladka,
+            'id_gallery' => (int) $idGallery,
+            'id_unknown_user' => (int) $unknownUserData['id']
+          ]);
         }
 
-        $countExistingImages = count(scandir($filePath)) - 2;
-        $newName = ($countExistingImages + 1) . $ext;
-
-        $imagePath = $filePath . '/' . $newName;
-      
-        if (!file_put_contents($imagePath, $image)) {
-          Response::throwException('Error with images uploading');
+        foreach ($postData['images'] as $image) {
+          uploadImage($image);
         }
-
-        $idGallery = $galleryModel->insert([
-          'link' => $newName,
-          'created_at' => date('Y-m-d H:i:s')
-        ]);
-
-        $skladkyGalleryModel->insert([
-          'id_skladka' => (int)$insertedIdSkladka,
-          'id_gallery' => (int)$idGallery,
-          'id_unknown_user' => (int)$unknownUserData['id']
-        ]);
       }
 
       $infoMailer = new Mailer();
