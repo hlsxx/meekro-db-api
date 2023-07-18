@@ -175,6 +175,9 @@
 #VERSION 0.43
 - Pridane images
 
+#VERSION 0.44
+- Vycistis pridane afterPhotos a beforePhotos
+
 TODO: 
 - FILTROVANIE vracianie zoradenie podla vzdialenosti
 - FILTROVANIE pomocou typu odpadu

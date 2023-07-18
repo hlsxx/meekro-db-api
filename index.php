@@ -547,10 +547,14 @@ try {
 
       Request::validatePostParam('idSkladka');
       Request::validatePostParam('uid');
-      Request::validatePostParam('afterPhoto');
+      // DEPRECATED 18-07-2023 replace by afterPhotos
+      //Request::validatePostParam('afterPhoto');
+      Request::validatePostParam('afterPhotos');
+      Request::validatePostParam('beforePhotos');
       Request::validatePostParam('idUser');
 
-      if ($postData['afterPhoto'] == '') Response::throwException('Musíte nahrať obrázok vyčisteného miesta skládky');
+      if (empty($postData['beforePhotos'])) Response::throwException('Musíte nahrať obrázok pred vyčistením');
+      if (empty($postData['afterPhotos'])) Response::throwException('Musíte nahrať obrázok vyčisteného miesta skládky');
 
       $unknownUserModel = $bride->initModel('unknown_users');
       $unknownUserData = $unknownUserModel->getByCustom('uid', $postData['uid']);
@@ -604,35 +608,47 @@ try {
         }
       }
       
-      if (strpos($postData['afterPhoto'], 'data:image') !== false) {
-        $image = base64_decode(preg_replace('#^data:image/\w+;base64,#i', '', $postData['afterPhoto']));
-        $ext = '.jpg';
-      } else {
-        // IOS
-        $image = str_replace(" ", "+", $postData['afterPhoto']);
-        $image = base64_decode($image);
-        $ext = '.jpeg';
+      function uploadImage(string $image = "", string $type): void {
+        global $filePath, $galleryModel, $idSkladkaVycistena, $skladkyVycisteneGalleryModel, $unknownUserData;
+
+        if (strpos($image, 'data:image') !== false) {
+          $image = base64_decode(preg_replace('#^data:image/\w+;base64,#i', '', $image));
+          $ext = '.jpg';
+        } else {
+          // IOS
+          $image = str_replace(" ", "+", $image);
+          $image = base64_decode($image);
+          $ext = '.jpeg';
+        }
+
+        $countExistingImages = count(scandir($filePath)) - 2;
+        $newName = ($countExistingImages + 1) . $type . $ext;
+
+        $imagePath = $filePath . '/' . $newName;
+      
+        if (!file_put_contents($imagePath, $image)) {
+          Response::throwException('Error with images uploading');
+        }
+
+        $idGallery = $galleryModel->insert([
+          'link' => $newName,
+          'created_at' => date('Y-m-d H:i:s')
+        ]);
+
+        $skladkyVycisteneGalleryModel->insert([
+          'id_skladka_vycistena' => (int) $idSkladkaVycistena,
+          'id_gallery' => (int) $idGallery,
+          'id_unknown_user' => (int) $unknownUserData['id']
+        ]);
       }
 
-      $countExistingImages = count(scandir($filePath)) - 2;
-      $newName = ($countExistingImages + 1) . '_cleaned' . $ext;
-
-      $imagePath = $filePath . '/' . $newName;
-    
-      if (!file_put_contents($imagePath, $image)) {
-        Response::throwException('Nastala chyba pri nahrávaní obrázku');
+      foreach ($postData['beforePhotos'] as $image) {
+        uploadImage($image, '_before');
       }
 
-      $idGallery = $galleryModel->insert([
-        'link' => $newName,
-        'created_at' => date('Y-m-d H:i:s')
-      ]);
-
-      $skladkyVycisteneGalleryModel->insert([
-        'id_skladka_vycistena' => (int)$idSkladkaVycistena,
-        'id_gallery' => (int)$idGallery,
-        'id_unknown_user' => (int)$unknownUserData['id']
-      ]);
+      foreach ($postData['afterPhotos'] as $image) {
+        uploadImage($image, '_cleaned');
+      }
 
       $infoMailer = new Mailer();
       $infoMailer->sendNotification();
