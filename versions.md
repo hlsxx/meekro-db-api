@@ -177,6 +177,7 @@
 
 #VERSION 0.44
 - Vycistis pridane afterPhotos a beforePhotos
+- skladky-vsetky-simple zjedodusene iba pre mapu
 
 TODO: 
 - FILTROVANIE vracianie zoradenie podla vzdialenosti

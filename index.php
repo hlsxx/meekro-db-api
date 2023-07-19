@@ -106,11 +106,19 @@ try {
         'data' => $skladkaFullData
       ]); 
     break;
-    case 'skladky-vsetky-simple': // GET | POST for filter
-      $skladkaModel = new SkladkaModel();
+    case 'skladky-vsetky-simple': // GET
+      $skladkaModel = $bride->initModel('skladky');
 
-      $data = [];
-      if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+      $skladkyData = $skladkaModel->query("
+        SELECT 
+          id,
+          lat,
+          lng
+        FROM {model}
+      ");
+
+      // DEPRECATED 19-07-2023 Replace with simple data
+      /*if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $postData = Request::getPostData();
 
         Request::validatePostParam('filter');
@@ -141,11 +149,11 @@ try {
             : $skladkaModel->getAll()
           ;
         }
-      }
+      }*/
 
       echo Response::getJson([
         'status' => 'success',
-        'data' => $data
+        'data' => $skladkyData
       ]); 
     break;
     case 'skladky-vsetky-simple-mapa': // GET
